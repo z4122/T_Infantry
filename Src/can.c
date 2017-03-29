@@ -48,7 +48,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "framework_debug.h"
 /* USER CODE END 0 */
 
 CAN_HandleTypeDef hcan1;

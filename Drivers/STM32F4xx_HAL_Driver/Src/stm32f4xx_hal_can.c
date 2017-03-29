@@ -141,6 +141,7 @@
   */
 static HAL_StatusTypeDef CAN_Receive_IT(CAN_HandleTypeDef* hcan, uint8_t FIFONumber);
 static HAL_StatusTypeDef CAN_Transmit_IT(CAN_HandleTypeDef* hcan);
+int testbusyrx = 0;
 /**
   * @}
   */
@@ -654,6 +655,7 @@ HAL_StatusTypeDef HAL_CAN_Transmit(CAN_HandleTypeDef* hcan, uint32_t Timeout)
     if(hcan->State == HAL_CAN_STATE_BUSY_TX_RX) 
     {
       /* Change CAN state */
+			testbusyrx = 4;
       hcan->State = HAL_CAN_STATE_BUSY_RX;
     }
     else
@@ -812,6 +814,7 @@ HAL_StatusTypeDef HAL_CAN_Receive(CAN_HandleTypeDef* hcan, uint8_t FIFONumber, u
   else
   {
     /* Change CAN state */
+		testbusyrx = 3;
     hcan->State = HAL_CAN_STATE_BUSY_RX;
   }
     
@@ -920,6 +923,7 @@ HAL_StatusTypeDef HAL_CAN_Receive_IT(CAN_HandleTypeDef* hcan, uint8_t FIFONumber
     else
     {
       /* Change CAN state */
+			testbusyrx = 1;
       hcan->State = HAL_CAN_STATE_BUSY_RX;
     }
     
@@ -1305,6 +1309,7 @@ static HAL_StatusTypeDef CAN_Transmit_IT(CAN_HandleTypeDef* hcan)
   if(hcan->State == HAL_CAN_STATE_BUSY_TX_RX) 
   {
     /* Change CAN state */
+		testbusyrx = 2;
     hcan->State = HAL_CAN_STATE_BUSY_RX;
   }
   else

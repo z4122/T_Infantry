@@ -52,7 +52,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "framework_debug.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -102,7 +102,7 @@ int main(void)
   MX_TIM2_Init();
 
   /* USER CODE BEGIN 2 */
-
+	
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -196,6 +196,13 @@ void Error_Handler(void)
   /* User can add his own implementation to report the HAL error return state */
   while(1) 
   {
+		fw_printfln("ERROR HANDLE");
+		uint16_t delayTime = 1000;
+		for(uint16_t i = 0; i < delayTime; i++)
+		{
+			uint16_t a = 42000; //at 168MHz 42000 is ok
+			while(a--);
+		}
   }
   /* USER CODE END Error_Handler */ 
 }

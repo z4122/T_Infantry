@@ -93,7 +93,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
     /* Peripheral clock enable */
     __HAL_RCC_TIM2_CLK_ENABLE();
   /* USER CODE BEGIN TIM2_MspInit 1 */
-
+	__HAL_TIM_ENABLE(&htim2);
   /* USER CODE END TIM2_MspInit 1 */
   }
 }
@@ -115,6 +115,9 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 } 
 
 /* USER CODE BEGIN 1 */
+uint32_t Get_Time_Micros(void){
+	return __HAL_TIM_GET_COUNTER(&htim2);
+}
 
 /* USER CODE END 1 */
 

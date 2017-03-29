@@ -82,7 +82,27 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
   if(i2cHandle->Instance==I2C1)
   {
   /* USER CODE BEGIN I2C1_MspInit 0 */
-
+		
+//		//GPIO配置为输出
+//		GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
+//		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//		GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+//		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+//		//强制上拉
+//		HAL_GPIO_WritePin(GPIOB, 8, GPIO_PIN_SET);
+//		HAL_GPIO_WritePin(GPIOB, 9, GPIO_PIN_SET);
+//		
+//		for(int i=0; i < 100; i++)
+//		{
+//			int a=42000; //at 168MHz 42000 is ok
+//			while(a--);
+//		}
+//		
+//		//复位I2C控制器
+//		i2cHandle->Instance->CR1 = I2C_CR1_SWRST;
+//		//解除复位
+//		i2cHandle->Instance->CR1 = 0;
+		
   /* USER CODE END I2C1_MspInit 0 */
   
     /**I2C1 GPIO Configuration    
