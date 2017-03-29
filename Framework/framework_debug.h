@@ -6,6 +6,7 @@
 
 
 #ifdef _FW_DEBUG
+	#include "stdio.h"
 	#define fw_printf(...) printf(__VA_ARGS__)
 #else
 	#define fw_printf(...)  

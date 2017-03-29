@@ -340,9 +340,9 @@ void printMPU6050Task(void const * argument){
 			mygetqval[4] = (float)mygy / 32.8f;
 			mygetqval[5] = (float)mygz / 32.8f;
 			
-			mygetqval[6] = (float)mymx - 38.0;
-			mygetqval[7] = (float)mymy - 102.5;
-			mygetqval[8] = (float)mymz - 15.5;
+			mygetqval[6] = (float)mymx - 38.0f;
+			mygetqval[7] = (float)mymy - 102.5f;
+			mygetqval[8] = (float)mymz - 15.5f;
 			
 			gYroX = mygetqval[3];
 			gYroY = mygetqval[4] - (-0.5);

@@ -47,11 +47,11 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>T_Infantry\</OutputDirectory>
+          <OutputDirectory>.\T_Infantry\</OutputDirectory>
           <OutputName>T_Infantry</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath></ListingPath>
@@ -133,11 +133,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4107</DriverSelection>
+            <DriverSelection>4100</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>STLink\ST-LINKIII-KEIL_SWO.dll</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -322,7 +322,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <v6Lang>1</v6Lang>
             <v6LangP>1</v6LangP>
@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F405xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Drivers/CMSIS/Include;..\Framework</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -385,9 +385,6 @@
               <FilePath>startup_stm32f405xx.s</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
           <GroupName>Middlewares/FreeRTOS</GroupName>
@@ -598,6 +595,109 @@
               <FilePath>../Src/system_stm32f4xx.c</FilePath>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>Application/User/Framework</GroupName>
+          <Files>
+            <File>
+              <FileName>framework_debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_debug.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_debug.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_debug.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_flash.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_flash.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_gycan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_gycan.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_gycan.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_gycan.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_iopool.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_iopool.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_iopool.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_iopool.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_led.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_led.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_led.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_motorcan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_motorcan.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_motorcan.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_motorcan.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_mpu6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_mpu6050.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_mpu6050.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_mpu6050address.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_mpu6050address.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_remotecontrol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_remotecontrol.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_remotecontrol.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_remotecontrol.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_uart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_uart.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>

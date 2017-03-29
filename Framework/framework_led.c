@@ -22,9 +22,9 @@ void ledGTask(void const * argument){
 			ledGOff();
 		}else if(ledGStatus == blink){
 			ledGOn();
-			osDelay(111);
+			osDelay(999);
 			ledGOff();
-			osDelay(111);
+			osDelay(234);
 		}
 	}
 }
@@ -37,9 +37,9 @@ void ledRTask(void const * argument){
 			ledROff();
 		}else if(ledRStatus == blink){
 			ledROn();
-			osDelay(555);
+			osDelay(88);
 			ledROff();
-			osDelay(222);
+			osDelay(88);
 		}
 	}
 }

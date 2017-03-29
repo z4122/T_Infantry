@@ -853,13 +853,13 @@ ARM Macro Assembler    Page 14
               00000000 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
-erwork --depend=t_infantry\startup_stm32f405xx.d -ot_infantry\startup_stm32f405
-xx.o -I..\Inc -IC:\LST\robot\stm32\workspace\T_Infantry\MDK-ARM\RTE\_T_Infantry
- -IC:\LST\programs\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.0\CMSIS\Include -IC:\LST\prog
-rams\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM32F4
-xx\Include --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 
-522" --predefine="_RTE_ SETA 1" --predefine="STM32F405xx SETA 1" --list=startup
-_stm32f405xx.lst startup_stm32f405xx.s
+erwork --depend=.\t_infantry\startup_stm32f405xx.d -o.\t_infantry\startup_stm32
+f405xx.o -I..\Inc -IC:\LST\robot\stm32\workspace\T_Infantry\MDK-ARM\RTE\_T_Infa
+ntry -IC:\LST\programs\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.0\CMSIS\Include -IC:\LST\
+programs\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM
+32F4xx\Include --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION S
+ETA 522" --predefine="_RTE_ SETA 1" --predefine="STM32F405xx SETA 1" --list=sta
+rtup_stm32f405xx.lst startup_stm32f405xx.s
 
 
 
