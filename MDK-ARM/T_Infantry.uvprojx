@@ -597,76 +597,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Framework</GroupName>
-          <Files>
-            <File>
-              <FileName>framework_gycan.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_gycan.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_gycan.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_gycan.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_led.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_led.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_led.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_motorcan.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_motorcan.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_motorcan.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_motorcan.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_mpu6050.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_mpu6050.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_mpu6050.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_mpu6050.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_mpu6050address.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_mpu6050address.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_remotecontrol.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_remotecontrol.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_remotecontrol.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_remotecontrol.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_uart.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_uart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_uart.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Framework/FreeRTOS</GroupName>
           <Files>
             <File>
@@ -705,24 +635,24 @@
           <GroupName>Framework/Utilities</GroupName>
           <Files>
             <File>
-              <FileName>framework_iopool.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_iopool.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_iopool.c</FileName>
+              <FileName>framework_utilities_debug.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_iopool.c</FilePath>
+              <FilePath>..\Framework\framework_utilities_debug.c</FilePath>
             </File>
             <File>
-              <FileName>framework_debug.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_debug.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_debug.h</FileName>
+              <FileName>framework_utilities_debug.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_debug.h</FilePath>
+              <FilePath>..\Framework\framework_utilities_debug.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_utilities_iopool.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_utilities_iopool.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_utilities_iopool.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_utilities_iopool.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -730,19 +660,84 @@
           <GroupName>Framework/Drivers</GroupName>
           <Files>
             <File>
-              <FileName>framework_flash.c</FileName>
+              <FileName>framework_drivers_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_flash.c</FilePath>
+              <FilePath>..\Framework\framework_drivers_flash.c</FilePath>
             </File>
             <File>
-              <FileName>framework_flash.h</FileName>
+              <FileName>framework_drivers_flash.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_flash.h</FilePath>
+              <FilePath>..\Framework\framework_drivers_flash.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_ledtask.h</FileName>
+              <FileName>framework_drivers_gycan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_drivers_gycan.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_gycan.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_ledtask.h</FilePath>
+              <FilePath>..\Framework\framework_drivers_gycan.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_drivers_led.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_led.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_led.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_led_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_led_task.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_motorcan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_drivers_motorcan.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_motorcan.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_motorcan.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_mpu6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_drivers_mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_mpu6050.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_mpu6050.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_mpu6050_address.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_mpu6050_address.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_remotecontrol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_drivers_remotecontrol.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_remotecontrol.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_remotecontrol.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_drivers_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_uart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_uart.h</FilePath>
             </File>
           </Files>
         </Group>

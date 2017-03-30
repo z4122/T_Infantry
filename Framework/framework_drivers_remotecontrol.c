@@ -1,7 +1,7 @@
-#include "framework_remotecontrol.h"
+#include "framework_drivers_remotecontrol.h"
 
-#include "framework_iopool.h"
-#include "framework_led.h"
+#include "framework_utilities_iopool.h"
+#include "framework_drivers_led.h"
 #include "usart.h"
 
 /*****Begin define ioPool*****/

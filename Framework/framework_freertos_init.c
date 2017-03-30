@@ -1,12 +1,12 @@
 #include "framework_freertos_init.h"
 
-#include "framework_debug.h"
-#include "framework_iopool.h"
-#include "framework_led.h"
-#include "framework_remotecontrol.h"
-#include "framework_motorcan.h"
-#include "framework_mpu6050.h"
-#include "framework_uart.h"
+#include "framework_utilities_debug.h"
+#include "framework_utilities_iopool.h"
+#include "framework_drivers_led.h"
+#include "framework_drivers_remotecontrol.h"
+#include "framework_drivers_motorcan.h"
+#include "framework_drivers_mpu6050.h"
+#include "framework_drivers_uart.h"
 
 void fw_freertos_init(){
 	//wait for devices

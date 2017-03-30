@@ -1,9 +1,9 @@
-#include "framework_motorcan.h"
+#include "framework_drivers_motorcan.h"
 
 #include "cmsis_os.h"
 #include "can.h"
-#include "framework_debug.h"
-#include "framework_iopool.h"
+#include "framework_utilities_debug.h"
+#include "framework_utilities_iopool.h"
 
 #define MINMAX(value, min, max) value = (value < min) ? min : (value > max ? max : value)
 //void motorInit(void){}

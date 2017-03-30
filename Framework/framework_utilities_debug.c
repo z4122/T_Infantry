@@ -1,4 +1,4 @@
-#include "framework_debug.h"
+#include "framework_utilities_debug.h"
 
 //µ÷ÊÔÊ±¿ªÆô
 #ifdef _FW_DEBUG

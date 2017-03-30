@@ -1,10 +1,10 @@
-#include "framework_mpu6050.h"
-#include "framework_mpu6050address.h"
+#include "framework_drivers_mpu6050.h"
+#include "framework_drivers_mpu6050_address.h"
 
 #include "cmsis_os.h"
 #include "i2c.h"
-#include "framework_debug.h"
-#include "framework_iopool.h"
+#include "framework_utilities_debug.h"
+#include "framework_utilities_iopool.h"
 
 /*****Begin define ioPool*****/
 #define IOPoolName0 mpuI2CIOPool 

@@ -1,8 +1,8 @@
-#include "framework_uart.h"
+#include "framework_drivers_uart.h"
 
-#include "framework_iopool.h"
-#include "framework_remotecontrol.h"
-#include "framework_debug.h"
+#include "framework_utilities_iopool.h"
+#include "framework_drivers_remotecontrol.h"
+#include "framework_utilities_debug.h"
 #include "usart.h"
 
 /*****Begin define ioPool*****/
@@ -46,7 +46,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 	}
 }   
 
-#include "framework_flash.h"
+#include "framework_drivers_flash.h"
 extern float yawAngleTarget, pitchAngleTarget;
 void printCtrlUartTask(void const * argument){
 	uint8_t data[10];
