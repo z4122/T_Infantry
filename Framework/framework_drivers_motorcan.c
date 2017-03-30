@@ -271,7 +271,6 @@ void controlMotorTask(void const * argument){
 }
 
 extern osSemaphoreId motorCanTransmitSemaphoreHandle;
-extern int testbusyrx;
 void motorCanTransmitTask(void const * argument){
 	//osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
 	while(1){
@@ -304,7 +303,6 @@ void motorCanTransmitTask(void const * argument){
 			if(HAL_CAN_Receive_IT(&motorCan, CAN_FIFO0) != HAL_OK){
 				fw_Warning();
 				fw_printf("canstate=%x\r\n", motorCan.State);
-				fw_printf("testbusyrx=%d\r\n", testbusyrx);
 			}else{
 				//fw_Warning();
 				isRcanStarted = 1;

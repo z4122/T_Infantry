@@ -600,26 +600,6 @@
           <GroupName>Framework</GroupName>
           <Files>
             <File>
-              <FileName>framework_debug.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_debug.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_debug.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_debug.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_flash.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_flash.h</FilePath>
-            </File>
-            <File>
               <FileName>framework_gycan.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\framework_gycan.c</FilePath>
@@ -628,16 +608,6 @@
               <FileName>framework_gycan.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\framework_gycan.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_iopool.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_iopool.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_iopool.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_iopool.h</FilePath>
             </File>
             <File>
               <FileName>framework_led.c</FileName>
@@ -700,14 +670,79 @@
           <GroupName>Framework/FreeRTOS</GroupName>
           <Files>
             <File>
-              <FileName>framework_freertos.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_freertos.c</FilePath>
+              <FileName>framework_freertos_init.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_freertos_init.h</FilePath>
             </File>
             <File>
-              <FileName>framework_freertos.h</FileName>
+              <FileName>framework_freertos_init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_freertos_init.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_freertos_semaphore.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_freertos_semaphore.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_freertos_semaphore.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_freertos.h</FilePath>
+              <FilePath>..\Framework\framework_freertos_semaphore.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_freertos_task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_freertos_task.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_freertos_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_freertos_task.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Framework/Utilities</GroupName>
+          <Files>
+            <File>
+              <FileName>framework_iopool.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_iopool.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_iopool.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_iopool.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_debug.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_debug.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_debug.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Framework/Drivers</GroupName>
+          <Files>
+            <File>
+              <FileName>framework_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_flash.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_flash.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_ledtask.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_ledtask.h</FilePath>
             </File>
           </Files>
         </Group>

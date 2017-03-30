@@ -1,7 +1,6 @@
 #ifndef FRAMEWORK_FLASH_H
 #define FRAMEWORK_FLASH_H
 
-#include "cmsis_os.h"
 //FLASH起始地址
 #define STM32_FLASH_BASE 0x08000000 	//STM32 FLASH的起始地址
 
