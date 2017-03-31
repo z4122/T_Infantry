@@ -1,28 +1,28 @@
 #include "framework_drivers_uart.h"
 
 #include "framework_utilities_iopool.h"
-#include "framework_drivers_remotecontrol.h"
+#include "framework_drivers_uartremotecontrol.h"
 #include "framework_utilities_debug.h"
 #include "usart.h"
 
 /*****Begin define ioPool*****/
-#define IOPoolName0 ctrlUartIOPool 
-#define DataType struct{uint8_t ch[10];}
 #define DataPoolInit {0}
 #define ReadPoolSize 1
 #define ReadPoolMap {0}
 #define GetIdFunc 0 
 #define ReadPoolInit {0, Empty, 1}
 
-DefineIOPool(IOPoolName0, DataType, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
-	
-#undef DataType
+IOPoolDeclare(ctrlUartIOPool, struct{uint8_t ch[10];});
+IOPoolDefine(ctrlUartIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
+
 #undef DataPoolInit 
 #undef ReadPoolSize 
 #undef ReadPoolMap
 #undef GetIdFunc
 #undef ReadPoolInit
 /*****End define ioPool*****/
+
+#define ctrlUart huart3
 
 void ctrlUartInit(){
 	//crtl DMA接收开启(一次接收10个字节)

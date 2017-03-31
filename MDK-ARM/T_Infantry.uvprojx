@@ -720,16 +720,6 @@
               <FilePath>..\Framework\framework_drivers_mpu6050_address.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_remotecontrol.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_drivers_remotecontrol.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_drivers_remotecontrol.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_remotecontrol.h</FilePath>
-            </File>
-            <File>
               <FileName>framework_drivers_uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\framework_drivers_uart.c</FilePath>
@@ -738,6 +728,61 @@
               <FileName>framework_drivers_uart.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\framework_drivers_uart.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_uartupper.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_drivers_uartupper.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_uartupper.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_uartupper.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_uartupper_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_uartupper_task.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_uartupper_iopool.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_uartupper_iopool.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_uartremotecontrol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_drivers_uartremotecontrol.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_uartremotecontrol.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_uartremotecontrol.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_uartremotecontrol_task.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_uartremotecontrol_task.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_uartremotecontrol_iopool.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_uartremotecontrol_iopool.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Framework/Tasks</GroupName>
+          <Files>
+            <File>
+              <FileName>framework_tasks_remotecontrol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_tasks_remotecontrol.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_remotecontrol.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_tasks_remotecontrol.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -7,17 +7,15 @@
 #include "framework_utilities_iopool.h"
 
 /*****Begin define ioPool*****/
-#define IOPoolName0 mpuI2CIOPool 
-#define DataType struct{uint8_t ch[20];}
 #define DataPoolInit {0}
 #define ReadPoolSize 1
 #define ReadPoolMap {0}
 #define GetIdFunc 0 
 #define ReadPoolInit {0, Empty, 1}
 
-DefineIOPool(IOPoolName0, DataType, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
-	
-#undef DataType
+IOPoolDeclare(mpuI2CIOPool, struct{uint8_t ch[20];});
+IOPoolDefine(mpuI2CIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
+
 #undef DataPoolInit 
 #undef ReadPoolSize 
 #undef ReadPoolMap

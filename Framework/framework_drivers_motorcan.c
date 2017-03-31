@@ -19,17 +19,15 @@
 #define MOTORPITCH_ID 0x206u
 
 /*****Begin define ioPool*****/
-#define IOPoolName0 motorCanRxIOPool
-#define DataType CanRxMsgTypeDef
 #define DataPoolInit {0}
 #define ReadPoolSize 6
 #define ReadPoolMap {MOTOR1_ID, MOTOR2_ID, MOTOR3_ID, MOTOR4_ID, MOTORYAW_ID, MOTORPITCH_ID}
 #define GetIdFunc (data.StdId)
 #define ReadPoolInit {{0, Empty, 1}, {2, Empty, 3}, {4, Empty, 5}, {6, Empty, 7}, {8, Empty, 9},{10, Empty, 11}}
 
-DefineIOPool(IOPoolName0, DataType, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
+IOPoolDeclare(motorCanRxIOPool, CanRxMsgTypeDef);
+IOPoolDefine(motorCanRxIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
 
-#undef DataType
 #undef DataPoolInit 
 #undef ReadPoolSize 
 #undef ReadPoolMap
@@ -40,13 +38,6 @@ DefineIOPool(IOPoolName0, DataType, DataPoolInit, ReadPoolSize, ReadPoolMap, Get
 #define MOTORCM_ID 0x200u
 #define MOTORGIMBAL_ID 0x1FFu
 /*****Begin define ioPool*****/
-#define IOPoolName1 motorCanTxIOPool
-#define DataType CanTxMsgTypeDef
-//#define DataPoolInit {MOTORCM_ID, 0, CAN_ID_STD, CAN_RTR_DATA, 8, {0}}
-//#define ReadPoolSize 1
-//#define ReadPoolMap {0}
-//#define GetIdFunc 0
-//#define ReadPoolInit {0, Empty, 1}
 #define DataPoolInit \
 	{ \
 		{MOTORCM_ID, 0, CAN_ID_STD, CAN_RTR_DATA, 8, {0}}, \
@@ -60,11 +51,11 @@ DefineIOPool(IOPoolName0, DataType, DataPoolInit, ReadPoolSize, ReadPoolMap, Get
 #define GetIdFunc (data.StdId)
 #define ReadPoolInit {{0, Empty, 1}, {2, Empty, 3}}
 
-DefineIOPool(IOPoolName1, DataType, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
+IOPoolDeclare(motorCanTxIOPool, CanTxMsgTypeDef);
+IOPoolDefine(motorCanTxIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
 
-#undef DataType
-#undef DataPoolInit
-#undef ReadPoolSize
+#undef DataPoolInit 
+#undef ReadPoolSize 
 #undef ReadPoolMap
 #undef GetIdFunc
 #undef ReadPoolInit

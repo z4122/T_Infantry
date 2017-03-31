@@ -1,47 +1,8 @@
-#include "framework_drivers_remotecontrol.h"
-
-#include "framework_utilities_iopool.h"
+#include "framework_tasks_remotecontrol.h"
+#include "framework_drivers_uartremotecontrol_iopool.h"
 #include "framework_drivers_led.h"
-#include "usart.h"
-
-/*****Begin define ioPool*****/
-#define IOPoolName0 rcUartIOPool 
-#define DataType struct{uint8_t ch[18];}
-#define DataPoolInit {0}
-#define ReadPoolSize 1
-#define ReadPoolMap {0}
-#define GetIdFunc 0 
-#define ReadPoolInit {0, Empty, 1}
-
-DefineIOPool(IOPoolName0, DataType, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
-	
-#undef DataType
-#undef DataPoolInit 
-#undef ReadPoolSize 
-#undef ReadPoolMap
-#undef GetIdFunc
-#undef ReadPoolInit
-/*****End define ioPool*****/
-
-void rcInit(){
-	//遥控器DMA接收开启(一次接收18个字节)
-	if(HAL_UART_Receive_DMA(&rcUart, IOPool_pGetWriteData(rcUartIOPool)->ch, 18) != HAL_OK){
-			Error_Handler();
-	} 
-}
-
-void rcUartRxCpltCallback(){
-	//osStatus osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec);
-	IOPool_getNextWrite(rcUartIOPool);
-	HAL_UART_Receive_DMA(&rcUart, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
-}
-
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
-//{
-//	if(UartHandle == &rcUart){
-//		rcUartRxCpltCallback();
-//	}
-//}   
+#include "stdint.h"
+#include "stddef.h"
 
 typedef struct{
 	int16_t ch0;
