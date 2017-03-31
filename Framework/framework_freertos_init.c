@@ -2,11 +2,11 @@
 
 #include "framework_utilities_debug.h"
 #include "framework_utilities_iopool.h"
-#include "framework_drivers_led.h"
-#include "framework_drivers_uartremotecontrol_task.h"
-#include "framework_drivers_motorcan.h"
+#include "framework_drivers_led_user.h"
+#include "framework_drivers_canmotor_low.h"
 #include "framework_drivers_mpu6050.h"
-#include "framework_drivers_uart.h"
+#include "framework_drivers_uartupper_low.h"
+#include "framework_drivers_uartremotecontrol_low.h"
 
 void fw_freertos_init(){
 	//wait for devices
