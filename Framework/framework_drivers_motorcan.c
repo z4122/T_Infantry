@@ -147,7 +147,7 @@ void printMotorTask(void const * argument){
 }
 
 int16_t yawZeroAngle = 1075, pitchZeroAngle = 710;
-float yawAngleTarget = 0.0, pitchAngleTarget = 0.0;
+float yawAngleTarget = 0.0, pitchAngleTarget = 8.0;
 extern float gYroX, gYroY, gYroZ;
 void controlMotorTask(void const * argument){
 //	int16_t testSpeed = 10000;
