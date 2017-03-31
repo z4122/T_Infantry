@@ -695,9 +695,14 @@
               <FilePath>..\Framework\framework_drivers_led.c</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_mpu6050.h</FileName>
+              <FileName>framework_drivers_mpu6050_user.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_mpu6050.h</FilePath>
+              <FilePath>..\Framework\framework_drivers_mpu6050_user.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_mpu6050_low.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_mpu6050_low.h</FilePath>
             </File>
             <File>
               <FileName>framework_drivers_mpu6050_address.h</FileName>
@@ -798,6 +803,16 @@
               <FileName>framework_tasks_motor.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\framework_tasks_motor.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_mpu6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_tasks_mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_mpu6050.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_tasks_mpu6050.h</FilePath>
             </File>
           </Files>
         </Group>

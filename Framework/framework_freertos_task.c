@@ -8,7 +8,8 @@
 #include "framework_tasks_upper.h"
 #include "framework_drivers_canmotor_low.h"
 #include "framework_tasks_motor.h"
-#include "framework_drivers_mpu6050.h"
+#include "framework_drivers_mpu6050_low.h"
+#include "framework_tasks_mpu6050.h"
 
 
 osThreadId ledGTaskHandle;

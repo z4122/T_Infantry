@@ -4,7 +4,7 @@
 #include "framework_utilities_iopool.h"
 #include "framework_drivers_led_user.h"
 #include "framework_drivers_canmotor_low.h"
-#include "framework_drivers_mpu6050.h"
+#include "framework_drivers_mpu6050_low.h"
 #include "framework_drivers_uartupper_low.h"
 #include "framework_drivers_uartremotecontrol_low.h"
 
