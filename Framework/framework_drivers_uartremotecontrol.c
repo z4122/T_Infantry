@@ -20,7 +20,7 @@ IOPoolDefine(rcUartIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, R
 /*****End define ioPool*****/
 
 void rcInit(){
-	//Ò£¿ØÆ÷DMA½ÓÊÕ¿ªÆô(Ò»´Î½ÓÊÕ18¸ö×Ö½Ú)
+	//é¥æŽ§å™¨DMAæŽ¥æ”¶å¼€å¯(ä¸€æ¬¡æŽ¥æ”¶18ä¸ªå­—èŠ‚)
 	if(HAL_UART_Receive_DMA(&rcUart, IOPool_pGetWriteData(rcUartIOPool)->ch, 18) != HAL_OK){
 			Error_Handler();
 	} 

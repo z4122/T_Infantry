@@ -90,7 +90,7 @@ void printMPU6050Task(void const * argument){
 			my = mygetqval[7];
 			mz = mygetqval[8];		
 
-			now = Get_Time_Micros();  //ׁȡʱݤ եλˇus   
+			now = Get_Time_Micros();  //读取时间 单位是us   
 			if(now<lastUpdate)
 			{
 			//halfT =  ((float)(now + (0xffffffff- lastUpdate)) / 2000000.0f);   //  uint 0.5s
@@ -99,13 +99,13 @@ void printMPU6050Task(void const * argument){
 			{
 					halfT =  ((float)(now - lastUpdate) / 2000000.0f);
 			}
-			lastUpdate = now;	//ټтʱݤ
-			//̙ࠬȳƽ׽ٹ̣ר
+			lastUpdate = now;	//更新时间
+			//快速求平方根算法
 			norm = invSqrt(ax*ax + ay*ay + az*az);       
 			ax = ax * norm;
 			ay = ay * norm;
 			az = az * norm;
-			//ёݓ݆քɽάвתԉեλвc
+			//把加计的三维向量转成单位向量。
 			norm = invSqrt(mx*mx + my*my + mz*mz);          
 			mx = mx * norm;
 			my = my * norm;
@@ -133,18 +133,18 @@ void printMPU6050Task(void const * argument){
 					exInt = exInt + ex * Ki * halfT;
 					eyInt = eyInt + ey * Ki * halfT;	
 					ezInt = ezInt + ez * Ki * halfT;
-					// ԃӦܽϳӮ4ضPIўֽΓÝ£ƫ
+					// 用叉积误差来做PI修正陀螺零偏
 					gx = gx + Kp*ex + exInt;
 					gy = gy + Kp*ey + eyInt;
 					gz = gz + Kp*ez + ezInt;
 			}
-			// ̄Ԫ˽΢ؖ׽Ԍ
+			// 四元数微分方程
 			tempq0 = q0 + (-q1*gx - q2*gy - q3*gz)*halfT;
 			tempq1 = q1 + (q0*gx + q2*gz - q3*gy)*halfT;
 			tempq2 = q2 + (q0*gy - q1*gz + q3*gx)*halfT;
 			tempq3 = q3 + (q0*gz + q1*gy - q2*gx)*halfT;  
 
-			// ̄Ԫ˽ڦ׶ۯ
+			// 四元数规范化
 			norm = invSqrt(tempq0*tempq0 + tempq1*tempq1 + tempq2*tempq2 + tempq3*tempq3);
 			q0 = tempq0 * norm;
 			q1 = tempq1 * norm;
@@ -152,7 +152,7 @@ void printMPU6050Task(void const * argument){
 			q3 = tempq3 * norm;
 			
 			float q[4];
-			q[0] = q0; //׵ܘձǰֵ
+			q[0] = q0; //返回当前值
 			q[1] = q1;
 			q[2] = q2;
 			q[3] = q3;
@@ -177,7 +177,7 @@ void printMPU6050Task(void const * argument){
 				static int yaw_count = 0;
 				last_yaw_temp = yaw_temp;
 				yaw_temp = angles[0]; 
-				if(yaw_temp-last_yaw_temp>=330)  //yawסއ׈ޭڽԦm۳ҤԉlѸք
+				if(yaw_temp-last_yaw_temp>=330)  //yaw轴角度经过处理后变成连续的
 				{
 					yaw_count--;
 				}
