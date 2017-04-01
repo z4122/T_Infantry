@@ -26,7 +26,7 @@ void ctrlUartRxCpltCallback(){
 }
 
 void ctrlUartInit(){
-	//crtl DMA½ÓÊÕ¿ªÆô(Ò»´Î½ÓÊÕ10¸ö×Ö½Ú)
+	//crtl DMAæŽ¥æ”¶å¼€å¯(ä¸€æ¬¡æŽ¥æ”¶10ä¸ªå­—èŠ‚)
 	if(HAL_UART_Receive_DMA(&ctrlUart, IOPool_pGetWriteData(ctrlUartIOPool)->ch, 10) != HAL_OK){
 			Error_Handler();
 	} 

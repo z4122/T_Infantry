@@ -27,8 +27,8 @@ IOPoolDefine(mpuI2CIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, R
 
 void I2C_Error_Handler(I2C_HandleTypeDef *hi2c){
 //	fw_printfln("I2C_Error_Handler");
-//	HAL_I2C_DeInit(hi2c);//ÊÍ·ÅIO¿ÚÎªGPIO,¸´Î»¾ä±ú×´Ì¬±êÖ¾
-//	HAL_I2C_Init(hi2c);//ÖØĞÂ³õÊ¼»¯I2C¿ØÖÆÆ÷
+//	HAL_I2C_DeInit(hi2c);//é‡Šæ”¾IOå£ä¸ºGPIO,å¤ä½å¥æŸ„çŠ¶æ€æ ‡å¿—
+//	HAL_I2C_Init(hi2c);//é‡æ–°åˆå§‹åŒ–I2Cæ§åˆ¶å™¨
 }
 
 void IIC_WriteData(uint8_t dev_addr, uint8_t reg_addr, uint8_t data){
@@ -92,11 +92,11 @@ void mpu6050Init(void){
 	//osDelay(5);
 	IIC_WriteData(HMC5883_ADDRESS, HMC58X3_R_CONFB,0xA0);
 	//osDelay(5);
-	IIC_WriteData(HMC5883_ADDRESS, HMC58X3_R_MODE,0x00);    //ÕâÀï³õÊ¼»¯Îª0x00 Á¬ĞøÄ£Ê½
+	IIC_WriteData(HMC5883_ADDRESS, HMC58X3_R_MODE,0x00);    //è¿™é‡Œåˆå§‹åŒ–ä¸º0x00 è¿ç»­æ¨¡å¼
 	//wait the response of the hmc5883 stabalizes, 6 milliseconds 
 	//osDelay(6);
 	//set DOR
-	IIC_WriteData(HMC5883_ADDRESS, HMC58X3_R_CONFA,6<<2);   //75HZ¸üĞÂ
+	IIC_WriteData(HMC5883_ADDRESS, HMC58X3_R_CONFA,6<<2);   //75HZæ›´æ–°
 	
 	fw_printfln("success MPU6050 init");
 }
@@ -115,11 +115,11 @@ float invSqrt(float x) {
 	y = y * (1.5f - (halfx * y * y));
 	return y;
 }
-//³õÊ¼»¯IMUÊı¾İ
-#define BOARD_DOWN 1   //°å×ÓÕıÃæ³¯ÏÂ°Ú·Å
+//åˆå§‹åŒ–IMUæ•°æ®
+#define BOARD_DOWN 1   //æ¿å­æ­£é¢æœä¸‹æ‘†æ”¾
 
 #include "math.h"
-void Init_Quaternion()//¸ù¾İ²âÁ¿Êı¾İ£¬³õÊ¼»¯q0,q1,q2.q3£¬´Ó¶ø¼Ó¿ìÊÕÁ²ËÙ¶È
+void Init_Quaternion()//æ ¹æ®æµ‹é‡æ•°æ®ï¼Œåˆå§‹åŒ–q0,q1,q2.q3ï¼Œä»è€ŒåŠ å¿«æ”¶æ•›é€Ÿåº¦
 {
 	int16_t hx,hy,hz;
 	//fw_printfln("wait for mpuI2CIOPool");
@@ -293,7 +293,7 @@ void Init_Quaternion()//¸ù¾İ²âÁ¿Êı¾İ£¬³õÊ¼»¯q0,q1,q2.q3£¬´Ó¶ø¼Ó¿ìÊÕÁ²ËÙ¶È
 	}
 	#endif
 	
-	//¸ù¾İhx hy hzÀ´ÅĞ¶ÏqµÄÖµ£¬È¡ËÄ¸öÏà½üµÄÖµ×ö±Æ½ü¼´¿É,³õÊ¼Öµ¿ÉÒÔÓÉÅ·À­½Ç×ª»»µ½ËÄÔªÊı¼ÆËãµÃµ½
+	//æ ¹æ®hx hy hzæ¥åˆ¤æ–­qçš„å€¼ï¼Œå–å››ä¸ªç›¸è¿‘çš„å€¼åšé€¼è¿‘å³å¯,åˆå§‹å€¼å¯ä»¥ç”±æ¬§æ‹‰è§’è½¬æ¢åˆ°å››å…ƒæ•°è®¡ç®—å¾—åˆ°
 	 //fw_printfln("Init_Quaternion finish");
 }
 

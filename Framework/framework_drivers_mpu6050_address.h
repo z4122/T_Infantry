@@ -1,13 +1,13 @@
 #ifndef FRAMEWORK_MPU6050ADDRESS_H
 #define FRAMEWORK_MPU6050ADDRESS_H
 
-#define	SMPLRT_DIV		          0x19	//�����ǲ����� ����ֵ 0X07 125Hz
-#define	CONFIG			            0x1A	//��ͨ�˲�Ƶ�� ����ֵ 0x00 
-#define	GYRO_CONFIG		          0x1B	//�������Լ켰������Χ                 ����ֵ 0x18 ���Լ� 2000deg/s
-#define	ACCEL_CONFIG	          0x1C	//���ٶȼ��Լ켰������Χ����ͨ�˲�Ƶ�� ����ֵ 0x01 ���Լ� 2G 5Hz
+#define	SMPLRT_DIV		          0x19	//陀螺仪采样率 典型值 0X07 125Hz
+#define	CONFIG			            0x1A	//低通滤波频率 典型值 0x00 
+#define	GYRO_CONFIG		          0x1B	//陀螺仪自检及测量范围                 典型值 0x18 不自检 2000deg/s
+#define	ACCEL_CONFIG	          0x1C	//加速度计自检及测量范围及高通滤波频率 典型值 0x01 不自检 2G 5Hz
 #define INT_PIN_CFG               0x37
 #define INT_ENABLE                0x38
-#define INT_STATUS                0x3A    //ֻ��
+#define INT_STATUS                0x3A    //只读
 #define	ACCEL_XOUT_H	          0x3B
 #define	ACCEL_XOUT_L	          0x3C
 #define	ACCEL_YOUT_H	          0x3D
@@ -22,12 +22,12 @@
 #define	GYRO_YOUT_L		          0x46
 #define	GYRO_ZOUT_H		          0x47
 #define	GYRO_ZOUT_L		          0x48
-#define	PWR_MGMT_1		          0x6B	//��Դ���� ����ֵ 0x00 ��������
-#define	WHO_AM_I		            0x75	//ֻ��  Ĭ�϶���Ӧ���� MPU6050_ID = 0x68
+#define	PWR_MGMT_1		          0x6B	//电源管理 典型值 0x00 正常启用
+#define	WHO_AM_I		            0x75	//只读  默认读出应该是 MPU6050_ID = 0x68
 #define MPU6050_ID                0x68
 #define MPU6050_DEVICE_ADDRESS    0xD0
 
-#define MPU6050_DATA_START        ACCEL_XOUT_H   //�������ݴ�ŵ�ַ�������ģ�����һ������
+#define MPU6050_DATA_START        ACCEL_XOUT_H   //由于数据存放地址是连续的，所以一并读出
 #define MPU6050_RA_SELF_TEST_X                  0x0D
 #define MPU6050_RA_SLEF_TEST_Y                  0x0E
 #define MPU6050_RA_SELF_TEST_Z                  0x0F

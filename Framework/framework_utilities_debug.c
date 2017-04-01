@@ -1,6 +1,6 @@
 #include "framework_utilities_debug.h"
 
-//µ÷ÊÔÊ±¿ªÆô
+//è°ƒè¯•æ—¶å¼€å¯
 #ifdef _FW_DEBUG
 	#include "usart.h"
 	#ifdef __GNUC__
