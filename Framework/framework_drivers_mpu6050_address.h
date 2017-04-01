@@ -1,5 +1,5 @@
-#ifndef FRAMEWORK_MPU6050ADDRESS_H
-#define FRAMEWORK_MPU6050ADDRESS_H
+#ifndef FRAMEWORK_DRIVERS_MPU6050ADDRESS_H
+#define FRAMEWORK_DRIVERS_MPU6050ADDRESS_H
 
 #define	SMPLRT_DIV		          0x19	//陀螺仪采样率 典型值 0X07 125Hz
 #define	CONFIG			            0x1A	//低通滤波频率 典型值 0x00 

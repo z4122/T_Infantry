@@ -1,5 +1,5 @@
-#ifndef FRAMEWORK_FLASH_H
-#define FRAMEWORK_FLASH_H
+#ifndef FRAMEWORK_DRIVERS_FLASH_H
+#define FRAMEWORK_DRIVERS_FLASH_H
 
 #include "stdint.h"
 

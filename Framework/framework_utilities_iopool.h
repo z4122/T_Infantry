@@ -1,5 +1,5 @@
-#ifndef FRAMEWORK_IOPOOL_H
-#define FRAMEWORK_IOPOOL_H
+#ifndef FRAMEWORK_UTILITIES_IOPOOL_H
+#define FRAMEWORK_UTILITIES_IOPOOL_H
 
 #include <stdint.h>
 
