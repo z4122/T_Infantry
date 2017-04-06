@@ -1,6 +1,8 @@
 #include "framework_drivers_mpu6050_low.h"
 #include "framework_drivers_mpu6050_user.h"
 #include "framework_drivers_mpu6050_address.h"
+#include "framework_freertos_semaphore.h"
+#include "framework_tasks_testtasks.h"
 
 #include "cmsis_os.h"
 #include "i2c.h"
@@ -297,11 +299,9 @@ void Init_Quaternion()//根据测量数据，初始化q0,q1,q2.q3，从而加快
 	 //fw_printfln("Init_Quaternion finish");
 }
 
-
-extern osSemaphoreId readMPU6050SemaphoreHandle;
-extern osSemaphoreId refreshMPU6050SemaphoreHandle;
 void readMPU6050Task(void const * argument){
 	while(1){
+		readMPU6050Tasktaskcount++;
 		//fw_printfln("wait refresh");
 		osSemaphoreWait(refreshMPU6050SemaphoreHandle, osWaitForever);
 		//fw_printfln("wait read");
@@ -329,6 +329,7 @@ void readMPU6050Task(void const * argument){
 			}
 		}
 		IOPool_getNextWrite(mpuI2CIOPool);
+		osSemaphoreRelease(refreshIMUSemaphoreHandle);
 	}
 }
 

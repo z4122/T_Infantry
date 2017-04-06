@@ -4,6 +4,7 @@
 #include "framework_drivers_flash.h"
 
 #include "framework_utilities_debug.h"
+#include "framework_tasks_testtasks.h"
 
 extern uint16_t yawAngle, pitchAngle;
 
@@ -11,6 +12,7 @@ extern float yawAngleTarget, pitchAngleTarget;
 void printCtrlUartTask(void const * argument){
 	uint8_t data[10];
 	while(1){
+		printCtrlUartTasktaskcount++;
 		if(IOPool_hasNextRead(ctrlUartIOPool, 0)){
 			IOPool_getNextRead(ctrlUartIOPool, 0);
 			

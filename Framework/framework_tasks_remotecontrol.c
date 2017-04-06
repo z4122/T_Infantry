@@ -4,6 +4,8 @@
 #include "stdint.h"
 #include "stddef.h"
 
+#include "framework_tasks_testtasks.h"
+
 typedef struct{
 	int16_t ch0;
 	int16_t ch1;
@@ -59,6 +61,7 @@ void RemoteDataPrcess(uint8_t *pData)
 void printRcTask(void const * argument){
 	uint8_t data[18];
 	while(1){
+		printRcTasktaskcount++;
 		if(IOPool_hasNextRead(rcUartIOPool, 0)){
 			IOPool_getNextRead(rcUartIOPool, 0);
 			

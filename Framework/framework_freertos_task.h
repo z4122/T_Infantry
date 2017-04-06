@@ -13,4 +13,6 @@ extern osThreadId printMPU6050TaskHandle;
 extern osThreadId readMPU6050TaskHandle;
 extern osThreadId printCtrlUartTaskHandle;
 
+extern osThreadId printTasksTaskHandle;
+
 #endif

@@ -11,6 +11,8 @@
 #include "framework_drivers_mpu6050_low.h"
 #include "framework_tasks_mpu6050.h"
 
+#include "framework_tasks_testtasks.h"
+
 
 osThreadId ledGTaskHandle;
 osThreadId ledRTaskHandle;
@@ -21,6 +23,8 @@ osThreadId motorCanTransmitTaskHandle;
 osThreadId printMPU6050TaskHandle;
 osThreadId readMPU6050TaskHandle;
 osThreadId printCtrlUartTaskHandle;
+
+osThreadId printTasksTaskHandle;
 
 void fw_freertos_addThreads(){
 	osThreadDef(ledGTask, ledGTask, osPriorityNormal, 0, 128);
@@ -35,7 +39,8 @@ void fw_freertos_addThreads(){
   printMotorTaskHandle = osThreadCreate(osThread(printMotorTask), NULL);
 	osThreadDef(controlMotorTask, controlMotorTask, osPriorityNormal, 0, 128);
   controlMotorTaskTaskHandle = osThreadCreate(osThread(controlMotorTask), NULL);
-	osThreadDef(motorCanTransmitTask, motorCanTransmitTask, osPriorityNormal, 0, 128);
+	
+	osThreadDef(motorCanTransmitTask, motorCanTransmitTask, osPriorityHigh, 0, 128);
   motorCanTransmitTaskHandle = osThreadCreate(osThread(motorCanTransmitTask), NULL);
 	
 	osThreadDef(printMPU6050Task, printMPU6050Task, osPriorityNormal, 0, 128);
@@ -45,4 +50,7 @@ void fw_freertos_addThreads(){
 	
 	osThreadDef(printCtrlUartTask, printCtrlUartTask, osPriorityNormal, 0, 128);
   printCtrlUartTaskHandle = osThreadCreate(osThread(printCtrlUartTask), NULL);
+	
+	osThreadDef(printTasksTask, printTasksTask, osPriorityNormal, 0, 128);
+  printTasksTaskHandle = osThreadCreate(osThread(printTasksTask), NULL);
 }

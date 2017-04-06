@@ -4,6 +4,8 @@
 #include "cmsis_os.h"
 #include "gpio.h"
 
+#include "framework_tasks_testtasks.h"
+
 #define G_GPIO GPIOC
 #define G_GPIO_PIN GPIO_PIN_1
 #define R_GPIO GPIOC
@@ -18,6 +20,7 @@ LedStatus_t ledGStatus = blink, ledRStatus = blink;
 
 void ledGTask(void const * argument){
 	while(1){
+		ledGTasktaskcount++;
 		if(ledGStatus == on){
 			ledGOn();
 		}else if(ledGStatus == off){
@@ -33,6 +36,7 @@ void ledGTask(void const * argument){
 
 void ledRTask(void const * argument){
 	while(1){
+		ledRTasktaskcount++;
 		if(ledRStatus == on){
 			ledROn();
 		}else if(ledRStatus == off){

@@ -670,16 +670,6 @@
               <FilePath>..\Framework\framework_drivers_flash.c</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_gycan.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_gycan.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_drivers_gycan.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_drivers_gycan.c</FilePath>
-            </File>
-            <File>
               <FileName>framework_drivers_led_low.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\framework_drivers_led_low.h</FilePath>
@@ -813,6 +803,16 @@
               <FileName>framework_tasks_mpu6050.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\framework_tasks_mpu6050.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_testtasks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_tasks_testtasks.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_testtasks.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_tasks_testtasks.h</FilePath>
             </File>
           </Files>
         </Group>

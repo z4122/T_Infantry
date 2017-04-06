@@ -5,6 +5,9 @@
 
 #include "framework_utilities_debug.h"
 #include "framework_utilities_iopool.h"
+#include "framework_freertos_semaphore.h"
+
+#include "framework_tasks_testtasks.h"
 
 
 //void motorInit(void){}
@@ -96,16 +99,19 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 	}else{
 		isRcanStarted = 1;
 	}
+	osSemaphoreRelease(motorCanReceiveSemaphoreHandle);
 }
 
-
-
-
-
-extern osSemaphoreId motorCanTransmitSemaphoreHandle;
+int counttestsemwait = 0;
+extern int counttestsemreleaseOk;
+extern int counttestsemreleaseError;
 void motorCanTransmitTask(void const * argument){
 	//osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
 	while(1){
+		motorCanTransmitTasktaskcount++;
+//		fw_printfln("w%d rO%d rE%d", counttestsemwait, counttestsemreleaseOk, counttestsemreleaseError);
+		osSemaphoreWait(motorCanHaveTransmitSemaphoreHandle, osWaitForever);//osWaitForever
+		counttestsemwait++;
 		if(IOPool_hasNextRead(motorCanTxIOPool, MOTORCM_ID)){
 			//fw_printf("m1");
 			osSemaphoreWait(motorCanTransmitSemaphoreHandle, osWaitForever);
@@ -123,6 +129,7 @@ void motorCanTransmitTask(void const * argument){
 			//fw_printf("w2");
 			IOPool_getNextRead(motorCanTxIOPool, MOTORGIMBAL_ID);
 			motorCan.pTxMsg = IOPool_pGetReadData(motorCanTxIOPool, MOTORGIMBAL_ID);
+//			fw_printfln("canT:%d", ((uint16_t)motorCan.pTxMsg->Data[2] << 8) + (uint16_t)motorCan.pTxMsg->Data[3]);
 			if(HAL_CAN_Transmit_IT(&motorCan) != HAL_OK){
 				fw_Warning();
 				osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
@@ -140,7 +147,7 @@ void motorCanTransmitTask(void const * argument){
 				isRcanStarted = 1;
 			}
 		}
-		
+		//osDelay(1);
 	}
 }
 

@@ -1,5 +1,7 @@
 #include "framework_tasks_mpu6050.h"
 #include "framework_drivers_mpu6050_user.h"
+#include "framework_freertos_semaphore.h"
+#include "framework_tasks_testtasks.h"
 
 #include <stdint.h>
 #include <math.h>
@@ -12,6 +14,8 @@ float gx, gy, gz, ax, ay, az, mx, my, mz;
 float gYroX, gYroY, gYroZ;
 void printMPU6050Task(void const * argument){
 	while(1){
+		printMPU6050Tasktaskcount++;
+		osSemaphoreWait(refreshIMUSemaphoreHandle, osWaitForever);
 		if(IOPool_hasNextRead(mpuI2CIOPool, 0)){
 			IOPool_getNextRead(mpuI2CIOPool, 0);
 			uint8_t *pData = IOPool_pGetReadData(mpuI2CIOPool, 0)->ch;
@@ -161,53 +165,54 @@ void printMPU6050Task(void const * argument){
 			angles[1] = -asin(-2 * q[1] * q[3] + 2 * q[0] * q[2])* 180/M_PI; // pitch    -pi/2    --- pi/2 
 			angles[2] = atan2(2 * q[2] * q[3] + 2 * q[0] * q[1], -2 * q[1] * q[1] - 2 * q[2] * q[2] + 1)* 180/M_PI; // roll       -pi-----pi  
 
-			static int countPrint = 0;
-			if(countPrint > 50){
-				countPrint = 0;
-				
-//				fw_printf("mx max = %d | min = %d\r\n", mymaxmx, myminmx);
-//				fw_printf("my max = %d | min = %d\r\n", mymaxmy, myminmy);
-//				fw_printf("mz max = %d | min = %d\r\n", mymaxmz, myminmz);
-//				fw_printf("========================\r\n");
-				
-//				fw_printf("now = %d \r\n", now);
-//				fw_printf("xxx = %d \r\n", 2147483647);
-//				fw_printf("halfT = %f \r\n", halfT);
-				static float last_yaw_temp, yaw_temp;
-				static int yaw_count = 0;
-				last_yaw_temp = yaw_temp;
-				yaw_temp = angles[0]; 
-				if(yaw_temp-last_yaw_temp>=330)  //yaw轴角度经过处理后变成连续的
-				{
-					yaw_count--;
-				}
-				else if (yaw_temp-last_yaw_temp<=-330)
-				{
-					yaw_count++;
-				}
-				float yaw_angle = yaw_temp + yaw_count*360;
-				
-//				fw_printf("yaw_angle = %f | ", yaw_angle);
-//				fw_printf("angles0 = %f | ", angles[0]);
-//				fw_printf("angles1 = %f | ", angles[1]);
-//				fw_printf("angles2 = %f\r\n", angles[2]);
-//				fw_printf("========================\r\n");
-				
-//				fw_printf("ax = %d | ", myax);
-//				fw_printf("ay = %d | ", myay);
-//				fw_printf("az = %d\r\n", myaz);
+			osSemaphoreRelease(refreshGimbalSemaphoreHandle);
+//			static int countPrint = 0;
+//			if(countPrint > 50){
+//				countPrint = 0;
 //				
-//				fw_printf("gx = %d | ", mygx);
-//				fw_printf("gy = %d | ", mygy);
-//				fw_printf("gz = %d\r\n", mygz);
-			
-//				fw_printf("mx = %d | ", mymx);
-//				fw_printf("my = %d | ", mymy);
-//				fw_printf("mz = %d\r\n", mymz);
-//				fw_printf("========================\r\n");
-			}else{
-				countPrint++;
-			}
+////				fw_printf("mx max = %d | min = %d\r\n", mymaxmx, myminmx);
+////				fw_printf("my max = %d | min = %d\r\n", mymaxmy, myminmy);
+////				fw_printf("mz max = %d | min = %d\r\n", mymaxmz, myminmz);
+////				fw_printf("========================\r\n");
+//				
+////				fw_printf("now = %d \r\n", now);
+////				fw_printf("xxx = %d \r\n", 2147483647);
+////				fw_printf("halfT = %f \r\n", halfT);
+//				static float last_yaw_temp, yaw_temp;
+//				static int yaw_count = 0;
+//				last_yaw_temp = yaw_temp;
+//				yaw_temp = angles[0]; 
+//				if(yaw_temp-last_yaw_temp>=330)  //yaw轴角度经过处理后变成连续的
+//				{
+//					yaw_count--;
+//				}
+//				else if (yaw_temp-last_yaw_temp<=-330)
+//				{
+//					yaw_count++;
+//				}
+//				float yaw_angle = yaw_temp + yaw_count*360;
+//				
+////				fw_printf("yaw_angle = %f | ", yaw_angle);
+////				fw_printf("angles0 = %f | ", angles[0]);
+////				fw_printf("angles1 = %f | ", angles[1]);
+////				fw_printf("angles2 = %f\r\n", angles[2]);
+////				fw_printf("========================\r\n");
+//				
+////				fw_printf("ax = %d | ", myax);
+////				fw_printf("ay = %d | ", myay);
+////				fw_printf("az = %d\r\n", myaz);
+////				
+////				fw_printf("gx = %d | ", mygx);
+////				fw_printf("gy = %d | ", mygy);
+////				fw_printf("gz = %d\r\n", mygz);
+//			
+////				fw_printf("mx = %d | ", mymx);
+////				fw_printf("my = %d | ", mymy);
+////				fw_printf("mz = %d\r\n", mymz);
+////				fw_printf("========================\r\n");
+//			}else{
+//				countPrint++;
+//			}
 
 //			fw_printf("ax = %d | ", ax);
 //			fw_printf("ay = %d | ", ay);
