@@ -13,15 +13,15 @@ int printCtrlUartTasktaskcount = 0;
 
 void printTasksTask(void const * argument){
 	while(1){
-		fw_printfln("ledg %d", ledGTasktaskcount);
-		fw_printfln("ledr %d", ledRTasktaskcount);
-		fw_printfln("Rc %d", printRcTasktaskcount);
-		fw_printfln("Motor %d", printMotorTasktaskcount);
-		fw_printfln("conM %d", controlMotorTaskTasktaskcount);
-		fw_printfln("mCan %d", motorCanTransmitTasktaskcount);
-		fw_printfln("pMPU %d", printMPU6050Tasktaskcount);
-		fw_printfln("rMPU %d", readMPU6050Tasktaskcount);
-		fw_printfln("puart %d", printCtrlUartTasktaskcount);
-		fw_printfln("=========");
+//		fw_printfln("ledg %d", ledGTasktaskcount);
+//		fw_printfln("ledr %d", ledRTasktaskcount);
+//		fw_printfln("Rc %d", printRcTasktaskcount);
+//		fw_printfln("Motor %d", printMotorTasktaskcount);
+//		fw_printfln("conM %d", controlMotorTaskTasktaskcount);
+//		fw_printfln("mCan %d", motorCanTransmitTasktaskcount);
+//		fw_printfln("pMPU %d", printMPU6050Tasktaskcount);
+//		fw_printfln("rMPU %d", readMPU6050Tasktaskcount);
+//		fw_printfln("puart %d", printCtrlUartTasktaskcount);
+//		fw_printfln("=========");
 	}
 }

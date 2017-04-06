@@ -8,6 +8,7 @@
 #include "framework_drivers_uartupper_low.h"
 #include "framework_drivers_uartremotecontrol_low.h"
 
+uint8_t isInited = 0;
 void fw_freertos_init(){
 	//wait for devices
 	for(int i=0; i < 3000; i++)

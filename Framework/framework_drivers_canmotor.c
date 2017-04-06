@@ -5,6 +5,7 @@
 
 #include "framework_utilities_debug.h"
 #include "framework_utilities_iopool.h"
+#include "framework_freertos_init.h"
 #include "framework_freertos_semaphore.h"
 
 #include "framework_tasks_testtasks.h"
@@ -99,7 +100,9 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 	}else{
 		isRcanStarted = 1;
 	}
-	osSemaphoreRelease(motorCanReceiveSemaphoreHandle);
+	if(isInited == 1){
+		osSemaphoreRelease(motorCanReceiveSemaphoreHandle);
+	}
 }
 
 int counttestsemwait = 0;
