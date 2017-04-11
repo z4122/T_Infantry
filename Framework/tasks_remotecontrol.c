@@ -1,10 +1,10 @@
-#include "framework_tasks_remotecontrol.h"
-#include "framework_drivers_uartremotecontrol_user.h"
-#include "framework_drivers_led_user.h"
+#include "tasks_remotecontrol.h"
+#include "drivers_uartremotecontrol_user.h"
+#include "drivers_led_user.h"
 #include "stdint.h"
 #include "stddef.h"
 
-#include "framework_tasks_testtasks.h"
+#include "tasks_testtasks.h"
 
 typedef struct{
 	int16_t ch0;

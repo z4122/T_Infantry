@@ -1,6 +1,6 @@
-#include "framework_drivers_uart.h"
-#include "framework_drivers_uartremotecontrol_low.h"
-#include "framework_drivers_uartupper_low.h"
+#include "drivers_uart.h"
+#include "drivers_uartremotecontrol_low.h"
+#include "drivers_uartupper_low.h"
 
 #include "usart.h"
 

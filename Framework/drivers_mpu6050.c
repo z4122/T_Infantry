@@ -1,12 +1,12 @@
-#include "framework_drivers_mpu6050_low.h"
-#include "framework_drivers_mpu6050_user.h"
-#include "framework_drivers_mpu6050_address.h"
-#include "framework_freertos_semaphore.h"
-#include "framework_tasks_testtasks.h"
+#include "drivers_mpu6050_low.h"
+#include "drivers_mpu6050_user.h"
+#include "drivers_mpu6050_address.h"
+#include "freertos_semaphore.h"
+#include "tasks_testtasks.h"
 
 #include "cmsis_os.h"
 #include "i2c.h"
-#include "framework_utilities_debug.h"
+#include "utilities_debug.h"
 
 
 /*****Begin define ioPool*****/

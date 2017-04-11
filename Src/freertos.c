@@ -47,7 +47,7 @@
 #include "cmsis_os.h"
 
 /* USER CODE BEGIN Includes */   
-#include "framework_freertos_init.h"
+#include "freertos_init.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/

@@ -1,5 +1,5 @@
-#include "framework_drivers_uartupper_low.h"
-#include "framework_drivers_uartupper_user.h"
+#include "drivers_uartupper_low.h"
+#include "drivers_uartupper_user.h"
 
 #include "usart.h"
 

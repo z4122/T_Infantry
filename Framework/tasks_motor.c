@@ -1,9 +1,9 @@
-#include "framework_tasks_motor.h"
-#include "framework_drivers_canmotor_user.h"
-#include "framework_freertos_semaphore.h"
+#include "tasks_motor.h"
+#include "drivers_canmotor_user.h"
+#include "freertos_semaphore.h"
 
-#include "framework_tasks_testtasks.h"
-#include "framework_utilities_debug.h"
+#include "tasks_testtasks.h"
+#include "utilities_debug.h"
 
 #include "stdint.h"
 

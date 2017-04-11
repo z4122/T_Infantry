@@ -1,14 +1,14 @@
-#include "framework_drivers_canmotor_low.h"
-#include "framework_drivers_canmotor_user.h"
+#include "drivers_canmotor_low.h"
+#include "drivers_canmotor_user.h"
 
 #include "cmsis_os.h"
 
-#include "framework_utilities_debug.h"
-#include "framework_utilities_iopool.h"
-#include "framework_freertos_init.h"
-#include "framework_freertos_semaphore.h"
+#include "utilities_debug.h"
+#include "utilities_iopool.h"
+#include "freertos_init.h"
+#include "freertos_semaphore.h"
 
-#include "framework_tasks_testtasks.h"
+#include "tasks_testtasks.h"
 
 /*****Begin define ioPool*****/
 #define DataPoolInit {0}

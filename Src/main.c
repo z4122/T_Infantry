@@ -52,7 +52,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-#include "framework_utilities_debug.h"
+#include "utilities_debug.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/

@@ -1,10 +1,10 @@
-#include "framework_drivers_led_user.h"
-#include "framework_drivers_led_low.h"
+#include "drivers_led_user.h"
+#include "drivers_led_low.h"
 
 #include "cmsis_os.h"
 #include "gpio.h"
 
-#include "framework_tasks_testtasks.h"
+#include "tasks_testtasks.h"
 
 #define G_GPIO GPIOC
 #define G_GPIO_PIN GPIO_PIN_1

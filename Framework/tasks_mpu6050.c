@@ -1,7 +1,7 @@
-#include "framework_tasks_mpu6050.h"
-#include "framework_drivers_mpu6050_user.h"
-#include "framework_freertos_semaphore.h"
-#include "framework_tasks_testtasks.h"
+#include "tasks_mpu6050.h"
+#include "drivers_mpu6050_user.h"
+#include "freertos_semaphore.h"
+#include "tasks_testtasks.h"
 
 #include <stdint.h>
 #include <math.h>

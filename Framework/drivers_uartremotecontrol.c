@@ -1,6 +1,6 @@
-#include "framework_drivers_uartremotecontrol_user.h"
-#include "framework_drivers_uartremotecontrol_low.h"
-#include "framework_drivers_led_user.h"
+#include "drivers_uartremotecontrol_user.h"
+#include "drivers_uartremotecontrol_low.h"
+#include "drivers_led_user.h"
 #include "usart.h"
 
 /*****Begin define ioPool*****/

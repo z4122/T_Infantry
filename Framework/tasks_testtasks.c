@@ -1,5 +1,5 @@
-#include "framework_tasks_testtasks.h"
-#include "framework_utilities_debug.h"
+#include "tasks_testtasks.h"
+#include "utilities_debug.h"
 
 int ledGTasktaskcount = 0;
 int ledRTasktaskcount = 0;

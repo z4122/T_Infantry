@@ -1,10 +1,10 @@
-#include "framework_tasks_upper.h"
-#include "framework_drivers_uartupper_user.h"
+#include "tasks_upper.h"
+#include "drivers_uartupper_user.h"
 
-#include "framework_drivers_flash.h"
+#include "drivers_flash.h"
 
-#include "framework_utilities_debug.h"
-#include "framework_tasks_testtasks.h"
+#include "utilities_debug.h"
+#include "tasks_testtasks.h"
 
 extern uint16_t yawAngle, pitchAngle;
 

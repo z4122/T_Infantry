@@ -1,17 +1,17 @@
-#include "framework_freertos_task.h"
-#include "framework_freertos_init.h"
+#include "freertos_task.h"
+#include "freertos_init.h"
 
-#include "framework_utilities_debug.h"
-#include "framework_utilities_iopool.h"
-#include "framework_drivers_led_low.h"
-#include "framework_tasks_remotecontrol.h"
-#include "framework_tasks_upper.h"
-#include "framework_drivers_canmotor_low.h"
-#include "framework_tasks_motor.h"
-#include "framework_drivers_mpu6050_low.h"
-#include "framework_tasks_mpu6050.h"
+#include "utilities_debug.h"
+#include "utilities_iopool.h"
+#include "drivers_led_low.h"
+#include "tasks_remotecontrol.h"
+#include "tasks_upper.h"
+#include "drivers_canmotor_low.h"
+#include "tasks_motor.h"
+#include "drivers_mpu6050_low.h"
+#include "tasks_mpu6050.h"
 
-#include "framework_tasks_testtasks.h"
+#include "tasks_testtasks.h"
 
 
 osThreadId ledGTaskHandle;

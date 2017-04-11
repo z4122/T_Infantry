@@ -1,5 +1,5 @@
-#include "framework_freertos_semaphore.h"
-#include "framework_freertos_init.h"
+#include "freertos_semaphore.h"
+#include "freertos_init.h"
 
 osSemaphoreId motorCanTransmitSemaphoreHandle;
 osSemaphoreId motorCanReceiveSemaphoreHandle;

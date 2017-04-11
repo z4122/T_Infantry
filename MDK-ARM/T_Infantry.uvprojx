@@ -600,34 +600,34 @@
           <GroupName>Framework/FreeRTOS</GroupName>
           <Files>
             <File>
-              <FileName>framework_freertos_init.h</FileName>
+              <FileName>freertos_init.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_freertos_init.h</FilePath>
+              <FilePath>..\Framework\freertos_init.h</FilePath>
             </File>
             <File>
-              <FileName>framework_freertos_init.c</FileName>
+              <FileName>freertos_init.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_freertos_init.c</FilePath>
+              <FilePath>..\Framework\freertos_init.c</FilePath>
             </File>
             <File>
-              <FileName>framework_freertos_semaphore.c</FileName>
+              <FileName>freertos_semaphore.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_freertos_semaphore.c</FilePath>
+              <FilePath>..\Framework\freertos_semaphore.c</FilePath>
             </File>
             <File>
-              <FileName>framework_freertos_semaphore.h</FileName>
+              <FileName>freertos_semaphore.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_freertos_semaphore.h</FilePath>
+              <FilePath>..\Framework\freertos_semaphore.h</FilePath>
             </File>
             <File>
-              <FileName>framework_freertos_task.c</FileName>
+              <FileName>freertos_task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_freertos_task.c</FilePath>
+              <FilePath>..\Framework\freertos_task.c</FilePath>
             </File>
             <File>
-              <FileName>framework_freertos_task.h</FileName>
+              <FileName>freertos_task.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_freertos_task.h</FilePath>
+              <FilePath>..\Framework\freertos_task.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -635,24 +635,24 @@
           <GroupName>Framework/Utilities</GroupName>
           <Files>
             <File>
-              <FileName>framework_utilities_debug.c</FileName>
+              <FileName>utilities_debug.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_utilities_debug.c</FilePath>
+              <FilePath>..\Framework\utilities_debug.c</FilePath>
             </File>
             <File>
-              <FileName>framework_utilities_debug.h</FileName>
+              <FileName>utilities_debug.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_utilities_debug.h</FilePath>
+              <FilePath>..\Framework\utilities_debug.h</FilePath>
             </File>
             <File>
-              <FileName>framework_utilities_iopool.c</FileName>
+              <FileName>utilities_iopool.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_utilities_iopool.c</FilePath>
+              <FilePath>..\Framework\utilities_iopool.c</FilePath>
             </File>
             <File>
-              <FileName>framework_utilities_iopool.h</FileName>
+              <FileName>utilities_iopool.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_utilities_iopool.h</FilePath>
+              <FilePath>..\Framework\utilities_iopool.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -660,104 +660,104 @@
           <GroupName>Framework/Drivers</GroupName>
           <Files>
             <File>
-              <FileName>framework_drivers_flash.h</FileName>
+              <FileName>drivers_flash.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_flash.h</FilePath>
+              <FilePath>..\Framework\drivers_flash.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_flash.c</FileName>
+              <FileName>drivers_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_drivers_flash.c</FilePath>
+              <FilePath>..\Framework\drivers_flash.c</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_led_low.h</FileName>
+              <FileName>drivers_led_low.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_led_low.h</FilePath>
+              <FilePath>..\Framework\drivers_led_low.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_led_user.h</FileName>
+              <FileName>drivers_led_user.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_led_user.h</FilePath>
+              <FilePath>..\Framework\drivers_led_user.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_led.c</FileName>
+              <FileName>drivers_led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_drivers_led.c</FilePath>
+              <FilePath>..\Framework\drivers_led.c</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_mpu6050_user.h</FileName>
+              <FileName>drivers_mpu6050_user.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_mpu6050_user.h</FilePath>
+              <FilePath>..\Framework\drivers_mpu6050_user.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_mpu6050_low.h</FileName>
+              <FileName>drivers_mpu6050_low.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_mpu6050_low.h</FilePath>
+              <FilePath>..\Framework\drivers_mpu6050_low.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_mpu6050_address.h</FileName>
+              <FileName>drivers_mpu6050_address.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_mpu6050_address.h</FilePath>
+              <FilePath>..\Framework\drivers_mpu6050_address.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_mpu6050.c</FileName>
+              <FileName>drivers_mpu6050.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_drivers_mpu6050.c</FilePath>
+              <FilePath>..\Framework\drivers_mpu6050.c</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_uart.h</FileName>
+              <FileName>drivers_uart.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_uart.h</FilePath>
+              <FilePath>..\Framework\drivers_uart.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_uart.c</FileName>
+              <FileName>drivers_uart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_drivers_uart.c</FilePath>
+              <FilePath>..\Framework\drivers_uart.c</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_uartupper_user.h</FileName>
+              <FileName>drivers_uartupper_user.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_uartupper_user.h</FilePath>
+              <FilePath>..\Framework\drivers_uartupper_user.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_uartupper_low.h</FileName>
+              <FileName>drivers_uartupper_low.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_uartupper_low.h</FilePath>
+              <FilePath>..\Framework\drivers_uartupper_low.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_uartupper.c</FileName>
+              <FileName>drivers_uartupper.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_drivers_uartupper.c</FilePath>
+              <FilePath>..\Framework\drivers_uartupper.c</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_uartremotecontrol_user.h</FileName>
+              <FileName>drivers_uartremotecontrol_user.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_uartremotecontrol_user.h</FilePath>
+              <FilePath>..\Framework\drivers_uartremotecontrol_user.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_uartremotecontrol_low.h</FileName>
+              <FileName>drivers_uartremotecontrol_low.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_uartremotecontrol_low.h</FilePath>
+              <FilePath>..\Framework\drivers_uartremotecontrol_low.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_uartremotecontrol.c</FileName>
+              <FileName>drivers_uartremotecontrol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_drivers_uartremotecontrol.c</FilePath>
+              <FilePath>..\Framework\drivers_uartremotecontrol.c</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_canmotor_user.h</FileName>
+              <FileName>drivers_canmotor_user.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_canmotor_user.h</FilePath>
+              <FilePath>..\Framework\drivers_canmotor_user.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_canmotor_low.h</FileName>
+              <FileName>drivers_canmotor_low.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_drivers_canmotor_low.h</FilePath>
+              <FilePath>..\Framework\drivers_canmotor_low.h</FilePath>
             </File>
             <File>
-              <FileName>framework_drivers_canmotor.c</FileName>
+              <FileName>drivers_canmotor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_drivers_canmotor.c</FilePath>
+              <FilePath>..\Framework\drivers_canmotor.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -765,54 +765,54 @@
           <GroupName>Framework/Tasks</GroupName>
           <Files>
             <File>
-              <FileName>framework_tasks_remotecontrol.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\framework_tasks_remotecontrol.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_tasks_remotecontrol.h</FileName>
+              <FileName>tasks_mpu6050.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_tasks_remotecontrol.h</FilePath>
+              <FilePath>..\Framework\tasks_mpu6050.h</FilePath>
             </File>
             <File>
-              <FileName>framework_tasks_upper.c</FileName>
+              <FileName>tasks_testtasks.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_tasks_upper.c</FilePath>
+              <FilePath>..\Framework\tasks_testtasks.c</FilePath>
             </File>
             <File>
-              <FileName>framework_tasks_upper.h</FileName>
+              <FileName>tasks_testtasks.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_tasks_upper.h</FilePath>
+              <FilePath>..\Framework\tasks_testtasks.h</FilePath>
             </File>
             <File>
-              <FileName>framework_tasks_motor.c</FileName>
+              <FileName>tasks_motor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_tasks_motor.c</FilePath>
+              <FilePath>..\Framework\tasks_motor.c</FilePath>
             </File>
             <File>
-              <FileName>framework_tasks_motor.h</FileName>
+              <FileName>tasks_motor.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_tasks_motor.h</FilePath>
+              <FilePath>..\Framework\tasks_motor.h</FilePath>
             </File>
             <File>
-              <FileName>framework_tasks_mpu6050.c</FileName>
+              <FileName>tasks_mpu6050.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_tasks_mpu6050.c</FilePath>
+              <FilePath>..\Framework\tasks_mpu6050.c</FilePath>
             </File>
             <File>
-              <FileName>framework_tasks_mpu6050.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_tasks_mpu6050.h</FilePath>
-            </File>
-            <File>
-              <FileName>framework_tasks_testtasks.c</FileName>
+              <FileName>tasks_remotecontrol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\framework_tasks_testtasks.c</FilePath>
+              <FilePath>..\Framework\tasks_remotecontrol.c</FilePath>
             </File>
             <File>
-              <FileName>framework_tasks_testtasks.h</FileName>
+              <FileName>tasks_remotecontrol.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\framework_tasks_testtasks.h</FilePath>
+              <FilePath>..\Framework\tasks_remotecontrol.h</FilePath>
+            </File>
+            <File>
+              <FileName>tasks_upper.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\tasks_upper.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks_upper.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\tasks_upper.h</FilePath>
             </File>
           </Files>
         </Group>
