@@ -17,7 +17,7 @@
 osThreadId ledGTaskHandle;
 osThreadId ledRTaskHandle;
 osThreadId printRcTaskHandle;
-osThreadId printMotorTaskHandle;
+//osThreadId printMotorTaskHandle;
 osThreadId controlMotorTaskTaskHandle;
 osThreadId motorCanTransmitTaskHandle;
 osThreadId printMPU6050TaskHandle;
@@ -35,8 +35,8 @@ void fw_freertos_addThreads(){
 	osThreadDef(printRcTask, printRcTask, osPriorityNormal, 0, 128);
   printRcTaskHandle = osThreadCreate(osThread(printRcTask), NULL);
 	
-	osThreadDef(printMotorTask, printMotorTask, osPriorityAboveNormal, 0, 128);
-  printMotorTaskHandle = osThreadCreate(osThread(printMotorTask), NULL);
+//	osThreadDef(printMotorTask, printMotorTask, osPriorityAboveNormal, 0, 128);
+//  printMotorTaskHandle = osThreadCreate(osThread(printMotorTask), NULL);
 	osThreadDef(controlMotorTask, controlMotorTask, osPriorityHigh, 0, 128);
   controlMotorTaskTaskHandle = osThreadCreate(osThread(controlMotorTask), NULL);
 	

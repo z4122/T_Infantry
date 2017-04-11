@@ -6,9 +6,26 @@
 #include "utilities_debug.h"
 #include "tasks_testtasks.h"
 
-extern uint16_t yawAngle, pitchAngle;
+//IOPoolDeclare(upperGimbalIOPool, struct{float yawAdd; float pitchAdd;});
+/*****Begin define ioPool*****/
+#define DataPoolInit {0}
+#define ReadPoolSize 1
+#define ReadPoolMap {0}
+#define GetIdFunc 0 
+#define ReadPoolInit {0, Empty, 1}
 
-extern float yawAngleTarget, pitchAngleTarget;
+IOPoolDefine(upperGimbalIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
+	
+#undef DataPoolInit 
+#undef ReadPoolSize 
+#undef ReadPoolMap
+#undef GetIdFunc
+#undef ReadPoolInit
+/*****End define ioPool*****/
+
+extern uint16_t yawAngle, pitchAngle;
+int forPidDebug = 0;
+//extern float yawAngleTarget, pitchAngleTarget;
 void printCtrlUartTask(void const * argument){
 	uint8_t data[10];
 	while(1){
@@ -21,25 +38,37 @@ void printCtrlUartTask(void const * argument){
 				data[i] = pData[i];
 			}			
 			
-			int16_t yawZeroAngle = 1075, pitchZeroAngle = 710;
-			float yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8191.0;
-			yawRealAngle = (yawRealAngle > 180) ? yawRealAngle - 360 : yawRealAngle;
-			yawRealAngle = (yawRealAngle < -180) ? yawRealAngle + 360 : yawRealAngle;
-			float pitchRealAngle = (pitchZeroAngle - pitchAngle) * 360 / 8191.0;
-			pitchRealAngle = (pitchRealAngle > 180) ? pitchRealAngle - 360 : pitchRealAngle;
-			pitchRealAngle = (pitchRealAngle < -180) ? pitchRealAngle + 360 : pitchRealAngle;
+//			int16_t yawZeroAngle = 1075, pitchZeroAngle = 710;
+//			float yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8191.0;
+//			yawRealAngle = (yawRealAngle > 180) ? yawRealAngle - 360 : yawRealAngle;
+//			yawRealAngle = (yawRealAngle < -180) ? yawRealAngle + 360 : yawRealAngle;
+//			float pitchRealAngle = (pitchZeroAngle - pitchAngle) * 360 / 8191.0;
+//			pitchRealAngle = (pitchRealAngle > 180) ? pitchRealAngle - 360 : pitchRealAngle;
+//			pitchRealAngle = (pitchRealAngle < -180) ? pitchRealAngle + 360 : pitchRealAngle;
 			
+			IOPool_pGetWriteData(upperGimbalIOPool)->yawAdd = 0;
+			IOPool_pGetWriteData(upperGimbalIOPool)->pitchAdd = 0;
 			if(data[0] == 'L'){
-				yawAngleTarget = yawRealAngle + 1.0f * ((int)data[1] - 48);
+				IOPool_pGetWriteData(upperGimbalIOPool)->yawAdd = + 1.0f * ((int)data[1] - '0');
+				//yawAngleTarget = yawRealAngle + 1.0f * ((int)data[1] - 48);
 			}else if(data[0] == 'R'){
-				yawAngleTarget = yawRealAngle - 1.0f * ((int)data[1] - 48);
+				IOPool_pGetWriteData(upperGimbalIOPool)->yawAdd = - 1.0f * ((int)data[1] - '0');
+				//yawAngleTarget = yawRealAngle - 1.0f * ((int)data[1] - 48);
 			}else if(data[0] == 'U'){
-				pitchAngleTarget += 8.0f;
+				IOPool_pGetWriteData(upperGimbalIOPool)->pitchAdd = + 8.0f * ((int)data[1] - '0');
+				//pitchAngleTarget += 8.0f;
 			}else if(data[0] == 'D'){
-				pitchAngleTarget -= 8.0f;
+				IOPool_pGetWriteData(upperGimbalIOPool)->pitchAdd = - 8.0f * ((int)data[1] - '0');
+				//pitchAngleTarget -= 8.0f;
 			}else if(data[0] == 'T'){
 				fw_printfln("received T: %d", data[1]);
+			}else if(data[0] == '?'){
+				forPidDebug = 1;
+			}else if(data[0] == '!'){
+				forPidDebug = 0;
 			}
+			IOPool_getNextWrite(upperGimbalIOPool);
+			
 //			else if(data[0] == 'F'){
 //				uint32_t temp;
 //				if(data[1] == '1'){

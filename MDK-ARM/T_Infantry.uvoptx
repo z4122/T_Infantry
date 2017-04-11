@@ -1192,8 +1192,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Framework\tasks_testtasks.c</PathWithFileName>
-      <FilenameWithoutPath>tasks_testtasks.c</FilenameWithoutPath>
+      <PathWithFileName>..\Framework\tasks_mpu6050.c</PathWithFileName>
+      <FilenameWithoutPath>tasks_mpu6050.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1204,8 +1204,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Framework\tasks_testtasks.h</PathWithFileName>
-      <FilenameWithoutPath>tasks_testtasks.h</FilenameWithoutPath>
+      <PathWithFileName>..\Framework\tasks_motor.h</PathWithFileName>
+      <FilenameWithoutPath>tasks_motor.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1228,26 +1228,14 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Framework\tasks_motor.h</PathWithFileName>
-      <FilenameWithoutPath>tasks_motor.h</FilenameWithoutPath>
+      <PathWithFileName>..\Framework\tasks_remotecontrol.h</PathWithFileName>
+      <FilenameWithoutPath>tasks_remotecontrol.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
       <FileNumber>75</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\Framework\tasks_mpu6050.c</PathWithFileName>
-      <FilenameWithoutPath>tasks_mpu6050.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>9</GroupNumber>
-      <FileNumber>76</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1259,19 +1247,19 @@
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
-      <FileNumber>77</FileNumber>
+      <FileNumber>76</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Framework\tasks_remotecontrol.h</PathWithFileName>
-      <FilenameWithoutPath>tasks_remotecontrol.h</FilenameWithoutPath>
+      <PathWithFileName>..\Framework\tasks_upper.h</PathWithFileName>
+      <FilenameWithoutPath>tasks_upper.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
-      <FileNumber>78</FileNumber>
+      <FileNumber>77</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1283,13 +1271,25 @@
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
-      <FileNumber>79</FileNumber>
+      <FileNumber>78</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Framework\tasks_upper.h</PathWithFileName>
-      <FilenameWithoutPath>tasks_upper.h</FilenameWithoutPath>
+      <PathWithFileName>..\Framework\tasks_testtasks.h</PathWithFileName>
+      <FilenameWithoutPath>tasks_testtasks.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>79</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Framework\tasks_testtasks.c</PathWithFileName>
+      <FilenameWithoutPath>tasks_testtasks.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

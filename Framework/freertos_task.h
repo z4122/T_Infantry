@@ -6,7 +6,7 @@
 extern osThreadId ledGTaskHandle;
 extern osThreadId ledRTaskHandle;
 extern osThreadId printRcTaskHandle;
-extern osThreadId printMotorTaskHandle;
+//extern osThreadId printMotorTaskHandle;
 extern osThreadId controlMotorTaskTaskHandle;
 extern osThreadId motorCanTransmitTaskHandle;
 extern osThreadId printMPU6050TaskHandle;

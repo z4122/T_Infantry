@@ -770,19 +770,9 @@
               <FilePath>..\Framework\tasks_mpu6050.h</FilePath>
             </File>
             <File>
-              <FileName>tasks_testtasks.c</FileName>
+              <FileName>tasks_mpu6050.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\tasks_testtasks.c</FilePath>
-            </File>
-            <File>
-              <FileName>tasks_testtasks.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\tasks_testtasks.h</FilePath>
-            </File>
-            <File>
-              <FileName>tasks_motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\tasks_motor.c</FilePath>
+              <FilePath>..\Framework\tasks_mpu6050.c</FilePath>
             </File>
             <File>
               <FileName>tasks_motor.h</FileName>
@@ -790,14 +780,9 @@
               <FilePath>..\Framework\tasks_motor.h</FilePath>
             </File>
             <File>
-              <FileName>tasks_mpu6050.c</FileName>
+              <FileName>tasks_motor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\tasks_mpu6050.c</FilePath>
-            </File>
-            <File>
-              <FileName>tasks_remotecontrol.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\tasks_remotecontrol.c</FilePath>
+              <FilePath>..\Framework\tasks_motor.c</FilePath>
             </File>
             <File>
               <FileName>tasks_remotecontrol.h</FileName>
@@ -805,14 +790,29 @@
               <FilePath>..\Framework\tasks_remotecontrol.h</FilePath>
             </File>
             <File>
-              <FileName>tasks_upper.c</FileName>
+              <FileName>tasks_remotecontrol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\tasks_upper.c</FilePath>
+              <FilePath>..\Framework\tasks_remotecontrol.c</FilePath>
             </File>
             <File>
               <FileName>tasks_upper.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\tasks_upper.h</FilePath>
+            </File>
+            <File>
+              <FileName>tasks_upper.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\tasks_upper.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks_testtasks.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\tasks_testtasks.h</FilePath>
+            </File>
+            <File>
+              <FileName>tasks_testtasks.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\tasks_testtasks.c</FilePath>
             </File>
           </Files>
         </Group>
