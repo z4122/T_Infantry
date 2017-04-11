@@ -35,17 +35,17 @@ void fw_freertos_addThreads(){
 	osThreadDef(printRcTask, printRcTask, osPriorityNormal, 0, 128);
   printRcTaskHandle = osThreadCreate(osThread(printRcTask), NULL);
 	
-	osThreadDef(printMotorTask, printMotorTask, osPriorityNormal, 0, 128);
+	osThreadDef(printMotorTask, printMotorTask, osPriorityAboveNormal, 0, 128);
   printMotorTaskHandle = osThreadCreate(osThread(printMotorTask), NULL);
-	osThreadDef(controlMotorTask, controlMotorTask, osPriorityNormal, 0, 128);
+	osThreadDef(controlMotorTask, controlMotorTask, osPriorityHigh, 0, 128);
   controlMotorTaskTaskHandle = osThreadCreate(osThread(controlMotorTask), NULL);
 	
-	osThreadDef(motorCanTransmitTask, motorCanTransmitTask, osPriorityHigh, 0, 128);
+	osThreadDef(motorCanTransmitTask, motorCanTransmitTask, osPriorityRealtime, 0, 128);
   motorCanTransmitTaskHandle = osThreadCreate(osThread(motorCanTransmitTask), NULL);
 	
-	osThreadDef(printMPU6050Task, printMPU6050Task, osPriorityNormal, 0, 128);
+	osThreadDef(printMPU6050Task, printMPU6050Task, osPriorityHigh, 0, 128);
   printMPU6050TaskHandle = osThreadCreate(osThread(printMPU6050Task), NULL);
-	osThreadDef(readMPU6050Task, readMPU6050Task, osPriorityNormal, 0, 128);
+	osThreadDef(readMPU6050Task, readMPU6050Task, osPriorityHigh, 0, 128);
   readMPU6050TaskHandle = osThreadCreate(osThread(readMPU6050Task), NULL);
 	
 	osThreadDef(printCtrlUartTask, printCtrlUartTask, osPriorityNormal, 0, 128);

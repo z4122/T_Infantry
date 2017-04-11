@@ -10,14 +10,6 @@
 
 #include "framework_tasks_testtasks.h"
 
-
-//void motorInit(void){}
-//void printMotorTask(void const * argument){while(1){osDelay(100);}}
-//void controlMotorTask(void const * argument){while(1){osDelay(100);}}
-//void motorCanTransmitTask(void const * argument){while(1){osDelay(100);}}
-
-
-
 /*****Begin define ioPool*****/
 #define DataPoolInit {0}
 #define ReadPoolSize 6
@@ -62,12 +54,8 @@ IOPoolDefine(motorCanTxIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFun
 uint8_t isRcanStarted = 0;
 
 void motorInit(){
-	//wait for 820R
-//	for(int i=0; i < 3000; i++)
-//	{
-//		int a=42000; //at 168MHz 42000 is ok
-//		while(a--);
-//	}
+	//===wait for 820R
+	
 	
 	motorCan.pRxMsg = IOPool_pGetWriteData(motorCanRxIOPool);
 	
@@ -116,9 +104,7 @@ void motorCanTransmitTask(void const * argument){
 		osSemaphoreWait(motorCanHaveTransmitSemaphoreHandle, osWaitForever);//osWaitForever
 		counttestsemwait++;
 		if(IOPool_hasNextRead(motorCanTxIOPool, MOTORCM_ID)){
-			//fw_printf("m1");
 			osSemaphoreWait(motorCanTransmitSemaphoreHandle, osWaitForever);
-			//fw_printf("m2");
 			IOPool_getNextRead(motorCanTxIOPool, MOTORCM_ID);
 			motorCan.pTxMsg = IOPool_pGetReadData(motorCanTxIOPool, MOTORCM_ID);
 			if(HAL_CAN_Transmit_IT(&motorCan) != HAL_OK){
@@ -127,14 +113,14 @@ void motorCanTransmitTask(void const * argument){
 			}
 		}
 		if(IOPool_hasNextRead(motorCanTxIOPool, MOTORGIMBAL_ID)){
-			//fw_printf("w1");
 			osSemaphoreWait(motorCanTransmitSemaphoreHandle, osWaitForever);
-			//fw_printf("w2");
 			IOPool_getNextRead(motorCanTxIOPool, MOTORGIMBAL_ID);
 			motorCan.pTxMsg = IOPool_pGetReadData(motorCanTxIOPool, MOTORGIMBAL_ID);
-//			fw_printfln("canT:%d", ((uint16_t)motorCan.pTxMsg->Data[2] << 8) + (uint16_t)motorCan.pTxMsg->Data[3]);
-			if(HAL_CAN_Transmit_IT(&motorCan) != HAL_OK){
-				fw_Warning();
+			HAL_StatusTypeDef test = HAL_CAN_Transmit_IT(&motorCan);
+			if(test != HAL_OK){
+				fw_printfln("t%d", test);
+//				fw_printfln("h%d", motorCan.State);
+//				fw_Warning();
 				osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
 			}
 		}
