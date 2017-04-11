@@ -10,6 +10,15 @@ typedef uint8_t ReadPoolIndex_t;
 typedef enum{Empty, NextRead, Locked} ExchangeStatus_t;
 
 typedef struct{
+	uint16_t dev_yaw;
+	uint16_t dev_pitch;
+	uint16_t target_vl;	
+	uint16_t target_dis;
+	uint8_t DLC;
+	uint8_t Success;
+}xdata_ctrlUart;
+
+typedef struct{
 	DataIndex_t forRead;
 	ExchangeStatus_t exchangeStatus;
 	DataIndex_t forExchange;
