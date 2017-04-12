@@ -7,6 +7,8 @@
 #include "framework_drivers_motorcan.h"
 #include "framework_drivers_mpu6050.h"
 #include "framework_drivers_uart.h"
+#include "framework_tasks_remotecontrol.h"
+#include "ControlTask.h"
 
 void fw_freertos_init(){
 	//wait for devices
@@ -22,4 +24,8 @@ void fw_freertos_init(){
 	mpu6050Init();
 	Init_Quaternion();
 	fw_printfln("init success");
+	
+	//ÒÆÖ²º¯Êý
+	RemoteTaskInit();
+	ControtLoopTaskInit();
 }

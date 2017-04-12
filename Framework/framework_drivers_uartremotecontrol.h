@@ -164,13 +164,12 @@ void SetShootState(Shoot_State_e v);
 Shoot_State_e GetShootState(void);
 void SetFrictionState(FrictionWheelState_e v);
 FrictionWheelState_e GetFrictionState(void);
-void RemoteDataPrcess(uint8_t *pData);
 uint8_t IsRemoteBeingAction(void);
 void GimbalAngleLimit(void);
 void GetRemoteSwitchAction(RemoteSwitch_t *sw, uint8_t val);
 void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val);
-void RemoteControlProcess(Remote *rc);
 void MouseShootControl(Mouse *mouse);
-void MouseKeyControlProcess(Mouse *mouse, Key *key);
 
+
+void SetInputMode(Remote *rc);
 #endif

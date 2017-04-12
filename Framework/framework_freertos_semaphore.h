@@ -6,5 +6,7 @@
 extern osSemaphoreId motorCanTransmitSemaphoreHandle;
 extern osSemaphoreId readMPU6050SemaphoreHandle;
 extern osSemaphoreId refreshMPU6050SemaphoreHandle;
+extern xSemaphoreHandle xSemaphore_uart;
+extern xSemaphoreHandle xSemaphore_rcuart;
 
 #endif

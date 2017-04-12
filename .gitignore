@@ -1,2 +1,7 @@
 MDK-ARM/T_Infantry.uvguix.*
 MDK-ARM/T_Infantry/
+MDK-ARM/startup_stm32f405xx.lst
+*.uvoptx
+MDK-ARM/startup_stm32f405xx.lst
+*.uvoptx
+*.uvoptx

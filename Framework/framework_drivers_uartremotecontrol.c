@@ -5,6 +5,8 @@
 #include "usart.h"
 #include "ramp.h"
 #include "ControlTask.h"
+
+#define MINMAX(value, min, max) value = (value < min) ? min : (value > max ? max : value)
 /*****Begin define ioPool*****/
 #define DataPoolInit {0}
 #define ReadPoolSize 1
@@ -27,10 +29,15 @@ void rcInit(){
 			Error_Handler();
 	} 
 }
-
+extern xSemaphoreHandle xSemaphore_rcuart;
 void rcUartRxCpltCallback(){
 	//osStatus osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec);
+	//优先级指示
+	static portBASE_TYPE xHigherPriorityTaskWoken;
+  xHigherPriorityTaskWoken = pdFALSE;
+	
 	IOPool_getNextWrite(rcUartIOPool);
+	xSemaphoreGiveFromISR(xSemaphore_rcuart, &xHigherPriorityTaskWoken);
 	HAL_UART_Receive_DMA(&rcUart, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 }
 
@@ -119,6 +126,7 @@ InputMode_e GetInputMode()
 /*
 input: RemoteSwitch_t *sw, include the switch info
 */
+
 void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val) 
 {
 	GetRemoteSwitchAction(sw, val);
@@ -257,75 +265,9 @@ void MouseShootControl(Mouse *mouse)
 
 
 
-//键盘鼠标控制模式处理
-void MouseKeyControlProcess(Mouse *mouse, Key *key)
-{
-	static uint16_t forward_back_speed = 0;
-	static uint16_t left_right_speed = 0;
-    if(GetWorkState()!=PREPARE_STATE)
-    {
-		//speed mode: normal speed/high speed
-		if(key->v & 0x10)
-		{
-			forward_back_speed =  HIGH_FORWARD_BACK_SPEED;
-			left_right_speed = HIGH_LEFT_RIGHT_SPEED;
-		}
-		else
-		{
-			forward_back_speed =  NORMAL_FORWARD_BACK_SPEED;
-			left_right_speed = NORMAL_LEFT_RIGHT_SPEED;
-		}
-		//movement process
-		if(key->v & 0x01)  // key: w
-		{
-			ChassisSpeedRef.forward_back_ref = forward_back_speed* FBSpeedRamp.Calc(&FBSpeedRamp);
-		}
-		else if(key->v & 0x02) //key: s
-		{
-			ChassisSpeedRef.forward_back_ref = -forward_back_speed* FBSpeedRamp.Calc(&FBSpeedRamp);
-		}
-		else
-		{
-			ChassisSpeedRef.forward_back_ref = 0;
-			FBSpeedRamp.ResetCounter(&FBSpeedRamp);
-		}
-		
-		
-		if(key->v & 0x04)  // key: d
-		{
-			ChassisSpeedRef.left_right_ref = -left_right_speed* LRSpeedRamp.Calc(&LRSpeedRamp);
-		}
-		else if(key->v & 0x08) //key: a
-		{
-			ChassisSpeedRef.left_right_ref = left_right_speed* LRSpeedRamp.Calc(&LRSpeedRamp);
-		}
-		else
-		{
-			ChassisSpeedRef.left_right_ref = 0;
-			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
-		}
-	}
-	//step2: gimbal ref calc
-	#define MINMAX(value, min, max) value = (value < min) ? min : (value > max ? max : value)
-    if(GetWorkState() == NORMAL_STATE)
-    {
-		MINMAX(mouse->x, -150, 150); 
-		MINMAX(mouse->y, -150, 150); 
-		
-        GimbalRef.pitch_angle_dynamic_ref -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  //(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
-        GimbalRef.yaw_angle_dynamic_ref   += mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
 
-	}
-	
-	/* not used to control, just as a flag */ 
-    GimbalRef.pitch_speed_ref = mouse->y;    //speed_ref仅做输入量判断用
-    GimbalRef.yaw_speed_ref   = mouse->x;
-	GimbalAngleLimit();	
-	MouseShootControl(mouse);
-	
-}
 
-//
+
 Shoot_State_e GetShootState()
 {
 	return shootState;
@@ -352,22 +294,4 @@ void GimbalAngleLimit()
 //	MINMAX(GimbalRef.yaw_angle_dynamic_ref, GMYPositionPID.fdb - 60, GMYPositionPID.fdb + 60);
 }
 
-//遥控器数据初始化，斜坡函数等的初始化
-void RemoteTaskInit()
-{
-	//斜坡初始化
-	frictionRamp.SetScale(&frictionRamp, FRICTION_RAMP_TICK_COUNT);
-	LRSpeedRamp.SetScale(&LRSpeedRamp, MOUSE_LR_RAMP_TICK_COUNT);
-	FBSpeedRamp.SetScale(&FBSpeedRamp, MOUSR_FB_RAMP_TICK_COUNT);
-	frictionRamp.ResetCounter(&frictionRamp);
-	LRSpeedRamp.ResetCounter(&LRSpeedRamp);
-	FBSpeedRamp.ResetCounter(&FBSpeedRamp);
-	//底盘云台给定值初始化
-	GimbalRef.pitch_angle_dynamic_ref = 0.0f;
-	GimbalRef.yaw_angle_dynamic_ref = 0.0f;
-	ChassisSpeedRef.forward_back_ref = 0.0f;
-	ChassisSpeedRef.left_right_ref = 0.0f;
-	ChassisSpeedRef.rotate_ref = 0.0f;
-	//摩擦轮运行状态初始化
-	SetFrictionState(FRICTION_WHEEL_OFF);
-}
+

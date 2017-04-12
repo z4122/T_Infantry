@@ -137,6 +137,7 @@ void ctrlUartInit(){
 		printf( "ctrlUartInit error" );
 	} 
 }
+
 extern xSemaphoreHandle xSemaphore_uart; //妙算串口互斥信号量
 void ctrlUartRxCpltCallback(){ //控制串口回掉函数
 	static portBASE_TYPE xHigherPriorityTaskWoken;
