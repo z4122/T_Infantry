@@ -21,8 +21,8 @@ extern ChassisSpeed_Ref_t ChassisSpeedRef;
 extern Gimbal_Ref_t GimbalRef;
 extern FrictionWheelState_e friction_wheel_state ;
 static RemoteSwitch_t switch1;   //Ò£¿ØÆ÷×ó²à²¦¸Ë
-static volatile Shoot_State_e shootState = NOSHOOTING;
-static InputMode_e inputmode = REMOTE_INPUT;   //ÊäÈëÄ£Ê½Éè¶¨
+
+
 
 extern RampGen_t frictionRamp ;  //Ä¦²ÁÂÖÐ±ÆÂ
 extern RampGen_t LRSpeedRamp ;   //mouse×óÓÒÒÆ¶¯Ð±ÆÂ
@@ -30,6 +30,7 @@ extern RampGen_t FBSpeedRamp  ;   //mouseÇ°ºóÒÆ¶¯Ð±ÆÂ
 
 extern RC_Ctl_t RC_CtrlData; 
 extern xSemaphoreHandle xSemaphore_rcuart;
+extern float yawAngleTarget, pitchAngleTarget;
 void printRcTask(void const * argument){
 	uint8_t data[18];
 	while(1){
@@ -157,8 +158,8 @@ void RemoteControlProcess(Remote *rc)
 
     if(GetWorkState() == NORMAL_STATE)
     {
-        GimbalRef.pitch_angle_dynamic_ref += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
-        GimbalRef.yaw_angle_dynamic_ref   += (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT;      	
+        pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+        yawAngleTarget   += (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT;      	
 	}
 	
 	/* not used to control, just as a flag */ 
@@ -171,6 +172,7 @@ void RemoteControlProcess(Remote *rc)
 
 }
 //¼üÅÌÊó±ê¿ØÖÆÄ£Ê½´¦Àí
+
 void MouseKeyControlProcess(Mouse *mouse, Key *key)
 {
 	static uint16_t forward_back_speed = 0;
@@ -224,8 +226,8 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		VAL_LIMIT(mouse->x, -150, 150); 
 		VAL_LIMIT(mouse->y, -150, 150); 
 		
-        GimbalRef.pitch_angle_dynamic_ref -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  //(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
-        GimbalRef.yaw_angle_dynamic_ref   += mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
+        yawAngleTarget -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  //(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+        pitchAngleTarget   += mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
 
 	}
 	

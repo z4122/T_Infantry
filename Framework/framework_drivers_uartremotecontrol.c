@@ -45,7 +45,7 @@ RC_Ctl_t RC_CtrlData;   //remote control data
 ChassisSpeed_Ref_t ChassisSpeedRef;
 Gimbal_Ref_t GimbalRef;
  FrictionWheelState_e friction_wheel_state = FRICTION_WHEEL_OFF;
-static RemoteSwitch_t switch1;   //遥控器左侧拨杆
+
 static volatile Shoot_State_e shootState = NOSHOOTING;
 static InputMode_e inputmode = REMOTE_INPUT;   //输入模式设定
 

@@ -4,6 +4,14 @@
 #include "can.h"
 #include "framework_utilities_debug.h"
 #include "framework_utilities_iopool.h"
+#include "ControlTask.h"
+
+static uint32_t can_count = 0;
+volatile Encoder CM1Encoder = {0,0,0,0,0,0,0,0,0};
+volatile Encoder CM2Encoder = {0,0,0,0,0,0,0,0,0};
+volatile Encoder CM3Encoder = {0,0,0,0,0,0,0,0,0};
+volatile Encoder CM4Encoder = {0,0,0,0,0,0,0,0,0};
+volatile Encoder GMYawEncoder = {0,0,0,0,0,0,0,0,0};
 
 #define MINMAX(value, min, max) value = (value < min) ? min : (value > max ? max : value)
 //void motorInit(void){}
@@ -94,16 +102,25 @@ void motorInit(){
 	}
 	isRcanStarted = 1;
 }
-
+extern xSemaphoreHandle motorCanReceiveSemaphore;
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
+	static portBASE_TYPE xHigherPriorityTaskWoken;
+  xHigherPriorityTaskWoken = pdFALSE;
+	
 	IOPool_getNextWrite(motorCanRxIOPool);
 	motorCan.pRxMsg = IOPool_pGetWriteData(motorCanRxIOPool);
+	xSemaphoreGiveFromISR(motorCanReceiveSemaphore, &xHigherPriorityTaskWoken);
 	if(HAL_CAN_Receive_IT(&motorCan, CAN_FIFO0) != HAL_OK){
 		//fw_Warning();
 		isRcanStarted = 0;
 	}else{
 		isRcanStarted = 1;
 	}
+	/*上下文切换	
+	if( xHigherPriorityTaskWoken == pdTRUE )
+{
+	portSWITCH_CONTEXT();
+}*/
 }
 
 uint16_t yawAngle = 0, pitchAngle = 0;
@@ -111,6 +128,7 @@ void printMotorTask(void const * argument){
 //	uint32_t id = 0;
 //	uint16_t data0 = 0, data1 = 0, data2 = 0;
 	while(1){
+		xSemaphoreTake(motorCanReceiveSemaphore, osWaitForever);
 		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORYAW_ID)){
 			IOPool_getNextRead(motorCanRxIOPool, MOTORYAW_ID);
 			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTORYAW_ID);
@@ -120,12 +138,35 @@ void printMotorTask(void const * argument){
 //			data1 = ((uint16_t)pData->Data[2] << 8) + (uint16_t)pData->Data[3];
 //			data2 = ((uint16_t)pData->Data[4] << 8) + (uint16_t)pData->Data[5];
 			yawAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
+			CanReceiveMsgProcess(pData);
 		}
 		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORPITCH_ID)){
 			IOPool_getNextRead(motorCanRxIOPool, MOTORPITCH_ID);
 			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTORPITCH_ID);
 			pitchAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
 		}
+		if(IOPool_hasNextRead(motorCanRxIOPool, MOTOR1_ID)){
+			IOPool_getNextRead(motorCanRxIOPool, MOTOR1_ID);
+			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTOR1_ID);
+			CanReceiveMsgProcess(pData);
+		}
+		if(IOPool_hasNextRead(motorCanRxIOPool, MOTOR2_ID)){
+			IOPool_getNextRead(motorCanRxIOPool, MOTOR2_ID);
+			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTOR2_ID);
+			CanReceiveMsgProcess(pData);
+		}
+		if(IOPool_hasNextRead(motorCanRxIOPool, MOTOR3_ID)){
+			IOPool_getNextRead(motorCanRxIOPool, MOTOR3_ID);
+			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTOR3_ID);
+			CanReceiveMsgProcess(pData);
+		}
+		if(IOPool_hasNextRead(motorCanRxIOPool, MOTOR4_ID)){
+			IOPool_getNextRead(motorCanRxIOPool, MOTOR4_ID);
+			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTOR3_ID);
+			CanReceiveMsgProcess(pData);
+		}
+		
+
 //		int16_t yawZeroAngle = 1075;
 //		float yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8191.0;
 //		yawRealAngle = (yawRealAngle > 180) ? yawRealAngle - 360 : yawRealAngle;
@@ -165,6 +206,8 @@ void controlMotorTask(void const * argument){
 //		
 //		osDelay(250);
 //	}
+		portTickType xLastWakeTime;
+		xLastWakeTime = xTaskGetTickCount();
 	while(1){
 		
 //		yawAngleTarget = (yawAngleTarget < 3100) ? yawAngleTarget : 3100;
@@ -208,7 +251,7 @@ void controlMotorTask(void const * argument){
 		int16_t pitchIntensity = 0;
 		float pitchAngVP = 12.0;
 		float pitchAngVI = 0.0;
-		float pitchAngVD = 5000.0;
+		float pitchAngVD = 0;
 		static float pitchAngVIntegration = 0.0f;
 		static float pitchAngVLast = 0.0f;
 		float pitchAngVError = pitchAngVTarget - gYroY;
@@ -223,7 +266,7 @@ void controlMotorTask(void const * argument){
 //		yawIntensity = 0;
 //		pitchIntensity = 0;
 //		fw_printf("yawI = %5d | ", yawIntensity);
-		static int countwhile = 0;
+/*		static int countwhile = 0;
 		if(countwhile >= 500){
 			countwhile = 0;
 //			fw_printf("pvde = %f \r\n", pitchAngVTarget - gYroY);
@@ -246,7 +289,7 @@ void controlMotorTask(void const * argument){
 			countwhile++;
 		}
 		
-		
+	*/	
 //		yawIntensity = 0;
 //		pitchIntensity = 0;
 		
@@ -258,8 +301,28 @@ void controlMotorTask(void const * argument){
 		pData->Data[3] = (uint8_t)pitchIntensity;
 		IOPool_getNextWrite(motorCanTxIOPool);
 		//osDelay(250);
+    Control_Task();
+		vTaskDelayUntil( &xLastWakeTime, ( 1 / portTICK_RATE_MS ) );
 	}
 }
+/********************************************************************************
+   给底盘电调板发送指令，ID号为0x200８底盘返回ID为0x201-0x204
+*********************************************************************************/
+void Set_CM_Speed(int16_t cm1_iq, int16_t cm2_iq, int16_t cm3_iq, int16_t cm4_iq)
+{
+   	CanTxMsgTypeDef *tx_message = IOPool_pGetWriteData(motorCanTxIOPool);
+		tx_message->StdId = MOTORGIMBAL_ID;
+    tx_message->Data[0] = (uint8_t)(cm1_iq >> 8);
+    tx_message->Data[1] = (uint8_t)cm1_iq;
+    tx_message->Data[2] = (uint8_t)(cm2_iq >> 8);
+    tx_message->Data[3] = (uint8_t)cm2_iq;
+    tx_message->Data[4] = (uint8_t)(cm3_iq >> 8);
+    tx_message->Data[5] = (uint8_t)cm3_iq;
+    tx_message->Data[6] = (uint8_t)(cm4_iq >> 8);
+    tx_message->Data[7] = (uint8_t)cm4_iq;
+		IOPool_getNextWrite(motorCanTxIOPool);
+}
+
 
 extern osSemaphoreId motorCanTransmitSemaphoreHandle;
 void motorCanTransmitTask(void const * argument){
@@ -306,3 +369,163 @@ void motorCanTransmitTask(void const * argument){
 void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan){
 	osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
 }
+
+/*
+***********************************************************************************************
+*Name          :EncoderProcess
+*Input         :can message
+*Return        :void
+*Description   :to get the initiatial encoder of the chassis motor 201 202 203 204
+*
+*
+***********************************************************************************************
+*/
+void EncoderProcess(volatile Encoder *v, CanRxMsgTypeDef * msg)
+{
+	int i=0;
+	int32_t temp_sum = 0;    
+	v->last_raw_value = v->raw_value;
+	v->raw_value = (msg->Data[0]<<8)|msg->Data[1];
+	v->diff = v->raw_value - v->last_raw_value;
+	if(v->diff < -7500)    //两次编码器的反馈值差别太大，表示圈数发生了改变
+	{
+		v->round_cnt++;
+		v->ecd_raw_rate = v->diff + 8192;
+	}
+	else if(v->diff>7500)
+	{
+		v->round_cnt--;
+		v->ecd_raw_rate = v->diff- 8192;
+	}		
+	else
+	{
+		v->ecd_raw_rate = v->diff;
+	}
+	//计算得到连续的编码器输出值
+	v->ecd_value = v->raw_value + v->round_cnt * 8192;
+	//计算得到角度值，范围正负无穷大
+	v->ecd_angle = (float)(v->raw_value - v->ecd_bias)*360/8192 + v->round_cnt * 360;
+	v->rate_buf[v->buf_count++] = v->ecd_raw_rate;
+	if(v->buf_count == RATE_BUF_SIZE)
+	{
+		v->buf_count = 0;
+	}
+	//计算速度平均值
+	for(i = 0;i < RATE_BUF_SIZE; i++)
+	{
+		temp_sum += v->rate_buf[i];
+	}
+	v->filter_rate = (int32_t)(temp_sum/RATE_BUF_SIZE);					
+}
+/*
+***********************************************************************************************
+*Name          :GetEncoderBias
+*Input         :can message
+*Return        :void
+*Description   :to get the initiatial encoder of the chassis motor 201 202 203 204
+*
+*
+***********************************************************************************************
+*/
+
+void GetEncoderBias(volatile Encoder *v, CanRxMsgTypeDef * msg)
+{
+
+            v->ecd_bias = (msg->Data[0]<<8)|msg->Data[1];  //保存初始编码器值作为偏差  
+            v->ecd_value = v->ecd_bias;
+            v->last_raw_value = v->ecd_bias;
+            v->temp_count++;
+}
+/*
+************************************************************************************************************************
+*Name        : CanReceiveMsgProcess
+* Description: This function process the can message representing the encoder data received from the CAN2 bus.
+* Arguments  : msg     is a pointer to the can message.
+* Returns    : void
+* Note(s)    : none
+************************************************************************************************************************
+*/
+void CanReceiveMsgProcess(CanRxMsgTypeDef * msg)
+{      
+        //GMYawEncoder.ecd_bias = yaw_ecd_bias;
+        can_count++;
+		switch(msg->StdId)
+		{
+				case MOTOR1_ID:
+				{
+//					LostCounterFeed(GetLostCounter(MOTOR1_ID));
+					(can_count<=50) ? GetEncoderBias(&CM1Encoder ,msg):EncoderProcess(&CM1Encoder ,msg);       //获取到编码器的初始偏差值            
+                    
+				}break;
+				case MOTOR2_ID:
+				{
+//					LostCounterFeed(GetLostCounter(MOTOR2_ID));
+					(can_count<=50) ? GetEncoderBias(&CM2Encoder ,msg):EncoderProcess(&CM2Encoder ,msg);
+				}break;
+				case MOTOR3_ID:
+				{
+//					LostCounterFeed(GetLostCounter(MOTOR3_ID));
+					(can_count<=50) ? GetEncoderBias(&CM3Encoder ,msg):EncoderProcess(&CM3Encoder ,msg);   
+				}break;
+				case MOTOR4_ID:
+				{
+//					LostCounterFeed(GetLostCounter(MOTOR4_ID));
+				 	(can_count<=50) ? GetEncoderBias(&CM4Encoder ,msg):EncoderProcess(&CM4Encoder ,msg);
+				}break;
+				case MOTORYAW_ID:
+				{
+//					LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_MOTOR5));
+//					 GMYawEncoder.ecd_bias = yaw_ecd_bias;
+					 EncoderProcess(&GMYawEncoder ,msg);    
+				}
+						// 比较保存编码器的值和偏差值，如果编码器的值和初始偏差之间差距超过阈值，将偏差值做处理，防止出现云台反方向运动
+					// if(can_count>=90 && can_count<=100)
+/*					if(GetWorkState() == PREPARE_STATE)   //准备阶段要求二者之间的差值一定不能大于阈值，否则肯定是出现了临界切换
+					 {
+							 if((GMYawEncoder.ecd_bias - GMYawEncoder.ecd_value) <-4000)
+							 {
+								GMYawEncoder.ecd_bias = gAppParamStruct.GimbalCaliData.GimbalYawOffset + 8192;
+							 }
+							 else if((GMYawEncoder.ecd_bias - GMYawEncoder.ecd_value) > 4000)
+							 {
+								GMYawEncoder.ecd_bias = gAppParamStruct.GimbalCaliData.GimbalYawOffset - 8192;
+							 }
+					 }
+				}break;
+				case CAN_BUS2_MOTOR6_FEEDBACK_MSG_ID:
+				{
+					LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_MOTOR6));
+						//GMPitchEncoder.ecd_bias = pitch_ecd_bias;
+						EncoderProcess(&GMPitchEncoder ,msg);
+						//码盘中间值设定也需要修改
+						 if(can_count<=100)
+						 {
+							 if((GMPitchEncoder.ecd_bias - GMPitchEncoder.ecd_value) <-4000)
+							 {
+								 GMPitchEncoder.ecd_bias = gAppParamStruct.GimbalCaliData.GimbalPitchOffset + 8192;
+							 }
+							 else if((GMPitchEncoder.ecd_bias - GMPitchEncoder.ecd_value) > 4000)
+							 {
+								 GMPitchEncoder.ecd_bias = gAppParamStruct.GimbalCaliData.GimbalPitchOffset - 8192;
+							 }
+						 }
+				}break;		
+*/				
+/*				case CAN_BUS1_ZGYRO_FEEDBACK_MSG_ID:
+				{
+					LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_ZGYRO));
+					ZGyroModuleAngle = -0.01f*((int32_t)(msg->Data[0]<<24)|(int32_t)(msg->Data[1]<<16) | (int32_t)(msg->Data[2]<<8) | (int32_t)(msg->Data[3])); 
+				}break;
+				*/
+				default:
+				{
+				}
+		}
+		// check if deadlock, meeans the yaw angle is overflow //time should keep for a long time to avoid bug		
+/*			if(!LostCounterOverflowCheck(fabs(GMYawEncoder.ecd_angle), 70.0f) || GetWorkState() == STOP_STATE)  //如果是停止模式，一直喂狗防止重新启动失败
+			{
+				LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_DEADLOCK));
+			}		
+		*/
+}
+		

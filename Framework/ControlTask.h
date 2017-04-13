@@ -2,7 +2,11 @@
 #include "cmsis_os.h"
 
 void ControtLoopTaskInit(void);
-
+void Control_Task(void);
+void WorkStateFSM(void);
+static void WorkStateSwitchProcess(void);
+void CMControlLoop(void);
+void ShooterMControlLoop(void);
 //initiate status: 
 typedef enum
 {
@@ -15,8 +19,9 @@ typedef enum
 
 WorkState_e GetWorkState(void);
 
+#define PID_SHOOT_MOTOR_SPEED      (10)
 #define CHASSIS_SPEED_ATTENUATION   (1.0f)
-
+#define PREPARE_TIME_TICK_MS 4000      //prapare time in ms
 #define CHASSIS_MOTOR_ROTATE_PID_DEFAULT \
 {\
 	0,\
