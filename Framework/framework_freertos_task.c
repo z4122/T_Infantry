@@ -20,19 +20,19 @@ osThreadId readMPU6050TaskHandle;
 osThreadId printCtrlUartTaskHandle;
 
 void fw_freertos_addThreads(){
-	osThreadDef(ledGTask, ledGTask, osPriorityNormal, 0, 128);
+	osThreadDef(ledGTask, ledGTask, osPriorityNormal , 0, 128);
   ledGTaskHandle = osThreadCreate(osThread(ledGTask), NULL);
-	osThreadDef(ledRTask, ledRTask, osPriorityNormal, 0, 128);
+	osThreadDef(ledRTask, ledRTask, osPriorityNormal , 0, 128);
   ledRTaskHandle = osThreadCreate(osThread(ledRTask), NULL);
 	
-	osThreadDef(printRcTask, printRcTask, osPriorityNormal, 0, 128);
+	osThreadDef(printRcTask, printRcTask, osPriorityAboveNormal , 0, 128);
   printRcTaskHandle = osThreadCreate(osThread(printRcTask), NULL);
 	
-	osThreadDef(printMotorTask, printMotorTask, osPriorityNormal, 0, 128);
+	osThreadDef(printMotorTask, printMotorTask, osPriorityAboveNormal, 0, 128);
   printMotorTaskHandle = osThreadCreate(osThread(printMotorTask), NULL);
 	osThreadDef(controlMotorTask, controlMotorTask, osPriorityNormal, 0, 128);
   controlMotorTaskTaskHandle = osThreadCreate(osThread(controlMotorTask), NULL);
-	osThreadDef(motorCanTransmitTask, motorCanTransmitTask, osPriorityNormal, 0, 128);
+	osThreadDef(motorCanTransmitTask, motorCanTransmitTask, osPriorityAboveNormal, 0, 128);
   motorCanTransmitTaskHandle = osThreadCreate(osThread(motorCanTransmitTask), NULL);
 	
 	osThreadDef(printMPU6050Task, printMPU6050Task, osPriorityNormal, 0, 128);
@@ -42,4 +42,5 @@ void fw_freertos_addThreads(){
 	
 	osThreadDef(printCtrlUartTask, printCtrlUartTask, osPriorityNormal, 0, 128);
   printCtrlUartTaskHandle = osThreadCreate(osThread(printCtrlUartTask), NULL);
+	fw_printfln("taskint finished");
 }

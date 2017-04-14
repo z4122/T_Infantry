@@ -1,5 +1,7 @@
 #include "framework_freertos_semaphore.h"
 #include "framework_freertos_init.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
 
 osSemaphoreId motorCanTransmitSemaphoreHandle;
 osSemaphoreId readMPU6050SemaphoreHandle;
@@ -8,6 +10,7 @@ osSemaphoreId refreshMPU6050SemaphoreHandle;
 xSemaphoreHandle xSemaphore_uart;
 xSemaphoreHandle xSemaphore_rcuart;
 xSemaphoreHandle motorCanReceiveSemaphore;
+xSemaphoreHandle motorCanTransmitSemaphore;
 
 void fw_freertos_addSemaphores(){
 	osSemaphoreDef(motorCanTransmitSemaphore);
@@ -20,4 +23,5 @@ void fw_freertos_addSemaphores(){
 	vSemaphoreCreateBinary(xSemaphore_uart);
 	vSemaphoreCreateBinary(xSemaphore_rcuart);
 	vSemaphoreCreateBinary(motorCanReceiveSemaphore);
+	vSemaphoreCreateBinary(motorCanTransmitSemaphore);
 }

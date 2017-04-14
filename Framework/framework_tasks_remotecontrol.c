@@ -2,6 +2,7 @@
 #include "framework_drivers_uartremotecontrol.h"
 #include "framework_drivers_uartremotecontrol_iopool.h"
 #include "framework_drivers_led.h"
+#include "framework_utilities_debug.h"
 #include "stdint.h"
 #include "stddef.h"
 #include "ramp.h"
@@ -35,6 +36,7 @@ void printRcTask(void const * argument){
 	uint8_t data[18];
 	while(1){
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
+		fw_printfln("rcdata processing");
 		if(IOPool_hasNextRead(rcUartIOPool, 0)){
 			IOPool_getNextRead(rcUartIOPool, 0);
 			
@@ -158,8 +160,8 @@ void RemoteControlProcess(Remote *rc)
 
     if(GetWorkState() == NORMAL_STATE)
     {
-        pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
-        yawAngleTarget   += (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT;      	
+        GimbalRef.pitch_angle_dynamic_ref += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+        GimbalRef.yaw_angle_dynamic_ref    += (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT;      	
 	}
 	
 	/* not used to control, just as a flag */ 
@@ -226,8 +228,8 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		VAL_LIMIT(mouse->x, -150, 150); 
 		VAL_LIMIT(mouse->y, -150, 150); 
 		
-        yawAngleTarget -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  //(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
-        pitchAngleTarget   += mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
+        GimbalRef.pitch_angle_dynamic_ref -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  //(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+        GimbalRef.yaw_angle_dynamic_ref    += mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
 
 	}
 	

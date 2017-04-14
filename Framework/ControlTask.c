@@ -2,6 +2,7 @@
 #include "pid_Regulator.h"
 #include "framework_drivers_uartremotecontrol.h"
 #include "framework_drivers_motorcan.h"
+#include "framework_utilities_debug.h"
 
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT; 
 PID_Regulator_t CM1SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
@@ -94,6 +95,13 @@ void Control_Task(void)
 		//监控任务
 //		SuperviseTask();    
 		//底盘控制任务
+			static int countwhile = 0;
+			if(countwhile >= 2000){
+			countwhile = 0;
+//			fw_printfln("in CMcontrol_task");
+		}else{
+			countwhile++;
+		}
 		CMControlLoop();			 
 		ShooterMControlLoop();       //发射机构控制任务
 	}

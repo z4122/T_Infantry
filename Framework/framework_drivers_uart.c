@@ -179,6 +179,7 @@ extern float yawAngleTarget, pitchAngleTarget;
 void printCtrlUartTask(void const * argument){
 	while(1){
 		xSemaphoreTake(xSemaphore_uart, osWaitForever);
+		fw_printfln("CtrlUartTask processing");
 		if(IOPool_hasNextRead(ctrlUartIOPool, 0)){
 			IOPool_getNextRead(ctrlUartIOPool, 0);
 			
@@ -187,11 +188,11 @@ void printCtrlUartTask(void const * argument){
 			if( ctrlData.Success == 1) {
 				ctrlUartFlag = byte_EOF;
 //				printf("dataprocess finished\r\n");
-//				vSendUart( ctrlData );
+				vSendUart( ctrlData );
 			} else {
 				ctrlUartFlag = 0;
 //				printf("dataprocess error\r\n");
-//				vSendUart( ctrlData );
+				vSendUart( ctrlData );
 				}
 
 /*			for(uint8_t i = 0; i != 10; ++i){
