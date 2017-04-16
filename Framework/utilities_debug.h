@@ -1,7 +1,7 @@
-#ifndef FRAMEWORK_DEBUG_H
-#define FRAMEWORK_DEBUG_H
+#ifndef FRAMEWORK_UTILITIES_DEBUG_H
+#define FRAMEWORK_UTILITIES_DEBUG_H
 
-//µ÷ÊÔ¿ª¹Ø
+//è°ƒè¯•å¼€å…³
 #define _FW_DEBUG
 
 
