@@ -654,6 +654,11 @@
               <FileType>5</FileType>
               <FilePath>..\Framework\utilities_iopool.h</FilePath>
             </File>
+            <File>
+              <FileName>utilities_minmax.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\utilities_minmax.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -762,7 +767,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Framework/Tasks</GroupName>
+          <GroupName>Framework/Application</GroupName>
           <Files>
             <File>
               <FileName>tasks_mpu6050.h</FileName>
@@ -813,6 +818,16 @@
               <FileName>tasks_testtasks.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\tasks_testtasks.c</FilePath>
+            </File>
+            <File>
+              <FileName>application_pidfunc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\application_pidfunc.h</FilePath>
+            </File>
+            <File>
+              <FileName>application_pidfunc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\application_pidfunc.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -3,7 +3,8 @@
 
 osSemaphoreId motorCanTransmitSemaphoreHandle;
 osSemaphoreId motorCanReceiveSemaphoreHandle;
-osSemaphoreId refreshGimbalSemaphoreHandle;
+osSemaphoreId canrefreshGimbalSemaphoreHandle;
+osSemaphoreId imurefreshGimbalSemaphoreHandle;
 osSemaphoreId motorCanHaveTransmitSemaphoreHandle;
 
 osSemaphoreId readMPU6050SemaphoreHandle;
@@ -15,10 +16,12 @@ void fw_freertos_addSemaphores(){
 	motorCanTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(motorCanTransmitSemaphore), 1);
 	osSemaphoreDef(motorCanReceiveSemaphore);
 	motorCanReceiveSemaphoreHandle = osSemaphoreCreate(osSemaphore(motorCanReceiveSemaphore), 1);
-	osSemaphoreDef(refreshGimbalSemaphore);
-	refreshGimbalSemaphoreHandle = osSemaphoreCreate(osSemaphore(refreshGimbalSemaphore), 1);
 	osSemaphoreDef(motorCanHaveTransmitSemaphore);
 	motorCanHaveTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(motorCanHaveTransmitSemaphore), 1);
+	osSemaphoreDef(canrefreshGimbalSemaphore);
+	canrefreshGimbalSemaphoreHandle = osSemaphoreCreate(osSemaphore(canrefreshGimbalSemaphore), 1);
+	osSemaphoreDef(imurefreshGimbalSemaphore);
+	imurefreshGimbalSemaphoreHandle = osSemaphoreCreate(osSemaphore(imurefreshGimbalSemaphore), 1);
 	
 	osSemaphoreDef(readMPU6050Semaphore);
 	readMPU6050SemaphoreHandle = osSemaphoreCreate(osSemaphore(readMPU6050Semaphore), 1);

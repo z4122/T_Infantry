@@ -5,7 +5,8 @@
 
 extern osSemaphoreId motorCanTransmitSemaphoreHandle;
 extern osSemaphoreId motorCanReceiveSemaphoreHandle;
-extern osSemaphoreId refreshGimbalSemaphoreHandle;
+extern osSemaphoreId canrefreshGimbalSemaphoreHandle;
+extern osSemaphoreId imurefreshGimbalSemaphoreHandle;
 extern osSemaphoreId motorCanHaveTransmitSemaphoreHandle;
 
 extern osSemaphoreId readMPU6050SemaphoreHandle;

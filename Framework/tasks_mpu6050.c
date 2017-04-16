@@ -58,7 +58,7 @@ void printMPU6050Task(void const * argument){
 			mygetqval[8] = (float)mymz - 15.5f;
 			
 			gYroX = mygetqval[3];
-			gYroY = mygetqval[4] - (-0.5);
+			gYroY = mygetqval[4];// - (-0.5)
 			gYroZ = mygetqval[5];
 			
 #define Kp 2.0f
@@ -165,7 +165,7 @@ void printMPU6050Task(void const * argument){
 			angles[1] = -asin(-2 * q[1] * q[3] + 2 * q[0] * q[2])* 180/M_PI; // pitch    -pi/2    --- pi/2 
 			angles[2] = atan2(2 * q[2] * q[3] + 2 * q[0] * q[1], -2 * q[1] * q[1] - 2 * q[2] * q[2] + 1)* 180/M_PI; // roll       -pi-----pi  
 
-			osSemaphoreRelease(refreshGimbalSemaphoreHandle);
+			osSemaphoreRelease(imurefreshGimbalSemaphoreHandle);
 //			static int countPrint = 0;
 //			if(countPrint > 50){
 //				countPrint = 0;

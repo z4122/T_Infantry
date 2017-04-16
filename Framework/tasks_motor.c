@@ -6,6 +6,8 @@
 #include "utilities_debug.h"
 #include "tasks_upper.h"
 #include "drivers_led_user.h"
+#include "utilities_minmax.h"
+#include "application_pidfunc.h"
 
 #include "stdint.h"
 
@@ -28,185 +30,151 @@
 //	}
 //}
 
-#define MINMAX(value, min, max) value = (value < min) ? min : (value > max ? max : value)
+//PID_INIT(Kp, Ki, Kd, KpMax, KiMax, KdMax, OutputMax)
+PID_Regulator_t pitchPositionPID = PID_INIT(10.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
+PID_Regulator_t yawPositionPID = PID_INIT(30.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
+PID_Regulator_t pitchSpeedPID = PID_INIT(50.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);
+PID_Regulator_t yawSpeedPID = PID_INIT(70.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);
 
 extern float gYroX, gYroY, gYroZ;
 extern int forPidDebug;
 
 int counttestsemreleaseOk = 0;
 int counttestsemreleaseError = 0;
+
+//extern uint16_t testcanrxiopool;
+extern uint16_t pitchAngle, yawAngle;
 void controlMotorTask(void const * argument){
 	float yawAngleTarget = 0.0, pitchAngleTarget = 8.0;
-	int16_t yawZeroAngle = 1075, pitchZeroAngle = 710;
-	uint16_t yawAngle = 0, pitchAngle = 0;
+	int16_t yawZeroAngle = 1075, pitchZeroAngle = 710;//1075,710 | 750,6821
+	//uint16_t yawAngle = 0, pitchAngle = 0;
+	float yawRealAngle = 0.0, pitchRealAngle = 0.0;
 	uint16_t lastYawAngle = 0, lastPitchAngle = 0;
-	uint8_t isLastYawAngleInited = 0, isLastPitchAngleInited = 0;
+	
+	int16_t pitchIntensity = 0, yawIntensity = 0;
+	
+	uint8_t isLastAngleError = 0;
+	uint8_t pitchReady = 0, yawReady = 0;
 	while(1){
 		controlMotorTaskTasktaskcount++;
-		osSemaphoreWait(refreshGimbalSemaphoreHandle, osWaitForever);
-		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORYAW_ID)){
-			IOPool_getNextRead(motorCanRxIOPool, MOTORYAW_ID);
-			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTORYAW_ID);
-			yawAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
-		}
-		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORPITCH_ID)){
-			IOPool_getNextRead(motorCanRxIOPool, MOTORPITCH_ID);
-			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTORPITCH_ID);
-			pitchAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
-		}
-		if(isLastYawAngleInited && isLastPitchAngleInited 
-			&&(lastYawAngle - yawAngle > 100 || lastYawAngle - yawAngle < -100
-			|| lastPitchAngle - pitchAngle > 100 || lastPitchAngle - pitchAngle < -100)
-		){
-			continue;
-		}
-		lastYawAngle = yawAngle;
-		lastPitchAngle = pitchAngle;
-		isLastYawAngleInited = isLastPitchAngleInited = 1;
-		
-		MINMAX(yawAngleTarget, -45, 45);
-		MINMAX(pitchAngleTarget, -25, 25);
-		float yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8192.0;
-		yawRealAngle = (yawRealAngle > 180) ? yawRealAngle - 360 : yawRealAngle;
-		yawRealAngle = (yawRealAngle < -180) ? yawRealAngle + 360 : yawRealAngle;
-		float pitchRealAngle = (pitchZeroAngle - pitchAngle) * 360 / 8192.0;
-		pitchRealAngle = (pitchRealAngle > 180) ? pitchRealAngle - 360 : pitchRealAngle;
-		pitchRealAngle = (pitchRealAngle < -180) ? pitchRealAngle + 360 : pitchRealAngle;
-		
+		osSemaphoreWait(imurefreshGimbalSemaphoreHandle, osWaitForever);
+		osSemaphoreWait(canrefreshGimbalSemaphoreHandle, osWaitForever);
 		if(IOPool_hasNextRead(upperGimbalIOPool, 0)){
 			IOPool_getNextRead(upperGimbalIOPool, 0);
 			yawAngleTarget += IOPool_pGetReadData(upperGimbalIOPool, 0)->yawAdd;
 			pitchAngleTarget += IOPool_pGetReadData(upperGimbalIOPool, 0)->pitchAdd;
 		}
-//angle		
-		float yawAngVTarget;
-		float yawAngleP = -30.0;
-		yawAngVTarget = (yawAngleTarget - yawRealAngle) * yawAngleP;
 		
-		float pitchAngVTarget;
-		float pitchAngleP = -10.0;
-		pitchAngVTarget = (pitchAngleTarget - pitchRealAngle) * pitchAngleP;
-//angV
-		static float lastgYroY = 0;
-		static int countlastGY = 0;
-		if(lastgYroY != gYroY){
-			lastgYroY = gYroY;
-			countlastGY = 0;
-		}else{
-			countlastGY++;
+		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORYAW_ID)){
+			IOPool_getNextRead(motorCanRxIOPool, MOTORYAW_ID);
+			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTORYAW_ID);
+			//yawAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
+			
+			yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8192.0;
+			yawRealAngle = (yawRealAngle > 180) ? yawRealAngle - 360 : yawRealAngle;
+			yawRealAngle = (yawRealAngle < -180) ? yawRealAngle + 360 : yawRealAngle;
+			MINMAX(yawAngleTarget, -45, 45);
+			//position		
+			yawPositionPID.target = yawAngleTarget;
+			yawPositionPID.feedback = yawRealAngle;
+			yawPositionPID.Calc(&yawPositionPID);
+			//speed
+			yawSpeedPID.target = yawPositionPID.output;
+			yawSpeedPID.feedback = -gYroZ;
+			yawSpeedPID.Calc(&yawSpeedPID);
+			yawIntensity = (int16_t)yawSpeedPID.output;
+			
+			yawReady = 1;
 		}
-		if(countlastGY > 100){
-			ledRStatus = on;
+		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORPITCH_ID)){
+			IOPool_getNextRead(motorCanRxIOPool, MOTORPITCH_ID);
+			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTORPITCH_ID);
+			//pitchAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
+			
+			pitchRealAngle = -(pitchAngle - pitchZeroAngle) * 360 / 8192.0;
+			pitchRealAngle = (pitchRealAngle > 180) ? pitchRealAngle - 360 : pitchRealAngle;
+			pitchRealAngle = (pitchRealAngle < -180) ? pitchRealAngle + 360 : pitchRealAngle;
+			MINMAX(pitchAngleTarget, -25, 25);
+			//position		
+			pitchPositionPID.target = pitchAngleTarget;
+			pitchPositionPID.feedback = pitchRealAngle;
+			pitchPositionPID.Calc(&pitchPositionPID);
+			//speed
+			pitchSpeedPID.target = pitchPositionPID.output;
+			pitchSpeedPID.feedback = -gYroY;
+			pitchSpeedPID.Calc(&pitchSpeedPID);
+			pitchIntensity = -(int16_t)pitchSpeedPID.output;
+			
+			pitchReady = 1;
 		}
 		
-		int16_t yawIntensity = 0;
-		float yawAngVP = -70.0;
-		float yawIntensityTemp = (yawAngVTarget - gYroZ) * yawAngVP;
-		MINMAX(yawIntensityTemp, -4900, 4900);
-		yawIntensity = (int16_t)yawIntensityTemp;
-		
-		int16_t pitchIntensity = 0;
-		float pitchAngVP = 70.0;
-		float pitchAngVI = 0.0;
-		float pitchAngVD = 0.0;//
-		static float pitchAngVIntegration = 0.0f;
-		static float pitchAngVLast = 0.0f;
-		float pitchAngVError = pitchAngVTarget - gYroY;
-		pitchAngVIntegration += pitchAngVError;
-		float pitchIntensityTemp = pitchAngVError * pitchAngVP 
-			+ pitchAngVIntegration * pitchAngVI
-			+ (pitchAngVError - pitchAngVLast) * pitchAngVD;
-		pitchAngVLast = pitchAngVError;
-		MINMAX(pitchIntensityTemp, -4900, 4900);
-		pitchIntensity = (int16_t)pitchIntensityTemp;
+//		if(isLastAngleError >= 0){
+//			isLastAngleError = 0;
+//		}else if(/*isLastYawAngleInited && isLastPitchAngleInited 
+//			&&(*/lastYawAngle - yawAngle > 100 || lastYawAngle - yawAngle < -100
+//			|| lastPitchAngle - pitchAngle > 100 || lastPitchAngle - pitchAngle < -100/*)*/
+//		){
+//			isLastAngleError++;
+//			continue;
+//		}
+//		lastYawAngle = yawAngle;
+//		lastPitchAngle = pitchAngle;
+//		isLastYawAngleInited = isLastPitchAngleInited = 1;
 		
 		static int countwhile = 0;
-		static int yIoutCount = 0, pIoutCount = 0, totalCount = 0;
-		totalCount++;
-		if(yawIntensity == 4900 | yawIntensity == -4900){
-			yIoutCount++;
-		}
-		if(pitchIntensity == 4900 | pitchIntensity == -4900){
-			pIoutCount++;
-		}
-//		static uint16_t yA[20], pA[20];
-//		static int arrayCount = 0;
-//		if(arrayCount < 20){
-//			yA[arrayCount] = yawAngle;
-//			pA[arrayCount] = pitchAngle;
+//		static int yIoutCount = 0, pIoutCount = 0, totalCount = 0;
+//		totalCount++;
+//		if(yawIntensity == 4900 | yawIntensity == -4900){
+//			yIoutCount++;
 //		}
-//		arrayCount++;
-		if(countwhile >= 500){
+//		if(pitchIntensity == 4900 | pitchIntensity == -4900){
+//			pIoutCount++;
+//		}
+		if(countwhile >= 1){
 			countwhile = 0;
 			
-//			arrayCount = 0;
-//			for(int i = 0; i < 20; ++i){
-//				fw_printf("yA[%d] = %d\t", i, yA[i]);
-//			}
-//			for(int i = 0; i < 20; ++i){
-//				fw_printf("pA[%d] = %d\t", i, pA[i]);
-//			}
-//			fw_printfln("");
-//			fw_printf("pvde = %f \r\n", pitchAngVTarget - gYroY);
-//			fw_printf("pvdl = %f \r\n", pitchAngVLast);
-//			fw_printf("pvd = %f \r\n", (pitchAngVTarget - gYroY - pitchAngVLast) * pitchAngVD);
-//			fw_printf("pvde2 = %f \r\n", pitchAngVTarget - gYroY);
-//			fw_printf("pvdl2 = %f \r\n", pitchAngVLast);
-//			fw_printf("--------\r\n");
 			if(forPidDebug == 1){
-				fw_printf("yIoc = %d\t", yIoutCount);
-				fw_printf("pIoc = %d\t", pIoutCount);
-				fw_printf("count = %d\t", totalCount);
-				yIoutCount = 0, pIoutCount = 0, totalCount = 0;
+//				fw_printf("yIoc = %d\t", yIoutCount);
+//				fw_printf("pIoc = %d\t", pIoutCount);
+//				fw_printf("count = %d\t", totalCount);
+//				yIoutCount = 0, pIoutCount = 0, totalCount = 0;
 				
-				fw_printf("ya = %d\t", yawAngle);
-				fw_printf("yra = %f\t", yawRealAngle);
-				fw_printf("yI = %5d\t", yawIntensity);
-				fw_printf("yAVT = %f\t", yawAngVTarget);
-				fw_printf("gYroZ = %f\t", gYroZ);
+//				fw_printf("ya = %d\t", yawAngle);
+//				fw_printf("yra = %f\t", yawRealAngle);
+//				fw_printf("yI = %5d\t", yawIntensity);
+//				fw_printf("gYroZ = %f\t", gYroZ);
+//				
+//				fw_printf("pa = %d\t", pitchAngle);
+//				fw_printf("pra = %f\t", pitchRealAngle);
+//				fw_printf("pitI = %5d\t", pitchIntensity);
+//				fw_printf("gYroY = %f \r\n", gYroY);
 				
-				fw_printf("pa = %d\t", pitchAngle);
-				fw_printf("pra = %f\t", pitchRealAngle);
-				fw_printf("pitI = %5d\t", pitchIntensity);
-				fw_printf("pAVT = %f\t", pitchAngVTarget);
-				fw_printf("gYroY = %f \r\n", gYroY);
+				fw_printf("%d\r\n", pitchAngle);
 			}
 		}else{
 			countwhile++;
 		}
 		
-//		yawIntensity = 0;
-//		pitchIntensity = 0;
+		//fw_printf("%d\r\n", testcanrxiopool);
+		//yawIntensity = 0;
+		//pitchIntensity = -700;
 
-
-		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(motorCanTxIOPool);
-		pData->StdId = MOTORGIMBAL_ID;
-		pData->Data[0] = (uint8_t)(yawIntensity >> 8);
-		pData->Data[1] = (uint8_t)yawIntensity;
-		pData->Data[2] = (uint8_t)(pitchIntensity >> 8);
-		pData->Data[3] = (uint8_t)pitchIntensity;
-		IOPool_getNextWrite(motorCanTxIOPool);
-//			uint16_t cm1I = 1000;
-//			uint16_t cm2I = 1000;
-//			uint16_t cm3I = 1000;
-//			uint16_t cm4I = 1000;
-//			CanTxMsgTypeDef *pData = IOPool_pGetWriteData(motorCanTxIOPool);
-//			pData->StdId = MOTORCM_ID;//====MOTORGIMBAL_ID
-//			pData->Data[0] = (uint8_t)(cm1I >> 8);
-//			pData->Data[1] = (uint8_t)cm1I;
-//			pData->Data[2] = (uint8_t)(cm2I >> 8);
-//			pData->Data[3] = (uint8_t)cm2I;
-//			pData->Data[4] = (uint8_t)(cm3I >> 8);
-//			pData->Data[5] = (uint8_t)cm3I;
-//			pData->Data[6] = (uint8_t)(cm4I >> 8);
-//			pData->Data[7] = (uint8_t)cm4I;
-//		//		fw_printfln("pI:%d", pitchIntensity);
-//			IOPool_getNextWrite(motorCanTxIOPool);
+//		if(pitchReady == 1 && yawReady == 1){
+			CanTxMsgTypeDef *pData = IOPool_pGetWriteData(motorCanTxIOPool);
+			pData->StdId = MOTORGIMBAL_ID;
+			pData->Data[0] = (uint8_t)(yawIntensity >> 8);
+			pData->Data[1] = (uint8_t)yawIntensity;
+			pData->Data[2] = (uint8_t)(pitchIntensity >> 8);
+			pData->Data[3] = (uint8_t)pitchIntensity;
+			IOPool_getNextWrite(motorCanTxIOPool);
+			pitchReady = yawReady = 0;
+			
+			if(osSemaphoreRelease(motorCanHaveTransmitSemaphoreHandle) == osErrorOS){
+				counttestsemreleaseError++;
+			}else{
+				counttestsemreleaseOk++;
+			}
+//		}
 		
-		if(osSemaphoreRelease(motorCanHaveTransmitSemaphoreHandle) == osErrorOS){
-			counttestsemreleaseError++;
-		}else{
-			counttestsemreleaseOk++;
-		}
 	}
 }

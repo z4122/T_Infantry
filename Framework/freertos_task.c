@@ -37,7 +37,7 @@ void fw_freertos_addThreads(){
 	
 //	osThreadDef(printMotorTask, printMotorTask, osPriorityAboveNormal, 0, 128);
 //  printMotorTaskHandle = osThreadCreate(osThread(printMotorTask), NULL);
-	osThreadDef(controlMotorTask, controlMotorTask, osPriorityHigh, 0, 128);
+	osThreadDef(controlMotorTask, controlMotorTask, osPriorityAboveNormal, 0, 128);
   controlMotorTaskTaskHandle = osThreadCreate(osThread(controlMotorTask), NULL);
 	
 	osThreadDef(motorCanTransmitTask, motorCanTransmitTask, osPriorityRealtime, 0, 128);

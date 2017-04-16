@@ -79,7 +79,15 @@ void motorInit(){
 	isRcanStarted = 1;
 }
 
+uint16_t pitchAngle = 0, yawAngle = 0;
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
+	CanRxMsgTypeDef *temp = IOPool_pGetWriteData(motorCanRxIOPool);
+	if(temp->StdId == MOTORPITCH_ID){
+		pitchAngle = ((uint16_t)temp->Data[0] << 8) + (uint16_t)temp->Data[1];
+	}else if(temp->StdId == MOTORYAW_ID){
+		yawAngle = ((uint16_t)temp->Data[0] << 8) + (uint16_t)temp->Data[1];
+	}
+	
 	IOPool_getNextWrite(motorCanRxIOPool);
 	motorCan.pRxMsg = IOPool_pGetWriteData(motorCanRxIOPool);
 	if(HAL_CAN_Receive_IT(&motorCan, CAN_FIFO0) != HAL_OK){
@@ -89,7 +97,8 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 		isRcanStarted = 1;
 	}
 	if(isInited == 1){
-		osSemaphoreRelease(motorCanReceiveSemaphoreHandle);
+		osSemaphoreRelease(canrefreshGimbalSemaphoreHandle);
+		//osSemaphoreRelease(motorCanReceiveSemaphoreHandle);
 	}
 }
 
