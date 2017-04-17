@@ -290,7 +290,7 @@ void SetFrictionState(FrictionWheelState_e v)
 //“£øÿ∆˜ ‰»Î÷µ…Ë÷√£¨
 void GimbalAngleLimit()
 {
-	MINMAX(ChassisSpeedRef.forward_back_ref, -PITCH_MAX+7, PITCH_MAX);
+//	MINMAX(ChassisSpeedRef.forward_back_ref, -PITCH_MAX+7, PITCH_MAX);
 //	MINMAX(GimbalRef.yaw_angle_dynamic_ref, GMYPositionPID.fdb - 60, GMYPositionPID.fdb + 60);
 }
 

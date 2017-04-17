@@ -34,9 +34,9 @@ extern xSemaphoreHandle xSemaphore_rcuart;
 extern float yawAngleTarget, pitchAngleTarget;
 void printRcTask(void const * argument){
 	uint8_t data[18];
+			static int countwhile = 0;
 	while(1){
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
-		fw_printfln("rcdata processing");
 		if(IOPool_hasNextRead(rcUartIOPool, 0)){
 			IOPool_getNextRead(rcUartIOPool, 0);
 			
@@ -46,6 +46,27 @@ void printRcTask(void const * argument){
 			}
 		
 			RemoteDataProcess(data);
+			if(countwhile >= 300){
+			countwhile = 0;
+			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
+				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
+				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
+				fw_printf("ch3 = %d \r\n", RC_CtrlData.rc.ch3);
+				
+				fw_printf("s1 = %d | ", RC_CtrlData.rc.s1);
+				fw_printf("s2 = %d \r\n", RC_CtrlData.rc.s2);
+				
+				fw_printf("x = %d | ", RC_CtrlData.mouse.x);
+				fw_printf("y = %d | ", RC_CtrlData.mouse.y);
+				fw_printf("z = %d | ", RC_CtrlData.mouse.z);
+				fw_printf("l = %d | ", RC_CtrlData.mouse.press_l);
+				fw_printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
+				
+				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
+				fw_printf("===========\r\n");
+		}else{
+			countwhile++;
+		}
 			if(RC_CtrlData.rc.s1 == 1){
 				ledGStatus = on;
 			}else if(RC_CtrlData.rc.s1 == 2){
@@ -156,13 +177,17 @@ void RemoteControlProcess(Remote *rc)
     {
         ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
         ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
+			pitchAngleTarget -= (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+       yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
     }
 
     if(GetWorkState() == NORMAL_STATE)
     {
         GimbalRef.pitch_angle_dynamic_ref += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
         GimbalRef.yaw_angle_dynamic_ref    += (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT;      	
-	}
+//	      pitchAngleTarget -= (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+ //       yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
+		}
 	
 	/* not used to control, just as a flag */ 
     GimbalRef.pitch_speed_ref = rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET;    //speed_ref仅做输入量判断用
@@ -228,8 +253,8 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		VAL_LIMIT(mouse->x, -150, 150); 
 		VAL_LIMIT(mouse->y, -150, 150); 
 		
-        GimbalRef.pitch_angle_dynamic_ref -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  //(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
-        GimbalRef.yaw_angle_dynamic_ref    += mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
+        pitchAngleTarget -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  //(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+        yawAngleTarget    -= mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
 
 	}
 	

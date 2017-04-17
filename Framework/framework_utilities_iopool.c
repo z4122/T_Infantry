@@ -10,6 +10,8 @@ ReadPoolIndex_t getReadPoolIndexPrototype(Id_t id, uint8_t readPoolSize, const I
 			return i;
 		}
 	}
+	fw_printfln("size%d", readPoolSize);
+	fw_printfln("id%x", id);
 	fw_Error_Handler();
 	return i;
 }

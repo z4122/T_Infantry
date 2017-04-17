@@ -111,9 +111,16 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 	
 	IOPool_getNextWrite(motorCanRxIOPool);
 	motorCan.pRxMsg = IOPool_pGetWriteData(motorCanRxIOPool);
+/*		static int countwhilec = 0;
+		if(countwhilec >= 6000){
+			countwhilec = 0;
+				fw_printfln("can receive 6000");
+		}else{
+			countwhilec++;
+		}*/
 	xSemaphoreGiveFromISR(motorCanReceiveSemaphore, &xHigherPriorityTaskWoken);
 	if(HAL_CAN_Receive_IT(&motorCan, CAN_FIFO0) != HAL_OK){
-		//fw_Warning();
+		fw_Warning();
 		isRcanStarted = 0;
 	}else{
 		isRcanStarted = 1;
@@ -129,10 +136,9 @@ uint16_t yawAngle = 0, pitchAngle = 0;
 void printMotorTask(void const * argument){
 //	uint32_t id = 0;
 //	uint16_t data0 = 0, data1 = 0, data2 = 0;
+					static int countwhilec = 0;
 	while(1){
-		fw_printfln("printMotorTask runing");
 		xSemaphoreTake(motorCanReceiveSemaphore, osWaitForever);
-		fw_printfln("CanReceiveProcessing");
 		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORYAW_ID)){
 			IOPool_getNextRead(motorCanRxIOPool, MOTORYAW_ID);
 			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTORYAW_ID);
@@ -166,7 +172,7 @@ void printMotorTask(void const * argument){
 		}
 		if(IOPool_hasNextRead(motorCanRxIOPool, MOTOR4_ID)){
 			IOPool_getNextRead(motorCanRxIOPool, MOTOR4_ID);
-			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTOR3_ID);
+			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTOR4_ID);
 			CanReceiveMsgProcess(pData);
 		}
 		
@@ -242,8 +248,7 @@ void controlMotorTask(void const * argument){
 		float yawAngVTarget;
 		float yawAngleP = -20.0;
 		yawAngVTarget = (yawAngleTarget - yawRealAngle) * yawAngleP;
-		
-		float pitchAngVTarget;
+			float pitchAngVTarget;
 		float pitchAngleP = -10.0;
 		pitchAngVTarget = (pitchAngleTarget - pitchRealAngle) * pitchAngleP;
 //angV
@@ -272,7 +277,7 @@ void controlMotorTask(void const * argument){
 //		pitchIntensity = 0;
 //		fw_printf("yawI = %5d | ", yawIntensity);
 		static int countwhile = 0;
-		if(countwhile >= 2000){
+		if(countwhile >= 500){
 			countwhile = 0;
 //			fw_printf("pvde = %f \r\n", pitchAngVTarget - gYroY);
 //			fw_printf("pvdl = %f \r\n", pitchAngVLast);
@@ -290,7 +295,9 @@ void controlMotorTask(void const * argument){
 //			fw_printf("pitI = %5d | ", pitchIntensity);
 //			fw_printf("pAVT = %f | ", pitchAngVTarget);
 //			fw_printf("gYroY = %f \r\n", gYroY);
-			fw_printfln("controlMotortask runing");
+//			fw_printfln("controlMotortask runing");
+			fw_printfln("%f",yawAngleTarget);
+			fw_printfln("%d",yawIntensity);
 		}else{
 			countwhile++;
 		}
@@ -301,23 +308,20 @@ void controlMotorTask(void const * argument){
 		
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(motorCanTxIOPool);
 		pData->StdId = MOTORGIMBAL_ID;
-/*		pData->Data[0] = (uint8_t)(yawIntensity >> 8);
+		pData->Data[0] = (uint8_t)(yawIntensity >> 8);
 		pData->Data[1] = (uint8_t)yawIntensity;
 		pData->Data[2] = (uint8_t)(pitchIntensity >> 8);
-		pData->Data[3] = (uint8_t)pitchIntensity;*/
-			pData->Data[0] = 0;
-		pData->Data[1] = 0;
-		pData->Data[2] = 0;
-		pData->Data[3] = 0;
+		pData->Data[3] = (uint8_t)pitchIntensity;
 		IOPool_getNextWrite(motorCanTxIOPool);
+		xSemaphoreGive(motorCanTransmitSemaphore);
 		//osDelay(250);
     Control_Task();
-//		xSemaphoreGive(motorCanTransmitSemaphore);
+
 		if( xSemaphoreGive( motorCanTransmitSemaphore ) != pdTRUE )
        {
-       //    fw_printfln("xemaphoregive error");
+          fw_printfln("xemaphoregive error");
        }
-		vTaskDelayUntil( &xLastWakeTime, ( 3 / portTICK_RATE_MS ) );
+		vTaskDelayUntil( &xLastWakeTime, ( 1 / portTICK_RATE_MS ) );
 	}
 }
 /********************************************************************************
@@ -346,36 +350,16 @@ void motorCanTransmitTask(void const * argument){
 	static int countwhile = 0;
 	while(1){
 		xSemaphoreTake(motorCanTransmitSemaphore, osWaitForever);
-	/*	     if(xSemaphoreTake(motorCanTransmitSemaphore, osWaitForever) == pdTRUE )
-       {
-           fw_printfln("take error");
-       }
-
 		if(countwhile >= 500){
 			countwhile = 0;
 			fw_printfln("motorCanTransmitTask runing 500");
 		}else{
 			countwhile++;
-		}*/
-		fw_printfln("motorCanTransmitTask runing");
-		
-		if(IOPool_hasNextRead(motorCanTxIOPool, MOTORCM_ID)){
-			//fw_printf("m1");
-			osSemaphoreWait(motorCanTransmitSemaphoreHandle, osWaitForever);
-			//fw_printf("m2");
-			fw_printfln("CM CAN Transmit");
-			IOPool_getNextRead(motorCanTxIOPool, MOTORCM_ID);
-			motorCan.pTxMsg = IOPool_pGetReadData(motorCanTxIOPool, MOTORCM_ID);
-			if(HAL_CAN_Transmit_IT(&motorCan) != HAL_OK){
-				fw_Warning();
-				osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
-			}
 		}
-		if(IOPool_hasNextRead(motorCanTxIOPool, MOTORGIMBAL_ID)){
+				if(IOPool_hasNextRead(motorCanTxIOPool, MOTORGIMBAL_ID)){
 			//fw_printf("w1");
 			osSemaphoreWait(motorCanTransmitSemaphoreHandle, osWaitForever);
 			//fw_printf("w2");
-			fw_printfln("Gimbal CAN Transmit");
 			IOPool_getNextRead(motorCanTxIOPool, MOTORGIMBAL_ID);
 			motorCan.pTxMsg = IOPool_pGetReadData(motorCanTxIOPool, MOTORGIMBAL_ID);
 			if(HAL_CAN_Transmit_IT(&motorCan) != HAL_OK){
@@ -383,6 +367,18 @@ void motorCanTransmitTask(void const * argument){
 				osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
 			}
 		}
+		if(IOPool_hasNextRead(motorCanTxIOPool, MOTORCM_ID)){
+			//fw_printf("m1");
+			osSemaphoreWait(motorCanTransmitSemaphoreHandle, osWaitForever);
+			//fw_printf("m2");
+			IOPool_getNextRead(motorCanTxIOPool, MOTORCM_ID);
+			motorCan.pTxMsg = IOPool_pGetReadData(motorCanTxIOPool, MOTORCM_ID);
+			if(HAL_CAN_Transmit_IT(&motorCan) != HAL_OK){
+				fw_Warning();
+				osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
+			}
+		}
+
 		if(isRcanStarted == 0){
 			if(motorCan.State == HAL_CAN_STATE_BUSY_RX){
 				motorCan.State = HAL_CAN_STATE_READY;

@@ -184,10 +184,11 @@ void CMControlLoop(void)
 	else
 	{
 		 //底盘跟随编码器旋转PID计算
-		 CMRotatePID.ref = 1075;
+		 CMRotatePID.ref = 500;
 		 CMRotatePID.fdb = GMYawEncoder.ecd_angle;
 		 CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+				 ChassisSpeedRef.rotate_ref = 0;
 	}
 /*	if(Is_Lost_Error_Set(LOST_ERROR_RC))      //如果遥控器丢失，强制将速度设定值reset
 	{

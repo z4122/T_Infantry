@@ -20,10 +20,10 @@ void fw_freertos_init(){
 	
 	rcInit();
 	ctrlUartInit();
-	motorInit();
 	mpu6050Init();
 	Init_Quaternion();
 	fw_printfln("init success");
+  motorInit();
 	
 	//ÒÆÖ²º¯Êý
 	RemoteTaskInit();
