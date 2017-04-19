@@ -154,11 +154,8 @@ void ctrlUartRxCpltCallback(){ //控制串口回调函数
     	if(HAL_UART_Receive_DMA(&ctrlUart, &ctrlUartFlag, 1) != HAL_OK){
 			Error_Handler();}
 	}
-/*上下文切换	
-	if( xHigherPriorityTaskWoken == pdTRUE )
-{
-	portSWITCH_CONTEXT();
-}*/
+//上下文切换	
+      portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 /*真.串口回调函数*/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)

@@ -101,11 +101,8 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 	}else{
 		isRcanStarted = 1;
 	}
-	/*上下文切换	
-	if( xHigherPriorityTaskWoken == pdTRUE )
-{
-	portSWITCH_CONTEXT();
-}*/
+//上下文切换
+   portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 extern osSemaphoreId motorCanTransmitSemaphoreHandle;
 /*CAN发送回调函数*/

@@ -23,5 +23,5 @@ void fw_freertos_addSemaphores(){
 	vSemaphoreCreateBinary(xSemaphore_uart);
 	vSemaphoreCreateBinary(xSemaphore_rcuart);
 	vSemaphoreCreateBinary(motorCanReceiveSemaphore);
-	vSemaphoreCreateBinary(motorCanTransmitSemaphore);
+	motorCanTransmitSemaphore = xSemaphoreCreateCounting(10,0);
 }

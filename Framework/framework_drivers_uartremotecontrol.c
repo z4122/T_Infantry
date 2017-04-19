@@ -37,6 +37,8 @@ void rcUartRxCpltCallback(){
 	//TODO context switch
 	IOPool_getNextWrite(rcUartIOPool);
 	HAL_UART_Receive_DMA(&rcUart, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
+//иообндгп╩╩
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 RC_Ctl_t RC_CtrlData;   //remote control data
