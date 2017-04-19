@@ -46,7 +46,7 @@
 #include "task.h"
 #include "cmsis_os.h"
 
-/* USER CODE BEGIN Includes */   
+/* USER CODE BEGIN Includes */     
 #include "framework_freertos_init.h"
 /* USER CODE END Includes */
 
