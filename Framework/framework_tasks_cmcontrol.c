@@ -1,4 +1,4 @@
-#include "ControlTask.h"
+#include "framework_tasks_cmcontrol.h"
 #include "pid_Regulator.h"
 #include "framework_drivers_uartremotecontrol.h"
 #include "framework_drivers_motorcan.h"
@@ -70,31 +70,14 @@ void ControtLoopTaskInit(void)
 	CM3SpeedPID.Reset(&CM3SpeedPID);
 	CM4SpeedPID.Reset(&CM4SpeedPID);
 }
-//控制任务，放在timer6 1ms定时中断中执行
-void Control_Task(void)
+/*底盘控制任务*/
+void CMControl_Task(void)
 {
 	time_tick_1ms++;
-	WorkStateFSM();
-	WorkStateSwitchProcess();
-
-	//平台稳定启动后，复位陀螺仪模块
-/*	if(time_tick_1ms == PREPARE_TIME_TICK_MS/2)
-	{
-		GYRO_RST();
-	}
-	*/	
-	//step 1: 云台控制
-//	GimbalYawControlModeSwitch();   //模式切换处理，得到位置环的设定值和给定值
-//	GMPitchControlLoop();
-//	GMYawControlLoop();
-//	SetGimbalMotorOutput();
-//	CalibrateLoop();   //校准任务，当接收到校准命令后才有效执行，否则直接跳过
-	//chassis motor control
 	if(time_tick_1ms%4 == 0)  {       //motor control frequency 4ms
 //	{
 		//监控任务
 //		SuperviseTask();    
-		//底盘控制任务
 			static int countwhile = 0;
 			if(countwhile >= 2000){
 			countwhile = 0;
@@ -109,7 +92,7 @@ void Control_Task(void)
 	
 
 /**********************************************************
-*工作状态切换状态机,与1ms定时中断同频率
+*工作状态切换状态机
 **********************************************************/
 
 void WorkStateFSM(void)
@@ -163,8 +146,7 @@ void WorkStateFSM(void)
 		}
 	}	
 }
-
-static void WorkStateSwitchProcess(void)
+void WorkStateSwitchProcess(void)
 {
 	//如果从其他模式切换到prapare模式，要将一系列参数初始化
 	if((lastWorkState != workState) && (workState == PREPARE_STATE))  

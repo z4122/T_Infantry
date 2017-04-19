@@ -4,7 +4,7 @@
 #include "framework_drivers_led.h"
 #include "usart.h"
 #include "ramp.h"
-#include "ControlTask.h"
+#include "framework_tasks_cmcontrol.h"
 
 #define MINMAX(value, min, max) value = (value < min) ? min : (value > max ? max : value)
 /*****Begin define ioPool*****/
@@ -22,7 +22,6 @@ IOPoolDefine(rcUartIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, R
 #undef GetIdFunc
 #undef ReadPoolInit
 /*****End define ioPool*****/
-
 void rcInit(){
 	//遥控器DMA接收开启(一次接收18个字节)
 	if(HAL_UART_Receive_DMA(&rcUart, IOPool_pGetWriteData(rcUartIOPool)->ch, 18) != HAL_OK){
@@ -30,29 +29,29 @@ void rcInit(){
 	} 
 }
 extern xSemaphoreHandle xSemaphore_rcuart;
+/*遥控器串口回掉函数*/
 void rcUartRxCpltCallback(){
-	//osStatus osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec);
-	//优先级指示
 	static portBASE_TYPE xHigherPriorityTaskWoken;
-  xHigherPriorityTaskWoken = pdFALSE;
-	
-	IOPool_getNextWrite(rcUartIOPool);
+  xHigherPriorityTaskWoken = pdFALSE; //givefromisr 要求变量
 	xSemaphoreGiveFromISR(xSemaphore_rcuart, &xHigherPriorityTaskWoken);
+	//TODO context switch
+	IOPool_getNextWrite(rcUartIOPool);
 	HAL_UART_Receive_DMA(&rcUart, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 }
 
 RC_Ctl_t RC_CtrlData;   //remote control data
-ChassisSpeed_Ref_t ChassisSpeedRef;
-Gimbal_Ref_t GimbalRef;
- FrictionWheelState_e friction_wheel_state = FRICTION_WHEEL_OFF;
+ChassisSpeed_Ref_t ChassisSpeedRef; //底盘电机目标速度
+Gimbal_Ref_t GimbalRef; //云台目标
+FrictionWheelState_e friction_wheel_state = FRICTION_WHEEL_OFF; //摩擦轮状态
 
-static volatile Shoot_State_e shootState = NOSHOOTING;
+static volatile Shoot_State_e shootState = NOSHOOTING; //拨盘电机状态
 static InputMode_e inputmode = REMOTE_INPUT;   //输入模式设定
 
 RampGen_t frictionRamp = RAMP_GEN_DAFAULT;  //摩擦轮斜坡
 RampGen_t LRSpeedRamp = RAMP_GEN_DAFAULT;   //mouse左右移动斜坡
 RampGen_t FBSpeedRamp = RAMP_GEN_DAFAULT;   //mouse前后移动斜坡
- 
+
+/*遥控器左上角*/
 void GetRemoteSwitchAction(RemoteSwitch_t *sw, uint8_t val)
 {
 	static uint32_t switch_cnt = 0;
@@ -100,8 +99,7 @@ uint8_t IsRemoteBeingAction(void)
 {
 	return (abs(ChassisSpeedRef.forward_back_ref)>=10 || abs(ChassisSpeedRef.left_right_ref)>=10 || fabs(GimbalRef.yaw_speed_ref)>=10 || fabs(GimbalRef.pitch_speed_ref)>=10);
 }
-
-//输入模式设置 
+/*遥控器右上角*/
 void SetInputMode(Remote *rc)
 {
 	if(rc->s2 == 1)
@@ -287,7 +285,7 @@ void SetFrictionState(FrictionWheelState_e v)
 {
 	friction_wheel_state = v;
 }
-//遥控器输入值设置，
+//遥控器输入值限制
 void GimbalAngleLimit()
 {
 //	MINMAX(ChassisSpeedRef.forward_back_ref, -PITCH_MAX+7, PITCH_MAX);

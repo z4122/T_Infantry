@@ -23,8 +23,8 @@ void rcUartRxCpltCallback(void);
 #define FRICTION_WHEEL_MAX_DUTY             1600
 
 //mouse control parameters
-#define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f
-#define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f
+#define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 3
+#define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 3
 
 #define NORMAL_FORWARD_BACK_SPEED 			500
 #define NORMAL_LEFT_RIGHT_SPEED   			700
@@ -169,7 +169,5 @@ void GimbalAngleLimit(void);
 void GetRemoteSwitchAction(RemoteSwitch_t *sw, uint8_t val);
 void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val);
 void MouseShootControl(Mouse *mouse);
-
-
 void SetInputMode(Remote *rc);
 #endif

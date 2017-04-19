@@ -1,10 +1,12 @@
+#ifndef FRAMEWORK_TASKS_CMCONTROL_H
+#define FRAMEWORK_TASKS_CMCONTROL_H
 
 #include "cmsis_os.h"
 
 void ControtLoopTaskInit(void);
-void Control_Task(void);
+void CMControl_Task(void);
 void WorkStateFSM(void);
-static void WorkStateSwitchProcess(void);
+void WorkStateSwitchProcess(void);
 void CMControlLoop(void);
 void ShooterMControlLoop(void);
 //initiate status: 
@@ -212,5 +214,5 @@ WorkState_e GetWorkState(void);
 	&PID_Reset,\
 }\
 
-
+#endif
 

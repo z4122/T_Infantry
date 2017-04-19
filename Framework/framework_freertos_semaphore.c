@@ -10,7 +10,7 @@ osSemaphoreId refreshMPU6050SemaphoreHandle;
 xSemaphoreHandle xSemaphore_uart;
 xSemaphoreHandle xSemaphore_rcuart;
 xSemaphoreHandle motorCanReceiveSemaphore;
-xSemaphoreHandle motorCanTransmitSemaphore;
+xSemaphoreHandle motorCanTransmitSemaphore;//controltask -> transmit task
 
 void fw_freertos_addSemaphores(){
 	osSemaphoreDef(motorCanTransmitSemaphore);

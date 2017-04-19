@@ -3,6 +3,22 @@
 
 #include "cmsis_os.h"
 #include "can.h"
+#include "framework_utilities_iopool.h"
+
+IOPoolDeclare(motorCanRxIOPool, CanRxMsgTypeDef);
+IOPoolDeclare(motorCanTxIOPool, CanTxMsgTypeDef);
+
+#define MOTOR1_ID 0x201u
+#define MOTOR2_ID 0x202u
+#define MOTOR3_ID 0x203u
+#define MOTOR4_ID 0x204u
+#define MOTORYAW_ID 0x205u
+#define MOTORPITCH_ID 0x206u
+
+#define MOTORCM_ID 0x200u
+#define MOTORGIMBAL_ID 0x1FFu
+
+#define motorCan hcan2
 
 #define RATE_BUF_SIZE 6
 typedef struct{
@@ -21,10 +37,7 @@ typedef struct{
 }Encoder;
 
 void motorInit(void);
-void printMotorTask(void const * argument);
-void controlMotorTask(void const * argument);
 void Set_CM_Speed(int16_t cm1_iq, int16_t cm2_iq, int16_t cm3_iq, int16_t cm4_iq);
-void motorCanTransmitTask(void const * argument);
 void EncoderProcess(volatile Encoder *v, CanRxMsgTypeDef * msg);
 void GetEncoderBias(volatile Encoder *v, CanRxMsgTypeDef * msg);
 void CanReceiveMsgProcess(CanRxMsgTypeDef * msg);

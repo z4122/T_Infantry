@@ -7,7 +7,6 @@
 #include "usart.h"
 #include "semphr.h"
 #include "cmsis_os.h"
-#define size_frame 14  //定义妙算串口帧长度/字节
 
 /*****Begin define ioPool*****/
 #define DataPoolInit {0}  
@@ -16,7 +15,7 @@
 #define GetIdFunc 0 
 #define ReadPoolInit {0, Empty, 1}
 
-IOPoolDeclare(ctrlUartIOPool, struct{uint8_t ch[size_frame];});
+
 IOPoolDefine(ctrlUartIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
 
 #undef DataPoolInit 
@@ -27,12 +26,9 @@ IOPoolDefine(ctrlUartIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc,
 /*****End define ioPool*****/
 
 #define ctrlUart huart3
-#define byte_SOF 0x7d    //起始字节	
-#define byte_EOF 0x7e    //终止字节
-#define byte_ESCAPE 0xff //转义字节
 uint8_t ctrlUartFlag = byte_EOF; //帧错误后，等待终止字节
 xdata_ctrlUart ctrlData; //妙算接收变量
-/*发送协遥(暂无)*/
+/*发送协议*/
 //插入数组
 void vInsert( uint8_t a[ ], uint8_t i, uint8_t n, uint8_t number){
     for (int j=n;j>i;j--){
@@ -139,12 +135,12 @@ void ctrlUartInit(){
 }
 
 extern xSemaphoreHandle xSemaphore_uart; //妙算串口互斥信号量
-void ctrlUartRxCpltCallback(){ //控制串口回掉函数
+void ctrlUartRxCpltCallback(){ //控制串口回调函数
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
 	//osStatus osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec);
 	IOPool_getNextWrite(ctrlUartIOPool);
-	if( ctrlUartFlag == byte_EOF){   
+	if( ctrlUartFlag == byte_EOF){   //若ctrlUartFlag 为结尾字节，正常
 		if(HAL_UART_Receive_DMA(&ctrlUart, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
 			Error_Handler();
 		}
@@ -154,7 +150,7 @@ void ctrlUartRxCpltCallback(){ //控制串口回掉函数
 			if( ctrlData.Success == 1) 	ctrlUartFlag = byte_EOF;			 
 			else 	ctrlUartFlag = 0;				
 	}
-	else{
+	else{//若ctrlUartFlag 不是结尾字节，阻塞读取
     	if(HAL_UART_Receive_DMA(&ctrlUart, &ctrlUartFlag, 1) != HAL_OK){
 			Error_Handler();}
 	}
@@ -164,6 +160,7 @@ void ctrlUartRxCpltCallback(){ //控制串口回掉函数
 	portSWITCH_CONTEXT();
 }*/
 }
+/*真.串口回调函数*/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
 	if(UartHandle == &rcUart){
@@ -173,73 +170,3 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 	}
 }   
 
-#include "framework_drivers_flash.h"
-extern float yawAngleTarget, pitchAngleTarget;
-//妙算变量处理task
-void printCtrlUartTask(void const * argument){
-	while(1){
-		xSemaphoreTake(xSemaphore_uart, osWaitForever);
-		fw_printfln("CtrlUartTask processing");
-		if(IOPool_hasNextRead(ctrlUartIOPool, 0)){
-			IOPool_getNextRead(ctrlUartIOPool, 0);
-			
-			uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
-			ctrlData = xUartprocess( pData );
-			if( ctrlData.Success == 1) {
-				ctrlUartFlag = byte_EOF;
-//				printf("dataprocess finished\r\n");
-				vSendUart( ctrlData );
-			} else {
-				ctrlUartFlag = 0;
-//				printf("dataprocess error\r\n");
-				vSendUart( ctrlData );
-				}
-
-/*			for(uint8_t i = 0; i != 10; ++i){
-				data[i] = pData[i];
-			}			
-			if(data[0] == 'L'){
-				yawAngleTarget += 15.0f;
-			}else if(data[0] == 'R'){
-				yawAngleTarget -= 15.0f;
-			}else if(data[0] == 'U'){
-				pitchAngleTarget += 8.0f;
-			}else if(data[0] == 'D'){
-				pitchAngleTarget -= 8.0f;
-			}else if(data[0] == 'T'){
-				fw_printfln("received T: %d", data[1]);
-			}
-			*/
-//			else if(data[0] == 'F'){
-//				uint32_t temp;
-//				if(data[1] == '1'){
-//					temp = 1;
-//				}else if(data[1] == '0'){
-//					temp = 0;
-//				}else{
-//					temp = 99;
-//				}
-//				STMFLASH_Write(PARAM_SAVED_START_ADDRESS, &temp, 1);
-//				fw_printfln("F: %d", temp);
-//			}else if(data[0] == 'X'){
-//				uint32_t temp;
-//				STMFLASH_Read(PARAM_SAVED_START_ADDRESS, &temp, 1);
-//				fw_printfln("Read: %d", temp);
-//			}				
-			
-//			fw_printf("d:");
-//			fw_printf("%c|", data[0]);
-//			fw_printf("%c|", data[1]);
-//			fw_printf("%c|", data[2]);
-//			fw_printf("%c|", data[3]);
-//			fw_printf("%c|", data[4]);
-//			fw_printf("%c|", data[5]);
-//			fw_printf("%c|", data[6]);
-//			fw_printf("%c|", data[7]);
-//			fw_printf("%c|", data[8]);
-//			fw_printf("%c\r\n", data[9]);
-//			fw_printf("===========\r\n");
-
-		}
-	}
-}

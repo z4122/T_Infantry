@@ -8,7 +8,7 @@
 #include "framework_drivers_mpu6050.h"
 #include "framework_drivers_uart.h"
 #include "framework_tasks_remotecontrol.h"
-#include "ControlTask.h"
+#include "framework_tasks_cmcontrol.h"
 
 void fw_freertos_init(){
 	//wait for devices

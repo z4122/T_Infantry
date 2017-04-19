@@ -6,7 +6,7 @@
 #include "stdint.h"
 #include "stddef.h"
 #include "ramp.h"
-#include "ControlTask.h"
+#include "framework_tasks_cmcontrol.h"
 
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
@@ -23,8 +23,6 @@ extern Gimbal_Ref_t GimbalRef;
 extern FrictionWheelState_e friction_wheel_state ;
 static RemoteSwitch_t switch1;   //Ò£¿ØÆ÷×ó²à²¦¸Ë
 
-
-
 extern RampGen_t frictionRamp ;  //Ä¦²ÁÂÖÐ±ÆÂ
 extern RampGen_t LRSpeedRamp ;   //mouse×óÓÒÒÆ¶¯Ð±ÆÂ
 extern RampGen_t FBSpeedRamp  ;   //mouseÇ°ºóÒÆ¶¯Ð±ÆÂ
@@ -39,13 +37,14 @@ void printRcTask(void const * argument){
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
 		if(IOPool_hasNextRead(rcUartIOPool, 0)){
 			IOPool_getNextRead(rcUartIOPool, 0);
-			
+	
 			uint8_t *pData = IOPool_pGetReadData(rcUartIOPool, 0)->ch;
 			for(uint8_t i = 0; i != 18; ++i){
 				data[i] = pData[i];
 			}
 		
 			RemoteDataProcess(data);
+			
 			if(countwhile >= 300){
 			countwhile = 0;
 			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
@@ -67,39 +66,6 @@ void printRcTask(void const * argument){
 		}else{
 			countwhile++;
 		}
-			if(RC_CtrlData.rc.s1 == 1){
-				ledGStatus = on;
-			}else if(RC_CtrlData.rc.s1 == 2){
-				ledGStatus = blink;
-			}else{
-				ledGStatus = off;
-			}
-			if(RC_CtrlData.rc.s2 == 1){
-				ledRStatus = on;
-			}else if(RC_CtrlData.rc.s2 == 2){
-				ledRStatus = blink;
-			}else{
-				ledRStatus = off;
-			}
-			
-			
-//			printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
-//			printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
-//			printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
-//			printf("ch3 = %d \r\n", RC_CtrlData.rc.ch3);
-//			
-//			printf("s1 = %d | ", RC_CtrlData.rc.s1);
-//			printf("s2 = %d \r\n", RC_CtrlData.rc.s2);
-//			
-//			printf("x = %d | ", RC_CtrlData.mouse.x);
-//			printf("y = %d | ", RC_CtrlData.mouse.y);
-//			printf("z = %d | ", RC_CtrlData.mouse.z);
-//			printf("l = %d | ", RC_CtrlData.mouse.press_l);
-//			printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
-//			
-//			printf("key = %d \r\n", RC_CtrlData.key.v);
-//			printf("===========\r\n");
-
 		}
 	}
 }
@@ -150,8 +116,6 @@ void RemoteDataProcess(uint8_t *pData)
 		
 		SetInputMode(&RC_CtrlData.rc);
 	
-	//RemoteControlProcess(&(RC_CtrlData.rc));
-	
 	switch(GetInputMode())
 	{
 		case REMOTE_INPUT:
@@ -161,7 +125,7 @@ void RemoteDataProcess(uint8_t *pData)
 		}break;
 		case KEY_MOUSE_INPUT:
 		{
-			//Ò£¿ØÆ÷¿ØÖÆÄ£Ê½
+			//Êó±ê¼üÅÌ¿ØÖÆÄ£Ê½
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 		}break;
 		case STOP:
@@ -193,7 +157,7 @@ void RemoteControlProcess(Remote *rc)
     GimbalRef.pitch_speed_ref = rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET;    //speed_ref½ö×öÊäÈëÁ¿ÅÐ¶ÏÓÃ
     GimbalRef.yaw_speed_ref   = (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET);
 	GimbalAngleLimit();
-	//Ò£¿ØÆ÷²¦¸ËÊý¾Ý´¦Àí	
+	//Éä»÷-Ä¦²ÁÂÖ£¬²¦ÅÌµç»ú×´Ì¬
 	RemoteShootControl(&switch1, rc->s1);
 		
 
@@ -206,6 +170,11 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 	static uint16_t left_right_speed = 0;
     if(GetWorkState()!=PREPARE_STATE)
     {
+					VAL_LIMIT(mouse->x, -150, 150); 
+		VAL_LIMIT(mouse->y, -150, 150); 
+		
+        pitchAngleTarget -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  //(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+        yawAngleTarget    -= mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
 		//speed mode: normal speed/high speed
 		if(key->v & 0x10)
 		{
@@ -248,7 +217,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		}
 	}
 	//step2: gimbal ref calc
-    if(GetWorkState() == NORMAL_STATE)
+ /*   if(GetWorkState() == NORMAL_STATE)
     {
 		VAL_LIMIT(mouse->x, -150, 150); 
 		VAL_LIMIT(mouse->y, -150, 150); 
@@ -257,7 +226,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
         yawAngleTarget    -= mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
 
 	}
-	
+	*/
 	/* not used to control, just as a flag */ 
     GimbalRef.pitch_speed_ref = mouse->y;    //speed_ref½ö×öÊäÈëÁ¿ÅÐ¶ÏÓÃ
     GimbalRef.yaw_speed_ref   = mouse->x;
