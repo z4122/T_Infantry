@@ -3,6 +3,8 @@
 #include "framework_drivers_uartremotecontrol.h"
 #include "framework_drivers_motorcan.h"
 #include "framework_utilities_debug.h"
+#include "tim.h"
+#include "stdint.h"
 
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT; 
 PID_Regulator_t CM1SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
@@ -69,6 +71,10 @@ void ControtLoopTaskInit(void)
 	CM2SpeedPID.Reset(&CM2SpeedPID);
 	CM3SpeedPID.Reset(&CM3SpeedPID);
 	CM4SpeedPID.Reset(&CM4SpeedPID);
+	HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+	HAL_TIM_PWM_Start(&htim9, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2);
 }
 /*底盘控制任务*/
 void CMControl_Task(void)
@@ -203,21 +209,42 @@ void CMControlLoop(void)
 	 } 
 	 
 }
+static char Encoder_Dir = 1;
+  
+int32_t GetQuadEncoderDiff(void)
+{
+  int32_t cnt = 0;    
+	cnt = 0x7fff - __HAL_TIM_GET_COUNTER(&htim3);
+//	fw_printfln("%x",cnt);
+	 __HAL_TIM_SET_COUNTER(&htim3, 0x7fff);
+    if(Encoder_Dir == 1)
+	{
+		return cnt;	
+	}
+	else
+	{
+		return -cnt;            
+	}
+}
+
 //发射机构射击电机任务
 int16_t pwm_ccr = 0;
+extern TIM_HandleTypeDef htim9;
+uint16_t x = 0;
 void ShooterMControlLoop(void)	
 {				      
 	if(GetShootState() == SHOOTING)
 	{
-		ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;				
+		ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;	
 	}
 	else
 	{
 		ShootMotorSpeedPID.ref = 0;		
 	}
 	
-//	ShootMotorSpeedPID.fdb = GetQuadEncoderDiff();   
+	ShootMotorSpeedPID.fdb = GetQuadEncoderDiff();   
 	ShootMotorSpeedPID.Calc(&ShootMotorSpeedPID);
-//	PWM3 = ShootMotorSpeedPID.output;	
+	fw_printfln("%d",(uint32_t)ShootMotorSpeedPID.output);
+	__HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_1, ShootMotorSpeedPID.output);
 }
 

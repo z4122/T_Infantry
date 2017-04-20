@@ -4,6 +4,7 @@
 #include "framework_drivers_led.h"
 #include "usart.h"
 #include "ramp.h"
+#include "tim.h"
 #include "framework_tasks_cmcontrol.h"
 
 #define MINMAX(value, min, max) value = (value < min) ? min : (value > max ? max : value)
@@ -148,7 +149,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			{
 //				LASER_OFF();
 				SetShootState(NOSHOOTING);
-//				SetFrictionWheelSpeed(1000);
+				SetFrictionWheelSpeed(1000);
 				friction_wheel_state = FRICTION_WHEEL_OFF;
 				frictionRamp.ResetCounter(&frictionRamp);
 			}
@@ -156,7 +157,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			{
 				//摩擦轮加速
 				
-//				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
+				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
 					friction_wheel_state = FRICTION_WHEEL_ON; 	
@@ -170,7 +171,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			{
 //				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  
-//				SetFrictionWheelSpeed(1000); 
+				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetShootState(NOSHOOTING);
 			}
@@ -216,14 +217,14 @@ void MouseShootControl(Mouse *mouse)
 			{
 //				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  
-//				SetFrictionWheelSpeed(1000); 
+				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetShootState(NOSHOOTING);
 			}
 			else
 			{
 				//摩擦轮加速				
-//				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
+				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
 					friction_wheel_state = FRICTION_WHEEL_ON; 	
@@ -246,7 +247,7 @@ void MouseShootControl(Mouse *mouse)
 			{
 //				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  
-//				SetFrictionWheelSpeed(1000); 
+				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetShootState(NOSHOOTING);
 			}			
@@ -286,6 +287,11 @@ FrictionWheelState_e GetFrictionState()
 void SetFrictionState(FrictionWheelState_e v)
 {
 	friction_wheel_state = v;
+}
+void SetFrictionWheelSpeed(uint16_t x)
+{
+	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, x);
+	__HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, x);
 }
 //遥控器输入值限制
 void GimbalAngleLimit()

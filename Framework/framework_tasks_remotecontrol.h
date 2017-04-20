@@ -12,5 +12,4 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key);
 void RemoteControlProcess(Remote *rc);
 
 
-
 #endif
