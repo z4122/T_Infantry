@@ -5,6 +5,14 @@
 #include "cmsis_os.h"
 #include "framework_drivers_uartremotecontrol.h"
 
+typedef enum
+{
+	AUTO = 0,
+	MANUL = 1,
+}Shoot_Mode_e;
+Shoot_Mode_e GetShootMode(void);
+void SetShootMode(Shoot_Mode_e v);
+
 void printRcTask(void const * argument);
 void RemoteTaskInit(void);
 void RemoteDataProcess(uint8_t *pData);
