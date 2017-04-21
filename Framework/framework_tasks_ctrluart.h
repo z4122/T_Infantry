@@ -6,6 +6,6 @@
 #include "framework_utilities_iopool.h"
 
 IOPoolDeclare(upperGimbalIOPool, struct{float yawAdd; float pitchAdd;});
-void printCtrlUartTask(void const * argument);
+void CtrlUartTask(void const * argument);
 
 #endif

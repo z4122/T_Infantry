@@ -27,7 +27,7 @@ extern xdata_ctrlUart ctrlData;
 extern uint8_t ctrlUartFlag; 
 extern uint16_t x;
 /*妙算变量处理task*/
-void printCtrlUartTask(void const * argument){
+void CtrlUartTask(void const * argument){
 	while(1){
 		xSemaphoreTake(xSemaphore_uart, osWaitForever);
 		fw_printfln("CtrlUartTask processing");
