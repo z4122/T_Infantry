@@ -88,9 +88,9 @@ void CMControlTask(void const * argument)
 		//¼à¿ØÈÎÎñ
 //		SuperviseTask();    
 		static int countwhile = 0;
-		if(countwhile >= 500){
+		if(countwhile >= 2000){
 			countwhile = 0;
-			fw_printfln("in CMControlTask");
+//			fw_printfln("in CMControlTask");
 		}
 		else{
 			countwhile++;
