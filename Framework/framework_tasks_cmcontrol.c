@@ -244,7 +244,7 @@ void ShooterMControlLoop(void)
 	
 	ShootMotorSpeedPID.fdb = GetQuadEncoderDiff();   
 	ShootMotorSpeedPID.Calc(&ShootMotorSpeedPID);
-//	fw_printfln("%d",(uint32_t)ShootMotorSpeedPID.output);
+	fw_printfln("%d",(uint32_t)ShootMotorSpeedPID.output);
 	__HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_1, ShootMotorSpeedPID.output);
 }
 
