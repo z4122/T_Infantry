@@ -13,7 +13,7 @@ typedef enum
 Shoot_Mode_e GetShootMode(void);
 void SetShootMode(Shoot_Mode_e v);
 
-void printRcTask(void const * argument);
+void RCTask(void const * argument);
 void RemoteTaskInit(void);
 void RemoteDataProcess(uint8_t *pData);
 void MouseKeyControlProcess(Mouse *mouse, Key *key);

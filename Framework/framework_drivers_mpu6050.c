@@ -1,6 +1,7 @@
 #include "framework_drivers_mpu6050.h"
 #include "framework_drivers_mpu6050_address.h"
 
+#include "framework_freertos_semaphore.h"
 #include "cmsis_os.h"
 #include "i2c.h"
 #include "framework_utilities_debug.h"
@@ -296,11 +297,16 @@ void Init_Quaternion()//根据测量数据，初始化q0,q1,q2.q3，从而加快收敛速度
 	//根据hx hy hz来判断q的值，取四个相近的值做逼近即可,初始值可以由欧拉角转换到四元数计算得到
 	 //fw_printfln("Init_Quaternion finish");
 }
+#define BIT_0 ( 1 << 0 )
+#define BIT_4 ( 1 << 4 )
 uint32_t Get_Time_Micros(void);
 float gx, gy, gz, ax, ay, az, mx, my, mz;
 float gYroX, gYroY, gYroZ;
+extern EventGroupHandle_t xGMControl;
 void printMPU6050Task(void const * argument){
+	EventBits_t uxBits;
 	while(1){
+		osSemaphoreWait(refreshIMUSemaphoreHandle, osWaitForever);
 		if(IOPool_hasNextRead(mpuI2CIOPool, 0)){
 			IOPool_getNextRead(mpuI2CIOPool, 0);
 			uint8_t *pData = IOPool_pGetReadData(mpuI2CIOPool, 0)->ch;
@@ -450,6 +456,13 @@ void printMPU6050Task(void const * argument){
 			angles[1] = -asin(-2 * q[1] * q[3] + 2 * q[0] * q[2])* 180/M_PI; // pitch    -pi/2    --- pi/2 
 			angles[2] = atan2(2 * q[2] * q[3] + 2 * q[0] * q[1], -2 * q[1] * q[1] - 2 * q[2] * q[2] + 1)* 180/M_PI; // roll       -pi-----pi  
 
+			 uxBits = xEventGroupSetBits(
+									xGMControl,    // The event group being updated.
+									BIT_0 );// The bit being set.
+			if( ( uxBits & ( BIT_0 ) ) == ( BIT_0  ) )
+    {
+        //  bit 0 remained set when the function returned.
+    }
 			static int countPrint = 0;
 			if(countPrint > 50){
 				countPrint = 0;
@@ -546,6 +559,7 @@ void readMPU6050Task(void const * argument){
 			}
 		}
 		IOPool_getNextWrite(mpuI2CIOPool);
+		osSemaphoreRelease(refreshIMUSemaphoreHandle);
 	}
 }
 

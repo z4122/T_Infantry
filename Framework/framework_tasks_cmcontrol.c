@@ -77,24 +77,34 @@ void ControtLoopTaskInit(void)
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2);
 }
 /*底盘控制任务*/
-void CMControl_Task(void)
+extern xSemaphoreHandle motorCanTransmitSemaphore;
+void CMControlTask(void const * argument)
 {
-	time_tick_1ms++;
-	if(time_tick_1ms%4 == 0)  {       //motor control frequency 4ms
-//	{
+		portTickType xLastWakeTime;
+		xLastWakeTime = xTaskGetTickCount();
+		WorkStateFSM();
+	  WorkStateSwitchProcess();
+	 while(1){       //motor control frequency 4ms
 		//监控任务
 //		SuperviseTask();    
-			static int countwhile = 0;
-			if(countwhile >= 2000){
+		static int countwhile = 0;
+		if(countwhile >= 2000){
 			countwhile = 0;
-//			fw_printfln("in CMcontrol_task");
-		}else{
+//			fw_printfln("in CMControlTask");
+		}
+		else{
 			countwhile++;
 		}
 		CMControlLoop();			 
 		ShooterMControlLoop();       //发射机构控制任务
+		if( xSemaphoreGive( motorCanTransmitSemaphore ) != pdTRUE )
+	 {
+			fw_printfln("xemaphoregive error");
+	 }
+		vTaskDelayUntil( &xLastWakeTime, ( 4 / portTICK_RATE_MS ) );
+			
 	}
-	}
+}
 	
 
 /**********************************************************
