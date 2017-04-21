@@ -29,6 +29,7 @@ void canReceiveTask(void const * argument){
 			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTORYAW_ID);
 			
 			yawAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
+	//		printf("%d", yawAngle);
 			CanReceiveMsgProcess(pData);
 			 uxBits = xEventGroupSetBits(
                         xGMControl,    // The event group being updated.
@@ -205,7 +206,7 @@ void GMControlTask(void const * argument){
 		pitchReady = yawReady = 0;
 		xSemaphoreGive(motorCanTransmitSemaphore);
 		//osDelay(250);
-			vTaskDelayUntil( &xLastWakeTime, ( 1 / portTICK_RATE_MS ) );
+			vTaskDelayUntil( &xLastWakeTime, ( 10 / portTICK_RATE_MS ) );
 	}
 }
 
