@@ -11,17 +11,11 @@
 #include "pid_regulator.h"
 
 #define MINMAX(value, min, max) value = (value < min) ? min : (value > max ? max : value)
-#define BIT_0 ( 1 << 0 )
-#define BIT_3 ( 1 << 3 )
-#define BIT_4 ( 1 << 4 )
-
 
 uint16_t yawAngle = 0, pitchAngle = 0;
 extern xSemaphoreHandle motorCanReceiveSemaphore;
-extern EventGroupHandle_t xGMControl;
 /*Can接收处理任务*/
-void canReceiveTask(void const * argument){
-	EventBits_t uxBits;
+void printMotorTask(void const * argument){
 	while(1){
 		xSemaphoreTake(motorCanReceiveSemaphore, osWaitForever);
 		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORYAW_ID)){
@@ -30,27 +24,12 @@ void canReceiveTask(void const * argument){
 			
 			yawAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
 			CanReceiveMsgProcess(pData);
-			 uxBits = xEventGroupSetBits(
-                        xGMControl,    // The event group being updated.
-                        BIT_3 );// The bit being set.
-			if( ( uxBits & ( BIT_3 ) ) == ( BIT_3  ) )
-    {
-        //  bit 4 remained set when the function returned.
-    }
 		}
 		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORPITCH_ID)){
 			IOPool_getNextRead(motorCanRxIOPool, MOTORPITCH_ID);
 			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTORPITCH_ID);
 			
 			pitchAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
-			CanReceiveMsgProcess(pData);
-			uxBits = xEventGroupSetBits(
-                        xGMControl,    // The event group being updated.
-                        BIT_4 );// The bit being set.
-			if( ( uxBits & ( BIT_4 ) ) == ( BIT_4  ) )
-    {
-        //  bit 4 remained set when the function returned.
-    }
 		}
 		if(IOPool_hasNextRead(motorCanRxIOPool, MOTOR1_ID)){
 			IOPool_getNextRead(motorCanRxIOPool, MOTOR1_ID);
@@ -107,29 +86,37 @@ void canReceiveTask(void const * argument){
 	uint8_t isLastAngleError = 0;
 	uint8_t pitchReady = 0, yawReady = 0;
 
-
 extern float gYroX, gYroY, gYroZ;
 extern xSemaphoreHandle motorCanTransmitSemaphore;
 extern Shoot_Mode_e shootMode;
-/*云台控制任务*/
-void GMControlTask(void const * argument){
-	EventBits_t uxBits;
-			portTickType xLastWakeTime;
+/*控制任务，循环*/
+void controlMotorTask(void const * argument){
+//	int16_t testSpeed = 10000;
+//	while(1){
+//		if(testSpeed <= 0){
+//			testSpeed = 4000;
+//		}else{
+//			testSpeed -= 200;
+//		}
+//		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(motorCanTxIOPool);
+//		pData->StdId = MOTORCM_ID;
+//		pData->Data[0] = (uint8_t)(testSpeed >> 8);
+//		pData->Data[1] = (uint8_t)testSpeed;
+//		IOPool_getNextWrite(motorCanTxIOPool);
+//		
+//		osDelay(250);
+//	}
+		portTickType xLastWakeTime;
 		xLastWakeTime = xTaskGetTickCount();
 	while(1){
-//		uxBits = xEventGroupWaitBits(
-//                xGMControl,    // The event group being tested.
-//                BIT_0 | BIT_3| BIT_4,  // The bits within the event group to wait for.
-//                pdFALSE,         // BIT_0 and BIT_4 should not be cleared before returning.
-//                pdFALSE,        // wait for either bits
-//                osWaitForever); // Wait a maximum of 100ms for either bit to be set.
-		uxBits =  BIT_0 | BIT_3| BIT_4;
-		if( ( uxBits & ( BIT_0 ) ) == ( BIT_0 ) )
-    {
-        xEventGroupClearBits(
-                            xGMControl,    // The event group being updated.
-                            BIT_0 );// The bits being cleared.// xEventGroupWaitBits() returned because both bits were set.
-    }
+		
+//		yawAngleTarget = (yawAngleTarget < 3100) ? yawAngleTarget : 3100;
+//		yawAngleTarget = (yawAngleTarget > -1016) ? yawAngleTarget : -1016;
+//		pitchAngleTarget = (pitchAngleTarget < 1450) ? pitchAngleTarget : 1450;
+//		pitchAngleTarget = (pitchAngleTarget > 70) ? pitchAngleTarget : 70;
+//		int16_t yawAngleS = yawAngle, pitchAngleS = pitchAngle;
+
+//angle		
 		float yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8191.0;
 		yawRealAngle = (yawRealAngle > 180) ? yawRealAngle - 360 : yawRealAngle;
 		yawRealAngle = (yawRealAngle < -180) ? yawRealAngle + 360 : yawRealAngle;
@@ -147,12 +134,7 @@ void GMControlTask(void const * argument){
 		MINMAX(yawAngleTarget, -45, 45);
 		MINMAX(pitchAngleTarget, -25, 25);
 		
-	 if( ( uxBits & ( BIT_4 ) ) == ( BIT_4 ) )
-    {
-        xEventGroupClearBits(
-                            xGMControl,    // The event group being updated.
-                            BIT_4 );// The bits being cleared.// xEventGroupWaitBits() returned because both bits were set.
-    	//position		
+	 		//position		
 			pitchPositionPID.target = pitchAngleTarget;
 			pitchPositionPID.feedback = pitchRealAngle;
 			pitchPositionPID.Calc(&pitchPositionPID);
@@ -163,14 +145,7 @@ void GMControlTask(void const * argument){
 			pitchIntensity = -(int16_t)pitchSpeedPID.output;
 			
 			pitchReady = 1;
-		}
-	 	
-	 		if( ( uxBits & ( BIT_3 ) ) == ( BIT_3 ) )
-    {
-      xEventGroupClearBits(
-                            xGMControl,    // The event group being updated.
-                            BIT_3 );// The bits being cleared.// xEventGroupWaitBits() returned because both bits were set.
-    //position		
+	 	//position		
 			yawPositionPID.target = yawAngleTarget;
 			yawPositionPID.feedback = yawRealAngle;
 			yawPositionPID.Calc(&yawPositionPID);
@@ -181,7 +156,6 @@ void GMControlTask(void const * argument){
 			yawIntensity = (int16_t)yawSpeedPID.output;
 			
 			yawReady = 1;
-		}
 		static int countwhile = 0;
 		if(countwhile >= 500){
 			countwhile = 0;
@@ -205,7 +179,15 @@ void GMControlTask(void const * argument){
 		pitchReady = yawReady = 0;
 		xSemaphoreGive(motorCanTransmitSemaphore);
 		//osDelay(250);
-			vTaskDelayUntil( &xLastWakeTime, ( 1 / portTICK_RATE_MS ) );
+		WorkStateFSM();
+	  WorkStateSwitchProcess();
+    CMControl_Task();
+
+		if( xSemaphoreGive( motorCanTransmitSemaphore ) != pdTRUE )
+       {
+          fw_printfln("xemaphoregive error");
+       }
+		vTaskDelayUntil( &xLastWakeTime, ( 1 / portTICK_RATE_MS ) );
 	}
 }
 
@@ -223,16 +205,16 @@ void motorCanTransmitTask(void const * argument){
 		}else{
 			countwhile++;
 		}
-		if(IOPool_hasNextRead(motorCanTxIOPool, MOTORGIMBAL_ID)){
-		//fw_printf("w1");
+				if(IOPool_hasNextRead(motorCanTxIOPool, MOTORGIMBAL_ID)){
+			//fw_printf("w1");
 			osSemaphoreWait(motorCanTransmitSemaphoreHandle, osWaitForever);
 			//fw_printf("w2");
 			IOPool_getNextRead(motorCanTxIOPool, MOTORGIMBAL_ID);
 			motorCan.pTxMsg = IOPool_pGetReadData(motorCanTxIOPool, MOTORGIMBAL_ID);
 			if(HAL_CAN_Transmit_IT(&motorCan) != HAL_OK){
 				fw_Warning();
-			osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
-		}
+				osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
+			}
 		}
 		if(IOPool_hasNextRead(motorCanTxIOPool, MOTORCM_ID)){
 			//fw_printf("m1");
