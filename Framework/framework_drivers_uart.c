@@ -155,9 +155,7 @@ void ctrlUartRxCpltCallback(){ //控制串口回调函数
 			Error_Handler();}
 	}
 //上下文切换	
-  if( xHigherPriorityTaskWoken == pdTRUE ){
-   portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-	}
+      portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 /*真.串口回调函数*/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)

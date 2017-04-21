@@ -1,7 +1,6 @@
 #include "framework_drivers_uartremotecontrol_iopool.h"
 #include "framework_drivers_uartremotecontrol_task.h"
 #include "framework_drivers_uartremotecontrol.h"
-#include "framework_tasks_remotecontrol.h"
 #include "framework_drivers_led.h"
 #include "usart.h"
 #include "ramp.h"
@@ -40,9 +39,7 @@ void rcUartRxCpltCallback(){
 	IOPool_getNextWrite(rcUartIOPool);
 	HAL_UART_Receive_DMA(&rcUart, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 //上下文切换
-	if( xHigherPriorityTaskWoken == pdTRUE ){
-   portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-	}
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 RC_Ctl_t RC_CtrlData;   //remote control data
@@ -138,7 +135,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 	{
 		case FRICTION_WHEEL_OFF:
 		{
-			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_1TO3)   //从关闭到start turning
+			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   //从关闭到start turning
 			{
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);
@@ -180,12 +177,10 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			}
 			else if(sw->switch_value_raw == 2)
 			{
-				SetShootMode(AUTO);
 				SetShootState(SHOOTING);
 			}
 			else
 			{
-				SetShootMode(MANUL);
 				SetShootState(NOSHOOTING);
 			}					 
 		} break;				
@@ -258,12 +253,10 @@ void MouseShootControl(Mouse *mouse)
 			}			
 			else if(mouse->press_l== 1)  //按下左键，射击
 			{
-				SetShootMode(AUTO);
 				SetShootState(SHOOTING);				
 			}
 			else
 			{
-				SetShootMode(MANUL);
 				SetShootState(NOSHOOTING);				
 			}					 
 		} break;				

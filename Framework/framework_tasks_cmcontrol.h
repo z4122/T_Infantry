@@ -4,7 +4,7 @@
 #include "cmsis_os.h"
 
 void ControtLoopTaskInit(void);
-void CMControlTask(void const * argument);
+void CMControl_Task(void);
 void WorkStateFSM(void);
 void WorkStateSwitchProcess(void);
 void CMControlLoop(void);
