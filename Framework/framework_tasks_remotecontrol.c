@@ -18,6 +18,7 @@ else if(val>=max)\
 	val = max;\
 }\
 
+
 extern ChassisSpeed_Ref_t ChassisSpeedRef;
 extern Gimbal_Ref_t GimbalRef;
 extern FrictionWheelState_e friction_wheel_state ;
@@ -233,6 +234,17 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 	GimbalAngleLimit();	
 	MouseShootControl(mouse);
 	
+}
+
+Shoot_Mode_e shootMode = MANUL;
+Shoot_Mode_e GetShootMode()
+{
+	return shootMode;
+}
+
+void SetShootMode(Shoot_Mode_e v)
+{
+	shootMode = v;
 }
 
 
