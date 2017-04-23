@@ -3,6 +3,7 @@
 #include "framework_drivers_uartremotecontrol.h"
 #include "framework_drivers_motorcan.h"
 #include "framework_utilities_debug.h"
+#include "framework_freertos_task.h"
 #include "tim.h"
 #include "stdint.h"
 
@@ -83,16 +84,28 @@ void CMControlTask(void const * argument)
 {
 	portTickType xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
+	unsigned portBASE_TYPE StackResidue;
 	while(1)  {       //motor control frequency 4ms
 //	{
 		//监控任务
 //		SuperviseTask();    
 		static int countwhile = 0;
-		if(countwhile >= 1000){
+		if(countwhile >= 500){
 		countwhile = 0;
 //			fw_printfln("in CMcontrol_task");
+		StackResidue = uxTaskGetStackHighWaterMark( GMControlTaskHandle );
+//		fw_printfln("GM%ld",StackResidue);
 		}else{
 			countwhile++;
+		}
+		static int countwhile1 = 0;
+				if(countwhile1 >= 800){
+		countwhile1 = 0;
+//			fw_printfln("in CMcontrol_task");
+		StackResidue = uxTaskGetStackHighWaterMark( CMControlTaskHandle );
+//		fw_printfln("CM%ld",StackResidue);
+		}else{
+			countwhile1++;
 		}
 		CMControlLoop();			 
 		ShooterMControlLoop();       //发射机构控制任务

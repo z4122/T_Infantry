@@ -5,12 +5,13 @@
 
 extern osThreadId ledGTaskHandle;
 extern osThreadId ledRTaskHandle;
-extern osThreadId printRcTaskHandle;
-extern osThreadId printMotorTaskHandle;
-extern osThreadId controlMotorTaskTaskHandle;
+extern osThreadId RControlTaskHandle;
+extern osThreadId canReceiveTaskHandle;
+extern osThreadId GMControlTaskHandle;
+extern osThreadId CMControlTaskHandle;
 extern osThreadId motorCanTransmitTaskHandle;
 extern osThreadId printMPU6050TaskHandle;
 extern osThreadId readMPU6050TaskHandle;
-extern osThreadId printCtrlUartTaskHandle;
+extern osThreadId CtrlUartTaskHandle;
 
 #endif

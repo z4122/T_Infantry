@@ -16,7 +16,7 @@
 osThreadId ledGTaskHandle;
 osThreadId ledRTaskHandle;
 osThreadId RControlTaskHandle;
-osThreadId printMotorTaskHandle;
+osThreadId canReceiveTaskHandle;
 osThreadId GMControlTaskHandle;
 osThreadId CMControlTaskHandle;
 osThreadId motorCanTransmitTaskHandle;
@@ -34,7 +34,7 @@ void fw_freertos_addThreads(){
   RControlTaskHandle = osThreadCreate(osThread(RControlTask), NULL);
 	
 	osThreadDef(canReceivelTask, canReceivelTask, osPriorityAboveNormal, 0, 128);
-  printMotorTaskHandle = osThreadCreate(osThread(canReceivelTask), NULL);
+  canReceiveTaskHandle = osThreadCreate(osThread(canReceivelTask), NULL);
 	osThreadDef(GMControlTask, GMControlTask, osPriorityNormal, 0, 248);
   GMControlTaskHandle = osThreadCreate(osThread(GMControlTask), NULL);
 	osThreadDef(CMControlTask, CMControlTask, osPriorityNormal, 0, 248);
@@ -49,5 +49,5 @@ void fw_freertos_addThreads(){
 	
 	osThreadDef(CtrlUartTask, CtrlUartTask, osPriorityNormal, 0, 128);
   CtrlUartTaskHandle = osThreadCreate(osThread(CtrlUartTask), NULL);
-	fw_printfln("taskint finished");
+	// fw_printfln("taskint finished");
 }

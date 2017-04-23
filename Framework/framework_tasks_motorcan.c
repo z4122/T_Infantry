@@ -157,15 +157,7 @@ void GMControlTask(void const * argument){
 			yawIntensity = (int16_t)yawSpeedPID.output;
 			
 			yawReady = 1;
-		static int countwhile = 0;
-		if(countwhile >= 5000){
-			countwhile = 0;
-//			fw_printfln("%f",yawAngleTarget);
-//			fw_printfln("%d",yawIntensity);
-		}else{
-			countwhile++;
-		}
-		
+	
 		
 //		yawIntensity = 0;
 //		pitchIntensity = 0;
@@ -179,11 +171,18 @@ void GMControlTask(void const * argument){
 		IOPool_getNextWrite(motorCanTxIOPool);
 		pitchReady = yawReady = 0;
 		xSemaphoreGive(motorCanTransmitSemaphore);
-		StackResidue = uxTaskGetStackHighWaterMark( GMControlTask );
-//		fw_printfln("%d",StackResidue);
+		static int countwhile = 0;
+		if(countwhile >= 5000){
+			countwhile = 0;
+//			fw_printfln("%f",yawAngleTarget);
+//			fw_printfln("%d",yawIntensity);
+		}else{
+			countwhile++;
+		}
 		//osDelay(250);
     WorkStateFSM();
 	  WorkStateSwitchProcess();
+	//	fw_printfln("%ld",StackResidue);
 		vTaskDelayUntil( &xLastWakeTime, ( 1 / portTICK_RATE_MS ) );
 	}
 }
