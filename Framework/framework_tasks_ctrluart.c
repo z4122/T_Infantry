@@ -30,7 +30,7 @@ extern uint16_t x;
 void CtrlUartTask(void const * argument){
 	while(1){
 		xSemaphoreTake(xSemaphore_uart, osWaitForever);
-		fw_printfln("CtrlUartTask processing");
+//		fw_printfln("CtrlUartTask processing");
 		if(IOPool_hasNextRead(ctrlUartIOPool, 0)){
 			IOPool_getNextRead(ctrlUartIOPool, 0);
 			
@@ -38,16 +38,16 @@ void CtrlUartTask(void const * argument){
 			ctrlData = xUartprocess( pData );
 			if( ctrlData.Success == 1) {
 				ctrlUartFlag = byte_EOF;
-				printf("dataprocess finished\r\n");
-				vSendUart( ctrlData );
+//				printf("dataprocess finished\r\n");
+//				vSendUart( ctrlData );
 				} else {
 				ctrlUartFlag = 0;
-				printf("dataprocess error\r\n");
-			vSendUart( ctrlData );
+//				printf("dataprocess error\r\n");
+//			vSendUart( ctrlData );
 				}
-				fw_printfln("%x",ctrlData.dev_yaw);
+//				fw_printfln("%x",ctrlData.dev_yaw);
 		IOPool_pGetWriteData(upperGimbalIOPool)->yawAdd = ((float)ctrlData.dev_yaw - 9000)/100;
-	fw_printfln("%f",IOPool_pGetWriteData(upperGimbalIOPool)->yawAdd);
+//	fw_printfln("%f",IOPool_pGetWriteData(upperGimbalIOPool)->yawAdd);
 		IOPool_pGetWriteData(upperGimbalIOPool)->pitchAdd = ((float)ctrlData.dev_pitch - 5000)/100;
 		IOPool_getNextWrite(upperGimbalIOPool);
 

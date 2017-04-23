@@ -6,6 +6,7 @@
 osSemaphoreId motorCanTransmitSemaphoreHandle;
 osSemaphoreId readMPU6050SemaphoreHandle;
 osSemaphoreId refreshMPU6050SemaphoreHandle;
+osSemaphoreId refreshIMUSemaphoreHandle;
 
 xSemaphoreHandle xSemaphore_uart;
 xSemaphoreHandle xSemaphore_rcuart;
@@ -19,6 +20,8 @@ void fw_freertos_addSemaphores(){
 	readMPU6050SemaphoreHandle = osSemaphoreCreate(osSemaphore(readMPU6050Semaphore), 1);
 	osSemaphoreDef(refreshMPU6050Semaphore);
 	refreshMPU6050SemaphoreHandle = osSemaphoreCreate(osSemaphore(refreshMPU6050Semaphore), 1);
+	osSemaphoreDef(refreshIMUSemaphore);
+	refreshIMUSemaphoreHandle = osSemaphoreCreate(osSemaphore(refreshIMUSemaphore), 1);
 	
 	vSemaphoreCreateBinary(xSemaphore_uart);
 	vSemaphoreCreateBinary(xSemaphore_rcuart);

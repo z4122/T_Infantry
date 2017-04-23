@@ -90,7 +90,7 @@ void CMControlTask(void const * argument)
 		static int countwhile = 0;
 		if(countwhile >= 1000){
 		countwhile = 0;
-			fw_printfln("in CMcontrol_task");
+//			fw_printfln("in CMcontrol_task");
 		}else{
 			countwhile++;
 		}

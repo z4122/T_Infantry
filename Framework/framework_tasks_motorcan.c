@@ -106,6 +106,7 @@ void GMControlTask(void const * argument){
 //		
 //		osDelay(250);
 //	}
+	unsigned portBASE_TYPE StackResidue;
 		portTickType xLastWakeTime;
 		xLastWakeTime = xTaskGetTickCount();
 	while(1){
@@ -159,8 +160,8 @@ void GMControlTask(void const * argument){
 		static int countwhile = 0;
 		if(countwhile >= 5000){
 			countwhile = 0;
-			fw_printfln("%f",yawAngleTarget);
-			fw_printfln("%d",yawIntensity);
+//			fw_printfln("%f",yawAngleTarget);
+//			fw_printfln("%d",yawIntensity);
 		}else{
 			countwhile++;
 		}
@@ -178,6 +179,8 @@ void GMControlTask(void const * argument){
 		IOPool_getNextWrite(motorCanTxIOPool);
 		pitchReady = yawReady = 0;
 		xSemaphoreGive(motorCanTransmitSemaphore);
+		StackResidue = uxTaskGetStackHighWaterMark( GMControlTask );
+//		fw_printfln("%d",StackResidue);
 		//osDelay(250);
     WorkStateFSM();
 	  WorkStateSwitchProcess();
@@ -195,7 +198,7 @@ void motorCanTransmitTask(void const * argument){
 		xSemaphoreTake(motorCanTransmitSemaphore, osWaitForever);
 		if(countwhile >= 5000){
 			countwhile = 0;
-			fw_printfln("motorCanTransmitTask runing 5000");
+//			fw_printfln("motorCanTransmitTask runing 5000");
 		}else{
 			countwhile++;
 		}
@@ -237,3 +240,8 @@ void motorCanTransmitTask(void const * argument){
 		
 	}
 }
+void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed portCHAR *pcTaskName )
+{
+	fw_printfln("%s", pcTaskName);
+}
+

@@ -1,5 +1,6 @@
 #include "framework_drivers_mpu6050.h"
 #include "framework_drivers_mpu6050_address.h"
+#include "framework_freertos_semaphore.h"
 
 #include "cmsis_os.h"
 #include "i2c.h"
@@ -301,6 +302,7 @@ float gx, gy, gz, ax, ay, az, mx, my, mz;
 float gYroX, gYroY, gYroZ;
 void printMPU6050Task(void const * argument){
 	while(1){
+//		osSemaphoreWait(refreshIMUSemaphoreHandle, osWaitForever);
 		if(IOPool_hasNextRead(mpuI2CIOPool, 0)){
 			IOPool_getNextRead(mpuI2CIOPool, 0);
 			uint8_t *pData = IOPool_pGetReadData(mpuI2CIOPool, 0)->ch;
@@ -546,6 +548,7 @@ void readMPU6050Task(void const * argument){
 			}
 		}
 		IOPool_getNextWrite(mpuI2CIOPool);
+		osSemaphoreRelease(refreshIMUSemaphoreHandle);
 	}
 }
 

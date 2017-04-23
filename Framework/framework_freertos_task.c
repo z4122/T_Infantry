@@ -35,9 +35,9 @@ void fw_freertos_addThreads(){
 	
 	osThreadDef(canReceivelTask, canReceivelTask, osPriorityAboveNormal, 0, 128);
   printMotorTaskHandle = osThreadCreate(osThread(canReceivelTask), NULL);
-	osThreadDef(GMControlTask, GMControlTask, osPriorityNormal, 0, 128);
+	osThreadDef(GMControlTask, GMControlTask, osPriorityNormal, 0, 248);
   GMControlTaskHandle = osThreadCreate(osThread(GMControlTask), NULL);
-	osThreadDef(CMControlTask, CMControlTask, osPriorityNormal, 0, 128);
+	osThreadDef(CMControlTask, CMControlTask, osPriorityNormal, 0, 248);
   CMControlTaskHandle = osThreadCreate(osThread(CMControlTask), NULL);
 	osThreadDef(motorCanTransmitTask, motorCanTransmitTask, osPriorityAboveNormal, 0, 128);
   motorCanTransmitTaskHandle = osThreadCreate(osThread(motorCanTransmitTask), NULL);

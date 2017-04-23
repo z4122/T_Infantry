@@ -48,22 +48,22 @@ void RControlTask(void const * argument){
 			
 			if(countwhile >= 300){
 			countwhile = 0;
-			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
-				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
-				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
-				fw_printf("ch3 = %d \r\n", RC_CtrlData.rc.ch3);
-				
-				fw_printf("s1 = %d | ", RC_CtrlData.rc.s1);
-				fw_printf("s2 = %d \r\n", RC_CtrlData.rc.s2);
-				
-				fw_printf("x = %d | ", RC_CtrlData.mouse.x);
-				fw_printf("y = %d | ", RC_CtrlData.mouse.y);
-				fw_printf("z = %d | ", RC_CtrlData.mouse.z);
-				fw_printf("l = %d | ", RC_CtrlData.mouse.press_l);
-				fw_printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
-				
-				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
-				fw_printf("===========\r\n");
+//			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
+//				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
+//				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
+//				fw_printf("ch3 = %d \r\n", RC_CtrlData.rc.ch3);
+//				
+//				fw_printf("s1 = %d | ", RC_CtrlData.rc.s1);
+//				fw_printf("s2 = %d \r\n", RC_CtrlData.rc.s2);
+//				
+//				fw_printf("x = %d | ", RC_CtrlData.mouse.x);
+//				fw_printf("y = %d | ", RC_CtrlData.mouse.y);
+//				fw_printf("z = %d | ", RC_CtrlData.mouse.z);
+//				fw_printf("l = %d | ", RC_CtrlData.mouse.press_l);
+//				fw_printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
+//				
+//				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
+//				fw_printf("===========\r\n");
 		}else{
 			countwhile++;
 		}
