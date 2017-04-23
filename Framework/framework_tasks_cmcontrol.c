@@ -6,6 +6,7 @@
 #include "tim.h"
 #include "stdint.h"
 
+
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT; 
 PID_Regulator_t CM1SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
 PID_Regulator_t CM2SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
@@ -77,22 +78,29 @@ void ControtLoopTaskInit(void)
 	HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2);
 }
 /*底盘控制任务*/
-void CMControl_Task(void)
+extern xSemaphoreHandle motorCanTransmitSemaphore;
+void CMControlTask(void const * argument)
 {
-	time_tick_1ms++;
-	if(time_tick_1ms%4 == 0)  {       //motor control frequency 4ms
+	portTickType xLastWakeTime;
+	xLastWakeTime = xTaskGetTickCount();
+	while(1)  {       //motor control frequency 4ms
 //	{
 		//监控任务
 //		SuperviseTask();    
-			static int countwhile = 0;
-			if(countwhile >= 2000){
-			countwhile = 0;
-//			fw_printfln("in CMcontrol_task");
+		static int countwhile = 0;
+		if(countwhile >= 1000){
+		countwhile = 0;
+			fw_printfln("in CMcontrol_task");
 		}else{
 			countwhile++;
 		}
 		CMControlLoop();			 
 		ShooterMControlLoop();       //发射机构控制任务
+		if( xSemaphoreGive( motorCanTransmitSemaphore ) != pdTRUE )
+   {
+   fw_printfln("xemaphoregive error");
+   }
+		vTaskDelayUntil( &xLastWakeTime, ( 4 / portTICK_RATE_MS ) );
 	}
 	}
 	
@@ -104,6 +112,7 @@ void CMControl_Task(void)
 void WorkStateFSM(void)
 {
 	lastWorkState = workState;
+	time_tick_1ms ++;
 	switch(workState)
 	{
 		case PREPARE_STATE:

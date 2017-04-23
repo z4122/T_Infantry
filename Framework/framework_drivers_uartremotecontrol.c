@@ -135,7 +135,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 	{
 		case FRICTION_WHEEL_OFF:
 		{
-			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   //从关闭到start turning
+			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_1TO3)   //从关闭到start turning
 			{
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);

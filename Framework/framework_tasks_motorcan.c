@@ -15,7 +15,7 @@
 uint16_t yawAngle = 0, pitchAngle = 0;
 extern xSemaphoreHandle motorCanReceiveSemaphore;
 /*Can接收处理任务*/
-void printMotorTask(void const * argument){
+void canReceivelTask(void const * argument){
 	while(1){
 		xSemaphoreTake(motorCanReceiveSemaphore, osWaitForever);
 		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORYAW_ID)){
@@ -75,11 +75,11 @@ void printMotorTask(void const * argument){
 	}
 }
 
-	int16_t yawZeroAngle = 1075, pitchZeroAngle = 710;
+	int16_t yawZeroAngle = 1075, pitchZeroAngle = 550;
 	float yawAngleTarget = 0.0, pitchAngleTarget = 0.0;
-	fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(10.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
-	fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(30.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
-	fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(10, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);
+	fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(20.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
+	fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(20.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
+	fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(15, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);
 	fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(15.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);
 	uint16_t lastYawAngle = 0, lastPitchAngle = 0;
 	int16_t pitchIntensity = 0, yawIntensity = 0;
@@ -90,7 +90,7 @@ extern float gYroX, gYroY, gYroZ;
 extern xSemaphoreHandle motorCanTransmitSemaphore;
 extern Shoot_Mode_e shootMode;
 /*控制任务，循环*/
-void controlMotorTask(void const * argument){
+void GMControlTask(void const * argument){
 //	int16_t testSpeed = 10000;
 //	while(1){
 //		if(testSpeed <= 0){
@@ -125,9 +125,9 @@ void controlMotorTask(void const * argument){
 		pitchRealAngle = (pitchRealAngle < -180) ? pitchRealAngle + 360 : pitchRealAngle;
 		
 		if( GetShootMode() == AUTO){
-		if(IOPool_hasNextRead(upperGimbalIOPool, 0)){
+		if(IOPool_hasNextRead(upperGimbalIOPool, 0)){ 
 			IOPool_getNextRead(upperGimbalIOPool, 0);
-			yawAngleTarget = yawRealAngle + IOPool_pGetReadData(upperGimbalIOPool, 0)->yawAdd;
+			yawAngleTarget = yawRealAngle - IOPool_pGetReadData(upperGimbalIOPool, 0)->yawAdd;
 			pitchAngleTarget = pitchRealAngle + IOPool_pGetReadData(upperGimbalIOPool, 0)->pitchAdd;
 		}
 	 }
@@ -157,7 +157,7 @@ void controlMotorTask(void const * argument){
 			
 			yawReady = 1;
 		static int countwhile = 0;
-		if(countwhile >= 500){
+		if(countwhile >= 5000){
 			countwhile = 0;
 			fw_printfln("%f",yawAngleTarget);
 			fw_printfln("%d",yawIntensity);
@@ -179,14 +179,8 @@ void controlMotorTask(void const * argument){
 		pitchReady = yawReady = 0;
 		xSemaphoreGive(motorCanTransmitSemaphore);
 		//osDelay(250);
-		WorkStateFSM();
+    WorkStateFSM();
 	  WorkStateSwitchProcess();
-    CMControl_Task();
-
-		if( xSemaphoreGive( motorCanTransmitSemaphore ) != pdTRUE )
-       {
-          fw_printfln("xemaphoregive error");
-       }
 		vTaskDelayUntil( &xLastWakeTime, ( 1 / portTICK_RATE_MS ) );
 	}
 }
@@ -199,9 +193,9 @@ void motorCanTransmitTask(void const * argument){
 	static int countwhile = 0;
 	while(1){
 		xSemaphoreTake(motorCanTransmitSemaphore, osWaitForever);
-		if(countwhile >= 500){
+		if(countwhile >= 5000){
 			countwhile = 0;
-			fw_printfln("motorCanTransmitTask runing 500");
+			fw_printfln("motorCanTransmitTask runing 5000");
 		}else{
 			countwhile++;
 		}

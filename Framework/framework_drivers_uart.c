@@ -40,7 +40,7 @@ void vInsert( uint8_t a[ ], uint8_t i, uint8_t n, uint8_t number){
 }
 //¼ì²é×ªÒå·û
 void vCheck( uint8_t a[] ){
-	for(uint8_t i = 1; i <= size_frame - 3; i++)
+	for(uint8_t i = 1; i <= size_frame - 5; i++)
 	{switch ( a[i] ){
 		case byte_SOF    : vInsert( a, i, size_frame, byte_ESCAPE);
 		                 a[i+1] = 0X00; 

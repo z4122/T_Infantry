@@ -31,7 +31,7 @@ extern RampGen_t FBSpeedRamp  ;   //mouse前后移动斜坡
 extern RC_Ctl_t RC_CtrlData; 
 extern xSemaphoreHandle xSemaphore_rcuart;
 extern float yawAngleTarget, pitchAngleTarget;
-void printRcTask(void const * argument){
+void RControlTask(void const * argument){
 	uint8_t data[18];
 			static int countwhile = 0;
 	while(1){
@@ -122,6 +122,7 @@ void RemoteDataProcess(uint8_t *pData)
 		case REMOTE_INPUT:
 		{
 			//遥控器控制模式
+//			fw_printfln("in remote mode");
 			RemoteControlProcess(&(RC_CtrlData.rc));
 		}break;
 		case KEY_MOUSE_INPUT:
@@ -131,6 +132,7 @@ void RemoteDataProcess(uint8_t *pData)
 		}break;
 		case STOP:
 		{
+			SetShootMode(AUTO);
 			//紧急停车
 		}break;
 	}
@@ -140,11 +142,14 @@ void RemoteControlProcess(Remote *rc)
 {
     if(GetWorkState()!=PREPARE_STATE)
     {
+			SetShootMode(MANUL);
         ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
         ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
-			  pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+			if(GetShootMode() == MANUL){  
+			pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
         yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
-    }
+			}
+			}
 
     if(GetWorkState() == NORMAL_STATE)
     {
