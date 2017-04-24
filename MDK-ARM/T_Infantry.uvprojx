@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F405xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Drivers/CMSIS/Include;..\Framework</IncludePath>
+              <IncludePath>../Inc;               ../Drivers/STM32F4xx_HAL_Driver/Inc;               ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;               ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;               ../Drivers/CMSIS/Device/ST/STM32F4xx/Include;               ../Middlewares/Third_Party/FreeRTOS/Source/include;               ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;               ../Drivers/CMSIS/Include;               ..\Framework</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -620,6 +620,11 @@
               <FilePath>..\Framework\framework_freertos_semaphore.h</FilePath>
             </File>
             <File>
+              <FileName>framework_utilities_debug.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_utilities_debug.h</FilePath>
+            </File>
+            <File>
               <FileName>framework_freertos_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\framework_freertos_task.c</FilePath>
@@ -638,11 +643,6 @@
               <FileName>framework_utilities_debug.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\framework_utilities_debug.c</FilePath>
-            </File>
-            <File>
-              <FileName>framework_utilities_debug.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\framework_utilities_debug.h</FilePath>
             </File>
             <File>
               <FileName>framework_utilities_iopool.c</FileName>
@@ -769,6 +769,16 @@
               <FileType>5</FileType>
               <FilePath>..\Framework\framework_drivers_uartremotecontrol_iopool.h</FilePath>
             </File>
+            <File>
+              <FileName>ramp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\ramp.h</FilePath>
+            </File>
+            <File>
+              <FileName>RMLib.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\Framework\RMLib.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -783,6 +793,46 @@
               <FileName>framework_tasks_remotecontrol.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\framework_tasks_remotecontrol.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_cmcontrol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_tasks_cmcontrol.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_cmcontrol.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_tasks_cmcontrol.h</FilePath>
+            </File>
+            <File>
+              <FileName>pid_regulator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\pid_regulator.c</FilePath>
+            </File>
+            <File>
+              <FileName>pid_regulator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\pid_regulator.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_ctrluart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_tasks_ctrluart.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_ctrluart.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_tasks_ctrluart.h</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_motorcan.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\framework_tasks_motorcan.c</FilePath>
+            </File>
+            <File>
+              <FileName>framework_tasks_motorcan.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_tasks_motorcan.h</FilePath>
             </File>
           </Files>
         </Group>

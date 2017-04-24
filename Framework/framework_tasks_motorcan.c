@@ -106,7 +106,6 @@ void GMControlTask(void const * argument){
 //		
 //		osDelay(250);
 //	}
-	unsigned portBASE_TYPE StackResidue;
 		portTickType xLastWakeTime;
 		xLastWakeTime = xTaskGetTickCount();
 	while(1){
@@ -128,8 +127,12 @@ void GMControlTask(void const * argument){
 		if( GetShootMode() == AUTO){
 		if(IOPool_hasNextRead(upperGimbalIOPool, 0)){ 
 			IOPool_getNextRead(upperGimbalIOPool, 0);
-			yawAngleTarget = yawRealAngle - IOPool_pGetReadData(upperGimbalIOPool, 0)->yawAdd;
-			pitchAngleTarget = pitchRealAngle + IOPool_pGetReadData(upperGimbalIOPool, 0)->pitchAdd;
+//			yawAngleTarget = yawRealAngle - IOPool_pGetReadData(upperGimbalIOPool, 0)->yawAdd;
+//			pitchAngleTarget = pitchRealAngle + IOPool_pGetReadData(upperGimbalIOPool, 0)->pitchAdd;
+		float yaw =  MINMAX(IOPool_pGetReadData(upperGimbalIOPool, 0)->yawAdd,-2.0f,2.0f);
+			float pitch = MINMAX(IOPool_pGetReadData(upperGimbalIOPool,  0)->pitchAdd,-2.0f,2.0f);
+			yawAngleTarget = yawRealAngle - yaw;
+			pitchAngleTarget = pitchRealAngle + pitch;
 		}
 	 }
 		MINMAX(yawAngleTarget, -45, 45);

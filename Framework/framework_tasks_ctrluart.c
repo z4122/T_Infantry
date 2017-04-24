@@ -42,7 +42,7 @@ void CtrlUartTask(void const * argument){
 //				vSendUart( ctrlData );
 				} else {
 				ctrlUartFlag = 0;
-//				printf("dataprocess error\r\n");
+				printf("dataprocess error\r\n");
 //			vSendUart( ctrlData );
 				}
 //				fw_printfln("%x",ctrlData.dev_yaw);

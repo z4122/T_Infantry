@@ -12,6 +12,7 @@ xSemaphoreHandle xSemaphore_uart;
 xSemaphoreHandle xSemaphore_rcuart;
 xSemaphoreHandle motorCanReceiveSemaphore;
 xSemaphoreHandle motorCanTransmitSemaphore;//controltask -> transmit task
+EventGroupHandle_t xGMControl;
 
 void fw_freertos_addSemaphores(){
 	osSemaphoreDef(motorCanTransmitSemaphore);
@@ -27,4 +28,6 @@ void fw_freertos_addSemaphores(){
 	vSemaphoreCreateBinary(xSemaphore_rcuart);
 	vSemaphoreCreateBinary(motorCanReceiveSemaphore);
 	motorCanTransmitSemaphore = xSemaphoreCreateCounting(10,0);
+	
+	xGMControl = xEventGroupCreate();
 }

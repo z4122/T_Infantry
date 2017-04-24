@@ -302,7 +302,7 @@ float gx, gy, gz, ax, ay, az, mx, my, mz;
 float gYroX, gYroY, gYroZ;
 void printMPU6050Task(void const * argument){
 	while(1){
-//		osSemaphoreWait(refreshIMUSemaphoreHandle, osWaitForever);
+		osSemaphoreWait(refreshIMUSemaphoreHandle, osWaitForever);
 		if(IOPool_hasNextRead(mpuI2CIOPool, 0)){
 			IOPool_getNextRead(mpuI2CIOPool, 0);
 			uint8_t *pData = IOPool_pGetReadData(mpuI2CIOPool, 0)->ch;
