@@ -42,7 +42,7 @@ void fw_freertos_addThreads(){
 	osThreadDef(motorCanTransmitTask, motorCanTransmitTask, osPriorityAboveNormal, 0, 128);
   motorCanTransmitTaskHandle = osThreadCreate(osThread(motorCanTransmitTask), NULL);
 	
-	osThreadDef(printMPU6050Task, printMPU6050Task, osPriorityNormal, 0, 128);
+	osThreadDef(printMPU6050Task, printMPU6050Task, osPriorityNormal, 0, 512);
   printMPU6050TaskHandle = osThreadCreate(osThread(printMPU6050Task), NULL);
 	osThreadDef(readMPU6050Task, readMPU6050Task, osPriorityNormal, 0, 128);
   readMPU6050TaskHandle = osThreadCreate(osThread(readMPU6050Task), NULL);

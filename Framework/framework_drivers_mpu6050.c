@@ -299,8 +299,14 @@ void Init_Quaternion()//根据测量数据，初始化q0,q1,q2.q3，从而加快收敛速度
 }
 uint32_t Get_Time_Micros(void);
 float gx, gy, gz, ax, ay, az, mx, my, mz;
+int mx_max = 0, mx_min = 0, my_max = 0, my_min = 0, mz_max = 0, mz_min = 200;
 float gYroX, gYroY, gYroZ;
+void minmax_refresh( int a, int *min, int *max){
+	if (a > *max) *max = a;
+	if( a < *min) *min = a;
+}
 void printMPU6050Task(void const * argument){
+	mz_min = 200;
 	while(1){
 		osSemaphoreWait(refreshIMUSemaphoreHandle, osWaitForever);
 		if(IOPool_hasNextRead(mpuI2CIOPool, 0)){
@@ -340,9 +346,13 @@ void printMPU6050Task(void const * argument){
 			mygetqval[4] = (float)mygy / 32.8f;
 			mygetqval[5] = (float)mygz / 32.8f;
 			
-			mygetqval[6] = (float)mymx - 38.0f;
-			mygetqval[7] = (float)mymy - 102.5f;
-			mygetqval[8] = (float)mymz - 15.5f;
+			mygetqval[6] = (float)mymx - 22.0f;
+			mygetqval[7] = (float)mymy - 0.5f;
+			mygetqval[8] = (float)mymz - 177.5f;
+			
+			minmax_refresh( mymx, &mx_min, &mx_max);
+			minmax_refresh( mymy, &my_min, &my_max);
+			minmax_refresh( mymz, &mz_min, &mz_max);
 			
 			gYroX = mygetqval[3];
 			gYroY = mygetqval[4] - (-0.5);
@@ -453,7 +463,7 @@ void printMPU6050Task(void const * argument){
 			angles[2] = atan2(2 * q[2] * q[3] + 2 * q[0] * q[1], -2 * q[1] * q[1] - 2 * q[2] * q[2] + 1)* 180/M_PI; // roll       -pi-----pi  
 
 			static int countPrint = 0;
-			if(countPrint > 50){
+			if(countPrint > 100){
 				countPrint = 0;
 				
 //				fw_printf("mx max = %d | min = %d\r\n", mymaxmx, myminmx);
@@ -478,11 +488,11 @@ void printMPU6050Task(void const * argument){
 				}
 				float yaw_angle = yaw_temp + yaw_count*360;
 				
-//				fw_printf("yaw_angle = %f | ", yaw_angle);
+				fw_printf("yaw_angle = %f | ", yaw_angle);
 //				fw_printf("angles0 = %f | ", angles[0]);
-//				fw_printf("angles1 = %f | ", angles[1]);
-//				fw_printf("angles2 = %f\r\n", angles[2]);
-//				fw_printf("========================\r\n");
+				fw_printf("angles1 = %f | ", angles[1]);
+				fw_printf("angles2 = %f\r\n", angles[2]);
+				fw_printf("========================\r\n");
 				
 //				fw_printf("ax = %d | ", myax);
 //				fw_printf("ay = %d | ", myay);
@@ -495,6 +505,13 @@ void printMPU6050Task(void const * argument){
 //				fw_printf("mx = %d | ", mymx);
 //				fw_printf("my = %d | ", mymy);
 //				fw_printf("mz = %d\r\n", mymz);
+//				fw_printf("========================\r\n");
+//				fw_printf("mx_min = %d | ", mx_min);
+//				fw_printf("mx_max = %d | ", mx_max);
+//				fw_printf("my_min = %d | ", my_min);
+//				fw_printf("my_max = %d | ", my_max);
+//				fw_printf("mz_min = %d | ", mz_min);
+//				fw_printf("mz_max = %d | ", mz_max);
 //				fw_printf("========================\r\n");
 			}else{
 				countPrint++;
