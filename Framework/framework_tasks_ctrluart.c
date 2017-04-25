@@ -25,33 +25,42 @@ extern float yawAngleTarget, pitchAngleTarget;
 extern xSemaphoreHandle xSemaphore_uart;
 extern xdata_ctrlUart ctrlData; 
 extern uint8_t ctrlUartFlag; 
+extern uint8_t lastctrlUartFlag; 
 extern uint16_t x;
+float yawAdd = 0;
+float pitchAdd = 0;
+_Bool CReceive = 0;
 /*妙算变量处理task*/
 void CtrlUartTask(void const * argument){
 	while(1){
-		xSemaphoreTake(xSemaphore_uart, osWaitForever);
-//		fw_printfln("CtrlUartTask processing");
-		if(IOPool_hasNextRead(ctrlUartIOPool, 0)){
-			IOPool_getNextRead(ctrlUartIOPool, 0);
-			
+	xSemaphoreTake(xSemaphore_uart, osWaitForever);
+		fw_printfln("CtrlUartTask processing");
+//		if(IOPool_hasNextRead(ctrlUartIOPool, 0)){
+//			IOPool_getNextRead(ctrlUartIOPool, 0);
+	//	if(lastctrlUartFlag){
 			uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
 			ctrlData = xUartprocess( pData );
 			if( ctrlData.Success == 1) {
+			yawAdd = ((float)ctrlData.dev_yaw - 9000)/100;
+	  	pitchAdd = ((float)ctrlData.dev_pitch - 5000)/100;
+				CReceive = 1;
 				ctrlUartFlag = byte_EOF;
 //				printf("dataprocess finished\r\n");
 //				vSendUart( ctrlData );
+//	}
 				} else {
-				ctrlUartFlag = 0;
-				printf("dataprocess error\r\n");
+					yawAdd = 0;
+	  	pitchAdd = 0;
+//				ctrlUartFlag = 0;
+//				printf("dataprocess error\r\n");
 //			vSendUart( ctrlData );
 				}
 //				fw_printfln("%x",ctrlData.dev_yaw);
-		IOPool_pGetWriteData(upperGimbalIOPool)->yawAdd = ((float)ctrlData.dev_yaw - 9000)/100;
-//	fw_printfln("%f",IOPool_pGetWriteData(upperGimbalIOPool)->yawAdd);
-		IOPool_pGetWriteData(upperGimbalIOPool)->pitchAdd = ((float)ctrlData.dev_pitch - 5000)/100;
-		IOPool_getNextWrite(upperGimbalIOPool);
+//		IOPool_pGetWriteData(upperGimbalIOPool)->yawAdd = ((float)ctrlData.dev_yaw - 9000)/100;
+//		IOPool_pGetWriteData(upperGimbalIOPool)->pitchAdd = ((float)ctrlData.dev_pitch - 5000)/100;
+//		IOPool_getNextWrite(upperGimbalIOPool);
 
-		}
+//		}
 	}
 
 }

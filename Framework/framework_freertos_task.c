@@ -35,9 +35,9 @@ void fw_freertos_addThreads(){
 	
 	osThreadDef(canReceivelTask, canReceivelTask, osPriorityAboveNormal, 0, 128);
   canReceiveTaskHandle = osThreadCreate(osThread(canReceivelTask), NULL);
-	osThreadDef(GMControlTask, GMControlTask, osPriorityNormal, 0, 248);
+	osThreadDef(GMControlTask, GMControlTask, osPriorityNormal, 0, 512);
   GMControlTaskHandle = osThreadCreate(osThread(GMControlTask), NULL);
-	osThreadDef(CMControlTask, CMControlTask, osPriorityNormal, 0, 248);
+	osThreadDef(CMControlTask, CMControlTask, osPriorityNormal, 0, 512);
   CMControlTaskHandle = osThreadCreate(osThread(CMControlTask), NULL);
 	osThreadDef(motorCanTransmitTask, motorCanTransmitTask, osPriorityAboveNormal, 0, 128);
   motorCanTransmitTaskHandle = osThreadCreate(osThread(motorCanTransmitTask), NULL);
@@ -47,7 +47,7 @@ void fw_freertos_addThreads(){
 	osThreadDef(readMPU6050Task, readMPU6050Task, osPriorityNormal, 0, 128);
   readMPU6050TaskHandle = osThreadCreate(osThread(readMPU6050Task), NULL);
 	
-	osThreadDef(CtrlUartTask, CtrlUartTask, osPriorityHigh, 0, 248);
+	osThreadDef(CtrlUartTask, CtrlUartTask, osPriorityNormal, 0, 248);
   CtrlUartTaskHandle = osThreadCreate(osThread(CtrlUartTask), NULL);
 	// fw_printfln("taskint finished");
 }

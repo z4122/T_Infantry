@@ -78,9 +78,9 @@ void canReceivelTask(void const * argument){
 	int16_t yawZeroAngle = 1075, pitchZeroAngle = 550;
 	float yawAngleTarget = 0.0, pitchAngleTarget = 0.0;
 	fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(20.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
-	fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(20.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
+	fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(25.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
 	fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(15, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);
-	fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(15.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);
+	fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(20, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);
 	uint16_t lastYawAngle = 0, lastPitchAngle = 0;
 	int16_t pitchIntensity = 0, yawIntensity = 0;
 	uint8_t isLastAngleError = 0;
@@ -89,6 +89,8 @@ void canReceivelTask(void const * argument){
 extern float gYroX, gYroY, gYroZ;
 extern xSemaphoreHandle motorCanTransmitSemaphore;
 extern Shoot_Mode_e shootMode;
+extern float yawAdd, pitchAdd;
+extern _Bool CReceive;
 /*控制任务，循环*/
 void GMControlTask(void const * argument){
 //	int16_t testSpeed = 10000;
@@ -125,15 +127,22 @@ void GMControlTask(void const * argument){
 		pitchRealAngle = (pitchRealAngle < -180) ? pitchRealAngle + 360 : pitchRealAngle;
 		
 		if( GetShootMode() == AUTO){
-		if(IOPool_hasNextRead(upperGimbalIOPool, 0)){ 
+//		if(IOPool_hasNextRead(upperGimbalIOPool, 0)){ 
+//			IOPool_getNextRead(upperGimbalIOPool, 0);
+////			yawAngleTarget = yawRealAngle - IOPool_pGetReadData(upperGimbalIOPool, 0)->yawAdd;
+////			pitchAngleTarget = pitchRealAngle + IOPool_pGetReadData(upperGimbalIOPool, 0)->pitchAdd;
+//		float yaw =  MINMAX(IOPool_pGetReadData(upperGimbalIOPool, 0)->yawAdd,-2.0f,2.0f);
+//			float pitch = MINMAX(IOPool_pGetReadData(upperGimbalIOPool,  0)->pitchAdd,-2.0f,2.0f);
+//			yawAngleTarget = yawRealAngle - yaw;
+//			pitchAngleTarget = pitchRealAngle + pitch;
+//		}
+			if(CReceive){
 			IOPool_getNextRead(upperGimbalIOPool, 0);
-//			yawAngleTarget = yawRealAngle - IOPool_pGetReadData(upperGimbalIOPool, 0)->yawAdd;
-//			pitchAngleTarget = pitchRealAngle + IOPool_pGetReadData(upperGimbalIOPool, 0)->pitchAdd;
-		float yaw =  MINMAX(IOPool_pGetReadData(upperGimbalIOPool, 0)->yawAdd,-2.0f,2.0f);
-			float pitch = MINMAX(IOPool_pGetReadData(upperGimbalIOPool,  0)->pitchAdd,-2.0f,2.0f);
-			yawAngleTarget = yawRealAngle - yaw;
-			pitchAngleTarget = pitchRealAngle + pitch;
-		}
+			yawAngleTarget = yawRealAngle - (yawAdd*0.5);
+      pitchAngleTarget = pitchRealAngle + (pitchAdd*0.8) + 2.7;
+				CReceive = 0;
+	//		fw_printfln("yaw%f pitch%f",yawAngleTarget,pitchAngleTarget);
+		  }
 	 }
 		MINMAX(yawAngleTarget, -45, 45);
 		MINMAX(pitchAngleTarget, -25, 25);
@@ -187,6 +196,7 @@ void GMControlTask(void const * argument){
 	  WorkStateSwitchProcess();
 	//	fw_printfln("%ld",StackResidue);
 		vTaskDelayUntil( &xLastWakeTime, ( 1 / portTICK_RATE_MS ) );
+		
 	}
 }
 

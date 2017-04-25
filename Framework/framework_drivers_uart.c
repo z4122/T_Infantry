@@ -27,6 +27,7 @@ IOPoolDefine(ctrlUartIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc,
 
 #define ctrlUart huart3
 uint8_t ctrlUartFlag = byte_EOF; //帧错误后，等待终止字节
+uint8_t lastctrlUartFlag = byte_EOF; 
 xdata_ctrlUart ctrlData; //妙算接收变量
 /*发送协议*/
 //插入数组
@@ -135,25 +136,42 @@ void ctrlUartInit(){
 }
 
 extern xSemaphoreHandle xSemaphore_uart; //妙算串口互斥信号量
+extern float yawAdd, pitchAdd;
+extern _Bool CReceive;
 void ctrlUartRxCpltCallback(){ //控制串口回调函数
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
 	//osStatus osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec);
-	IOPool_getNextWrite(ctrlUartIOPool);
 	if( ctrlUartFlag == byte_EOF){   //若ctrlUartFlag 为结尾字节，正常
-		if(HAL_UART_Receive_DMA(&ctrlUart, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
-			Error_Handler();
-		}
-		xSemaphoreGiveFromISR(xSemaphore_uart, &xHigherPriorityTaskWoken);
-		uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
-		ctrlData = xUartprocess( pData );
-			if( ctrlData.Success == 1) 	ctrlUartFlag = byte_EOF;			 
-			else 	ctrlUartFlag = 0;				
-	}
+		fw_printfln("normal");
+		if(lastctrlUartFlag == byte_EOF){
+			IOPool_getNextWrite(ctrlUartIOPool);
+			IOPool_getNextRead(ctrlUartIOPool, 0);
+			uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
+			ctrlData = xUartprocess( pData );
+			 if( ctrlData.Success == 1) 	{
+			 ctrlUartFlag = byte_EOF;	
+			 xSemaphoreGiveFromISR(xSemaphore_uart, &xHigherPriorityTaskWoken);	
+			 if(HAL_UART_Receive_DMA(&ctrlUart, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+				Error_Handler(); }
+				}				
+				else 	{ctrlUartFlag = 0;		
+			 printf("dataprocess error\r\n");				
+				if(HAL_UART_Receive_DMA(&ctrlUart, &ctrlUartFlag, 1) != HAL_OK){
+				Error_Handler();}
+			}
+	  }
+		else{if(HAL_UART_Receive_DMA(&ctrlUart, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+				Error_Handler(); }
+				}		
+		
+  }
 	else{//若ctrlUartFlag 不是结尾字节，阻塞读取
+	//	fw_printfln("abnormal");
     	if(HAL_UART_Receive_DMA(&ctrlUart, &ctrlUartFlag, 1) != HAL_OK){
 			Error_Handler();}
 	}
+	lastctrlUartFlag = ctrlUartFlag;
 //上下文切换	
    if( xHigherPriorityTaskWoken == pdTRUE ){
    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
