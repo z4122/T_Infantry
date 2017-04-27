@@ -10,8 +10,17 @@ typedef enum
 	AUTO = 0,
 	MANUL = 1,
 }Shoot_Mode_e;
+
+typedef enum
+{
+	NORMAL = 0,
+	EMERGENCY = 1,
+}Emergency_Flag;
+
 Shoot_Mode_e GetShootMode(void);
 void SetShootMode(Shoot_Mode_e v);
+Emergency_Flag GetEmergencyFlag(void);
+void SetEmergencyFlag(Emergency_Flag v);
 
 void RControlTask(void const * argument);
 void RemoteTaskInit(void);

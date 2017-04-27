@@ -7,6 +7,7 @@
 #include "framework_utilities_debug.h"
 #include "framework_utilities_iopool.h"
 #include "framework_tasks_cmcontrol.h"
+#include "framework_drivers_mpu6050.h"
 
 static uint32_t can_count = 0;
 volatile Encoder CM1Encoder = {0,0,0,0,0,0,0,0,0};
@@ -14,6 +15,7 @@ volatile Encoder CM2Encoder = {0,0,0,0,0,0,0,0,0};
 volatile Encoder CM3Encoder = {0,0,0,0,0,0,0,0,0};
 volatile Encoder CM4Encoder = {0,0,0,0,0,0,0,0,0};
 volatile Encoder GMYawEncoder = {0,0,0,0,0,0,0,0,0};
+float ZGyroModuleAngle = 0.0f;
 
 /*****Begin define ioPool*****/
 #define DataPoolInit {0}
@@ -23,6 +25,22 @@ volatile Encoder GMYawEncoder = {0,0,0,0,0,0,0,0,0};
 #define ReadPoolInit {{0, Empty, 1}, {2, Empty, 3}, {4, Empty, 5}, {6, Empty, 7}, {8, Empty, 9},{10, Empty, 11}}
 
 IOPoolDefine(motorCanRxIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
+
+#undef DataPoolInit 
+#undef ReadPoolSize 
+#undef ReadPoolMap
+#undef GetIdFunc
+#undef ReadPoolInit
+/*****End define ioPool*****/
+	
+/*****Begin define ioPool*****/
+#define DataPoolInit {0}
+#define ReadPoolSize 1
+#define ReadPoolMap {ZGYRO_ID}
+#define GetIdFunc (data.StdId)
+#define ReadPoolInit {{0, Empty, 1}}
+
+IOPoolDefine(ZGYROCanRxIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFunc, ReadPoolInit);
 
 #undef DataPoolInit 
 #undef ReadPoolSize 
@@ -56,6 +74,8 @@ IOPoolDefine(motorCanTxIOPool, DataPoolInit, ReadPoolSize, ReadPoolMap, GetIdFun
 
 /*****CAN2ÅäÖÃ*****/
 extern uint8_t isRcanStarted;
+extern uint8_t isRcanStarted_AM;
+CanRxMsgTypeDef AMCanRxMsg;
 void motorInit(){
 	motorCan.pRxMsg = IOPool_pGetWriteData(motorCanRxIOPool);
 	
@@ -77,6 +97,25 @@ void motorInit(){
 		fw_Error_Handler(); 
 	}
 	isRcanStarted = 1;
+	
+	ZGYROCAN.pRxMsg = &AMCanRxMsg;
+	/*##-- Configure the CAN1 Filter ###########################################*/
+	CAN_FilterConfTypeDef sFilterConfig2;
+	sFilterConfig2.FilterNumber = 14;//14 - 27//14
+	sFilterConfig2.FilterMode = CAN_FILTERMODE_IDMASK;
+	sFilterConfig2.FilterScale = CAN_FILTERSCALE_32BIT;
+	sFilterConfig2.FilterIdHigh = 0x0000;
+  sFilterConfig2.FilterIdLow = 0x0000;
+  sFilterConfig2.FilterMaskIdHigh = 0x0000;
+  sFilterConfig2.FilterMaskIdLow = 0x0000;
+  sFilterConfig2.FilterFIFOAssignment = 0;
+  sFilterConfig2.FilterActivation = ENABLE;
+  sFilterConfig2.BankNumber = 14;
+  HAL_CAN_ConfigFilter(&ZGYROCAN, &sFilterConfig2);
+	if(HAL_CAN_Receive_IT(&ZGYROCAN, CAN_FIFO0) != HAL_OK){
+		fw_Error_Handler(); 
+	}
+	isRcanStarted_AM = 1;
 }
 
 extern xSemaphoreHandle motorCanReceiveSemaphore;
@@ -84,23 +123,34 @@ extern xSemaphoreHandle motorCanReceiveSemaphore;
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
-	
-	IOPool_getNextWrite(motorCanRxIOPool);
-	motorCan.pRxMsg = IOPool_pGetWriteData(motorCanRxIOPool);
-/*		static int countwhilec = 0;
+	/*		static int countwhilec = 0;
 		if(countwhilec >= 6000){
 			countwhilec = 0;
 				fw_printfln("can receive 6000");
 		}else{
 			countwhilec++;
 		}*/
-	xSemaphoreGiveFromISR(motorCanReceiveSemaphore, &xHigherPriorityTaskWoken);
+	if(hcan == &motorCan){
+	IOPool_getNextWrite(motorCanRxIOPool);
+	motorCan.pRxMsg = IOPool_pGetWriteData(motorCanRxIOPool);
 	if(HAL_CAN_Receive_IT(&motorCan, CAN_FIFO0) != HAL_OK){
 		fw_Warning();
 		isRcanStarted = 0;
 	}else{
 		isRcanStarted = 1;
 	}
+}
+	else if(hcan == &ZGYROCAN){
+		IOPool_getNextWrite(ZGYROCanRxIOPool);
+		ZGYROCAN.pRxMsg = IOPool_pGetWriteData(ZGYROCanRxIOPool);
+		if(HAL_CAN_Receive_IT(&ZGYROCAN, CAN_FIFO0) != HAL_OK){
+			//fw_Warning();
+			isRcanStarted_AM = 0;
+		}else{
+			isRcanStarted_AM = 1;
+		}
+	}
+	xSemaphoreGiveFromISR(motorCanReceiveSemaphore, &xHigherPriorityTaskWoken);
 //ÉÏÏÂÎÄÇĞ»»
 	if( xHigherPriorityTaskWoken == pdTRUE ){
    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
@@ -205,6 +255,8 @@ void GetEncoderBias(volatile Encoder *v, CanRxMsgTypeDef * msg)
 * Note(s)    : none
 ************************************************************************************************************************
 */
+extern float ZGyroModuleAngleMAX;
+extern float ZGyroModuleAngleMIN;
 void CanReceiveMsgProcess(CanRxMsgTypeDef * msg)
 {      
         //GMYawEncoder.ecd_bias = yaw_ecd_bias;
@@ -271,12 +323,12 @@ void CanReceiveMsgProcess(CanRxMsgTypeDef * msg)
 						 }
 				}break;		
 */				
-/*				case CAN_BUS1_ZGYRO_FEEDBACK_MSG_ID:
+  			case ZGYRO_ID:
 				{
-					LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_ZGYRO));
-					ZGyroModuleAngle = -0.01f*((int32_t)(msg->Data[0]<<24)|(int32_t)(msg->Data[1]<<16) | (int32_t)(msg->Data[2]<<8) | (int32_t)(msg->Data[3])); 
-				}break;
-				*/
+//					LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_ZGYRO));
+					ZGyroModuleAngle = 0.01f*0.0001*((int32_t)(msg->Data[0]<<24)|(int32_t)(msg->Data[1]<<16) | (int32_t)(msg->Data[2]<<8) | (int32_t)(msg->Data[3])); 
+					}break;
+				
 				default:
 				{
 				}

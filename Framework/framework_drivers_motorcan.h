@@ -6,6 +6,7 @@
 #include "framework_utilities_iopool.h"
 
 IOPoolDeclare(motorCanRxIOPool, CanRxMsgTypeDef);
+IOPoolDeclare(ZGYROCanRxIOPool, CanRxMsgTypeDef);
 IOPoolDeclare(motorCanTxIOPool, CanTxMsgTypeDef);
 
 #define MOTOR1_ID 0x201u
@@ -15,10 +16,13 @@ IOPoolDeclare(motorCanTxIOPool, CanTxMsgTypeDef);
 #define MOTORYAW_ID 0x205u
 #define MOTORPITCH_ID 0x206u
 
+#define ZGYRO_ID   0x401u
+
 #define MOTORCM_ID 0x200u
 #define MOTORGIMBAL_ID 0x1FFu
 
 #define motorCan hcan2
+#define ZGYROCAN hcan1
 
 #define RATE_BUF_SIZE 6
 typedef struct{

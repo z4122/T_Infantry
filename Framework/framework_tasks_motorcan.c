@@ -1,6 +1,7 @@
 #include "framework_utilities_debug.h"
 #include "framework_utilities_iopool.h"
 #include "framework_drivers_motorcan.h"
+#include "framework_tasks_motorcan.h"
 #include "FreeRTOS.h"
 #include "cmsis_os.h"
 #include "can.h"
@@ -55,6 +56,14 @@ void canReceivelTask(void const * argument){
 			
 			CanReceiveMsgProcess(pData);
 		}
+		
+		if(IOPool_hasNextRead(ZGYROCanRxIOPool, ZGYRO_ID)){
+			IOPool_getNextRead(ZGYROCanRxIOPool, ZGYRO_ID);
+			CanRxMsgTypeDef *pData = IOPool_pGetReadData(ZGYROCanRxIOPool, MOTORYAW_ID);
+			
+			yawAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
+			CanReceiveMsgProcess(pData);
+		}
 //		int16_t yawZeroAngle = 1075;
 //		float yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8191.0;
 //		yawRealAngle = (yawRealAngle > 180) ? yawRealAngle - 360 : yawRealAngle;
@@ -76,6 +85,8 @@ void canReceivelTask(void const * argument){
 }
 
 	int16_t yawZeroAngle = 1075, pitchZeroAngle = 550;
+  float magZeroAngle = -142;
+  extern float yaw_angle;
 	float yawAngleTarget = 0.0, pitchAngleTarget = 0.0;
 	fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(20.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
 	fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(25.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
@@ -91,6 +102,8 @@ extern xSemaphoreHandle motorCanTransmitSemaphore;
 extern Shoot_Mode_e shootMode;
 extern float yawAdd, pitchAdd;
 extern _Bool CReceive;
+extern float ZGyroModuleAngle;
+float yawRealAngle = 0;
 /*控制任务，循环*/
 void GMControlTask(void const * argument){
 //	int16_t testSpeed = 10000;
@@ -111,15 +124,10 @@ void GMControlTask(void const * argument){
 		portTickType xLastWakeTime;
 		xLastWakeTime = xTaskGetTickCount();
 	while(1){
-		
-//		yawAngleTarget = (yawAngleTarget < 3100) ? yawAngleTarget : 3100;
-//		yawAngleTarget = (yawAngleTarget > -1016) ? yawAngleTarget : -1016;
-//		pitchAngleTarget = (pitchAngleTarget < 1450) ? pitchAngleTarget : 1450;
-//		pitchAngleTarget = (pitchAngleTarget > 70) ? pitchAngleTarget : 70;
-//		int16_t yawAngleS = yawAngle, pitchAngleS = pitchAngle;
-
 //angle		
-		float yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8191.0;
+		WorkStateFSM();
+	  WorkStateSwitchProcess();
+		yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8191.0;
 		yawRealAngle = (yawRealAngle > 180) ? yawRealAngle - 360 : yawRealAngle;
 		yawRealAngle = (yawRealAngle < -180) ? yawRealAngle + 360 : yawRealAngle;
 		float pitchRealAngle = (pitchZeroAngle - pitchAngle) * 360 / 8191.0;
@@ -146,9 +154,54 @@ void GMControlTask(void const * argument){
 	 }
 		MINMAX(yawAngleTarget, -45, 45);
 		MINMAX(pitchAngleTarget, -25, 25);
-		
+	 static uint8_t normalFlag = 0;   //正常工作模式标志
+	static uint8_t standbyFlag = 1;  //IMU工作模式标志
+	static uint32_t modeChangeDelayCnt = 0;
+	static float angleSave = 0.0f;    //用于切换模式时保存切换前的角度值，用于角度给定值切换
+//	switch(GetWorkState())
+//	{
+//		case NORMAL_STATE:
+//		{
+//			if(standbyFlag == 1)
+//			{
+//				standbyFlag = 0;
+//				normalFlag = 1;
+//				yawAngleTarget= angleSave;   //修改设定值为STANDBY状态下记录的最后一个ZGYROMODULEAngle值
+//				modeChangeDelayCnt = 0;   //delay清零
+//			}
+//			yawPositionPID.target = yawAngleTarget*1.5;   //设定给定值
+//			yawPositionPID.feedback = ZGyroModuleAngle; 					//设定反馈值
+//			angleSave = yaw_angle;   //时刻保存IMU的值用于从NORMAL向STANDBY模式切换
+//		}break;
+//		case STANDBY_STATE:   //IMU模式
+//		{
+//			modeChangeDelayCnt++;
+//			if(modeChangeDelayCnt < STATE_SWITCH_DELAY_TICK)    //delay的这段时间与NORMAL_STATE一样
+//			{
+//				yawPositionPID.target = yawAngleTarget*1.5;;   //设定给定值
+//				yawPositionPID.feedback = ZGyroModuleAngle; 					//设定反馈值
+//				angleSave = yaw_angle;
+//			}
+//			else     //delay时间到，切换模式到IMU
+//			{
+//				if(normalFlag == 1)   //修改模式标志
+//				{
+//					normalFlag = 0;
+//					standbyFlag = 1;
+//					yawAngleTarget = angleSave;    //保存的是delay时间段内保存的
+//				}
+//				yawPositionPID.target = yawAngleTarget*1.5;;   //设定给定值
+//				yawPositionPID.feedback = yaw_angle; 					//设定反馈值	
+//				angleSave = ZGyroModuleAngle;           //IMU模式时，保存ZGyro的值供模式切换时修改给定值使用						
+//			}
+//		}break;
+//		default:
+//		break;
+//	}
+	 //		yawRealAngle = 2*(yaw_angle - magZeroAngle);
+	float yawRealAngle1 = (yaw_angle - magZeroAngle);
 	 		//position		
-			pitchPositionPID.target = pitchAngleTarget;
+	    pitchPositionPID.target = pitchAngleTarget;
 			pitchPositionPID.feedback = pitchRealAngle;
 			pitchPositionPID.Calc(&pitchPositionPID);
 			//speed
@@ -159,8 +212,9 @@ void GMControlTask(void const * argument){
 			
 			pitchReady = 1;
 	 	//position		
-			yawPositionPID.target = yawAngleTarget;
-			yawPositionPID.feedback = yawRealAngle;
+			yawPositionPID.target = yawAngleTarget*1.5;
+	//		yawPositionPID.feedback = yawRealAngle;
+	    yawPositionPID.feedback = (ZGyroModuleAngle - 71.8);
 			yawPositionPID.Calc(&yawPositionPID);
 			//speed
 			yawSpeedPID.target = yawPositionPID.output;
@@ -173,7 +227,10 @@ void GMControlTask(void const * argument){
 		
 //		yawIntensity = 0;
 //		pitchIntensity = 0;
-		
+		if(GetEmergencyFlag() == EMERGENCY){
+			yawIntensity = 0;
+			pitchIntensity = 0;
+		}
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(motorCanTxIOPool);
 		pData->StdId = MOTORGIMBAL_ID;
 		pData->Data[0] = (uint8_t)(yawIntensity >> 8);
@@ -184,17 +241,16 @@ void GMControlTask(void const * argument){
 		pitchReady = yawReady = 0;
 		xSemaphoreGive(motorCanTransmitSemaphore);
 		static int countwhile = 0;
-		if(countwhile >= 5000){
+		if(countwhile >= 1000){
 			countwhile = 0;
 //			fw_printfln("%f",yawAngleTarget);
 //			fw_printfln("%d",yawIntensity);
+//			fw_printfln("encoder %f\r\n mag %f", yawRealAngle,yawRealAngle1);
 		}else{
 			countwhile++;
 		}
 		//osDelay(250);
-    WorkStateFSM();
-	  WorkStateSwitchProcess();
-	//	fw_printfln("%ld",StackResidue);
+    //	fw_printfln("%ld",StackResidue);
 		vTaskDelayUntil( &xLastWakeTime, ( 1 / portTICK_RATE_MS ) );
 		
 	}
@@ -202,6 +258,7 @@ void GMControlTask(void const * argument){
 
 extern osSemaphoreId motorCanTransmitSemaphoreHandle;
 uint8_t isRcanStarted = 0;
+uint8_t isRcanStarted_AM = 0;
 /*Can发送任务*/
 void motorCanTransmitTask(void const * argument){
 	//osSemaphoreRelease(motorCanTransmitSemaphoreHandle);

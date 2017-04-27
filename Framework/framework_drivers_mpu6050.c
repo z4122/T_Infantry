@@ -301,7 +301,12 @@ uint32_t Get_Time_Micros(void);
 float gx, gy, gz, ax, ay, az, mx, my, mz;
 int mx_max = 0, mx_min = 0, my_max = 0, my_min = 0, mz_max = 0, mz_min = 200;
 float gYroX, gYroY, gYroZ;
+float yaw_angle;
 void minmax_refresh( int a, int *min, int *max){
+	if (a > *max) *max = a;
+	if( a < *min) *min = a;
+}
+void minmax_refresh_f( float a, float *min, float *max){
 	if (a > *max) *max = a;
 	if( a < *min) *min = a;
 }
@@ -358,8 +363,8 @@ void printMPU6050Task(void const * argument){
 			gYroY = mygetqval[4] - (-0.5);
 			gYroZ = mygetqval[5];
 			
-#define Kp 2.0f
-#define Ki 0.01f 
+#define Kp 3.0f
+#define Ki 0.005f 
 #define M_PI  (float)3.1415926535
 			static uint32_t lastUpdate, now;
 			static float exInt, eyInt, ezInt;
@@ -463,7 +468,7 @@ void printMPU6050Task(void const * argument){
 			angles[2] = atan2(2 * q[2] * q[3] + 2 * q[0] * q[1], -2 * q[1] * q[1] - 2 * q[2] * q[2] + 1)* 180/M_PI; // roll       -pi-----pi  
 
 			static int countPrint = 0;
-			if(countPrint > 100){
+			if(countPrint > 1000){
 				countPrint = 0;
 				
 //				fw_printf("mx max = %d | min = %d\r\n", mymaxmx, myminmx);
@@ -486,13 +491,13 @@ void printMPU6050Task(void const * argument){
 				{
 					yaw_count++;
 				}
-				float yaw_angle = yaw_temp + yaw_count*360;
+				yaw_angle = yaw_temp + yaw_count*360;
 				
-				fw_printf("yaw_angle = %f | ", yaw_angle);
+//				fw_printf("yaw_angle = %f | \r\n", yaw_angle);
 //				fw_printf("angles0 = %f | ", angles[0]);
-				fw_printf("angles1 = %f | ", angles[1]);
-				fw_printf("angles2 = %f\r\n", angles[2]);
-				fw_printf("========================\r\n");
+//				fw_printf("angles1 = %f | ", angles[1]);
+//				fw_printf("angles2 = %f\r\n", angles[2]);
+//				fw_printf("========================\r\n");
 				
 //				fw_printf("ax = %d | ", myax);
 //				fw_printf("ay = %d | ", myay);

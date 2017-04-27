@@ -1,11 +1,13 @@
 #include "framework_tasks_cmcontrol.h"
 #include "pid_Regulator.h"
 #include "framework_drivers_uartremotecontrol.h"
+#include "framework_tasks_remotecontrol.h"
 #include "framework_drivers_motorcan.h"
 #include "framework_utilities_debug.h"
 #include "framework_freertos_task.h"
 #include "tim.h"
 #include "stdint.h"
+#include "framework_drivers_mpu6050.h"
 
 
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT; 
@@ -80,6 +82,10 @@ void ControtLoopTaskInit(void)
 }
 /*底盘控制任务*/
 extern xSemaphoreHandle motorCanTransmitSemaphore;
+extern float ZGyroModuleAngle;
+float ZGyroModuleAngleMAX;
+float ZGyroModuleAngleMIN;
+extern float yawRealAngle;
 void CMControlTask(void const * argument)
 {
 	portTickType xLastWakeTime;
@@ -99,11 +105,16 @@ void CMControlTask(void const * argument)
 			countwhile++;
 		}
 		static int countwhile1 = 0;
-				if(countwhile1 >= 800){
+//		minmax_refresh_f(ZGyroModuleAngle,&ZGyroModuleAngleMIN,&ZGyroModuleAngleMAX);
+		if(countwhile1 >= 300){
 		countwhile1 = 0;
 //			fw_printfln("in CMcontrol_task");
 		StackResidue = uxTaskGetStackHighWaterMark( CMControlTaskHandle );
-//		fw_printfln("CM%ld",StackResidue);
+	//		fw_printfln("yawRealAngle:%f",yawRealAngle);
+//			fw_printf(" ZGyroModuleAngle:%f ||",ZGyroModuleAngle);
+//			fw_printf(" ZGyroModuleAngleMIN:%f ||",ZGyroModuleAngleMIN);
+//			fw_printf(" ZGyroModuleAngleMAX:%f ||\r\n",ZGyroModuleAngleMAX);
+//			fw_printf("========================\r\n");
 		}else{
 			countwhile1++;
 		}
@@ -147,6 +158,7 @@ void WorkStateFSM(void)
 			}
 			else if(!IsRemoteBeingAction()  && GetShootState() != SHOOTING) //||(Get_Lost_Error(LOST_ERROR_RC) == LOST_ERROR_RC
 			{
+				fw_printfln("进入STANDBY");
 				workState = STANDBY_STATE;      
 			}			
 		}break;
@@ -184,6 +196,7 @@ void WorkStateSwitchProcess(void)
 	}
 }
 //底盘控制任务
+extern int16_t yawZeroAngle;
 void CMControlLoop(void)
 {  
 	//底盘旋转量计算
@@ -194,8 +207,9 @@ void CMControlLoop(void)
 	else
 	{
 		 //底盘跟随编码器旋转PID计算
-		 CMRotatePID.ref = 500;
+		 CMRotatePID.ref = 48;
 		 CMRotatePID.fdb = GMYawEncoder.ecd_angle;
+//		fw_printfln("%f",GMYawEncoder.ecd_angle );
 		 CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 				 ChassisSpeedRef.rotate_ref = 0;
@@ -221,7 +235,7 @@ void CMControlLoop(void)
 	CM3SpeedPID.Calc(&CM3SpeedPID);
 	CM4SpeedPID.Calc(&CM4SpeedPID);
 	
-	 if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE)    //||Is_Serious_Error()|| dead_lock_flag == 1紧急停车，编码器校准，无控制输入时都会使底盘控制停止
+	 if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY)   //||Is_Serious_Error()|| dead_lock_flag == 1紧急停车，编码器校准，无控制输入时都会使底盘控制停止
 	 {
 		 Set_CM_Speed(0,0,0,0);
 	 }

@@ -19,6 +19,7 @@ typedef enum
     CALI_STATE,    			//У׼״̬
 }WorkState_e;
 
+
 WorkState_e GetWorkState(void);
 
 #define PID_SHOOT_MOTOR_SPEED      (10)

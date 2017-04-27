@@ -7,6 +7,7 @@
 #include "stddef.h"
 #include "ramp.h"
 #include "framework_tasks_cmcontrol.h"
+#include "pid_regulator.h"
 
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
@@ -90,7 +91,6 @@ void RemoteTaskInit()
 	SetFrictionState(FRICTION_WHEEL_OFF);
 }
 
-
 void RemoteDataProcess(uint8_t *pData)
 {
     if(pData == NULL)
@@ -123,16 +123,20 @@ void RemoteDataProcess(uint8_t *pData)
 		{
 			//遥控器控制模式
 //			fw_printfln("in remote mode");
+			SetEmergencyFlag(NORMAL);
 			RemoteControlProcess(&(RC_CtrlData.rc));
 		}break;
 		case KEY_MOUSE_INPUT:
 		{
+			
 			//鼠标键盘控制模式
-			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
+			//MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
+			SetEmergencyFlag(NORMAL);
+			SetShootMode(AUTO);
 		}break;
 		case STOP:
 		{
-			SetShootMode(AUTO);
+			SetEmergencyFlag(EMERGENCY);
 			//紧急停车
 		}break;
 	}
@@ -242,6 +246,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 }
 
 Shoot_Mode_e shootMode = MANUL;
+
 Shoot_Mode_e GetShootMode()
 {
 	return shootMode;
@@ -251,6 +256,18 @@ void SetShootMode(Shoot_Mode_e v)
 {
 	shootMode = v;
 }
+
+Emergency_Flag emergency_Flag = NORMAL;
+Emergency_Flag GetEmergencyFlag()
+{
+	return emergency_Flag;
+}
+
+void SetEmergencyFlag(Emergency_Flag v)
+{
+	emergency_Flag = v;
+}
+
 
 
 
