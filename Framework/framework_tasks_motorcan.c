@@ -84,7 +84,7 @@ void canReceivelTask(void const * argument){
 	}
 }
 
-	int16_t yawZeroAngle = 1075, pitchZeroAngle = 550;
+	int16_t yawZeroAngle = 1075, pitchZeroAngle = 6300;
   float magZeroAngle = -142;
   extern float yaw_angle;
 	float yawAngleTarget = 0.0, pitchAngleTarget = 0.0;
@@ -123,17 +123,23 @@ void GMControlTask(void const * argument){
 //	}
 		portTickType xLastWakeTime;
 		xLastWakeTime = xTaskGetTickCount();
+		static int countwhile = 0;
 	while(1){
 //angle		
 		WorkStateFSM();
 	  WorkStateSwitchProcess();
+		//fw_printfln("yawAngle%d",yawAngle);
 		yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8191.0;
 		yawRealAngle = (yawRealAngle > 180) ? yawRealAngle - 360 : yawRealAngle;
 		yawRealAngle = (yawRealAngle < -180) ? yawRealAngle + 360 : yawRealAngle;
+		//fw_printfln("yawRealAngle%f",yawRealAngle);
+		//fw_printfln("------------------");
+		//fw_printfln("pitchAngle:     %d",pitchAngle);
 		float pitchRealAngle = (pitchZeroAngle - pitchAngle) * 360 / 8191.0;
 		pitchRealAngle = (pitchRealAngle > 180) ? pitchRealAngle - 360 : pitchRealAngle;
 		pitchRealAngle = (pitchRealAngle < -180) ? pitchRealAngle + 360 : pitchRealAngle;
-		
+		//fw_printfln("pitchRealAngle: %f",pitchRealAngle);
+		//fw_printfln("------------------");
 		if( GetShootMode() == AUTO){
 //		if(IOPool_hasNextRead(upperGimbalIOPool, 0)){ 
 //			IOPool_getNextRead(upperGimbalIOPool, 0);
@@ -209,6 +215,7 @@ void GMControlTask(void const * argument){
 			pitchSpeedPID.feedback = -gYroY;
 			pitchSpeedPID.Calc(&pitchSpeedPID);
 			pitchIntensity = -(int16_t)pitchSpeedPID.output;
+			//pitchIntensity = 0;
 			
 			pitchReady = 1;
 	 	//position		
@@ -221,6 +228,7 @@ void GMControlTask(void const * argument){
 			yawSpeedPID.feedback = -gYroZ;
 			yawSpeedPID.Calc(&yawSpeedPID);
 			yawIntensity = (int16_t)yawSpeedPID.output;
+			//yawIntensity = 0;
 			
 			yawReady = 1;
 	
@@ -240,12 +248,14 @@ void GMControlTask(void const * argument){
 		IOPool_getNextWrite(motorCanTxIOPool);
 		pitchReady = yawReady = 0;
 		xSemaphoreGive(motorCanTransmitSemaphore);
-		static int countwhile = 0;
-		if(countwhile >= 1000){
+		if(countwhile >= 100){
 			countwhile = 0;
 //			fw_printfln("%f",yawAngleTarget);
 //			fw_printfln("%d",yawIntensity);
 //			fw_printfln("encoder %f\r\n mag %f", yawRealAngle,yawRealAngle1);
+			//fw_printfln("pitchAngle:     %d",pitchAngle);
+			//fw_printfln("pitchRealAngle: %f",pitchRealAngle);
+		//fw_printfln("------------------");
 		}else{
 			countwhile++;
 		}
