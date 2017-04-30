@@ -98,10 +98,10 @@ void motorInit(){
 	}
 	isRcanStarted = 1;
 	
-	ZGYROCAN.pRxMsg = &AMCanRxMsg;
+	ZGYROCAN.pRxMsg = IOPool_pGetWriteData(ZGYROCanRxIOPool);
 	/*##-- Configure the CAN1 Filter ###########################################*/
 	CAN_FilterConfTypeDef sFilterConfig2;
-	sFilterConfig2.FilterNumber = 14;//14 - 27//14
+	sFilterConfig2.FilterNumber = 0;
 	sFilterConfig2.FilterMode = CAN_FILTERMODE_IDMASK;
 	sFilterConfig2.FilterScale = CAN_FILTERSCALE_32BIT;
 	sFilterConfig2.FilterIdHigh = 0x0000;
@@ -111,12 +111,16 @@ void motorInit(){
   sFilterConfig2.FilterFIFOAssignment = 0;
   sFilterConfig2.FilterActivation = ENABLE;
   sFilterConfig2.BankNumber = 14;
-  HAL_CAN_ConfigFilter(&ZGYROCAN, &sFilterConfig2);
+//  HAL_CAN_ConfigFilter(&ZGYROCAN, &sFilterConfig2);
+	
 	if(HAL_CAN_Receive_IT(&ZGYROCAN, CAN_FIFO0) != HAL_OK){
 		fw_Error_Handler(); 
 	}
 	isRcanStarted_AM = 1;
+	
+	gyroinit();
 }
+
 
 extern xSemaphoreHandle motorCanReceiveSemaphore;
 /*CAN接收回调函数*/
@@ -141,17 +145,18 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 	}
 }
 	else if(hcan == &ZGYROCAN){
+		fw_printfln("zgyrocan receive");
 		IOPool_getNextWrite(ZGYROCanRxIOPool);
 		ZGYROCAN.pRxMsg = IOPool_pGetWriteData(ZGYROCanRxIOPool);
 		if(HAL_CAN_Receive_IT(&ZGYROCAN, CAN_FIFO0) != HAL_OK){
-			//fw_Warning();
+			fw_Warning();
 			isRcanStarted_AM = 0;
 		}else{
 			isRcanStarted_AM = 1;
 		}
 	}
 	xSemaphoreGiveFromISR(motorCanReceiveSemaphore, &xHigherPriorityTaskWoken);
-//上下文切换
+	//上下文切换
 	if( xHigherPriorityTaskWoken == pdTRUE ){
    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 	}
@@ -162,6 +167,30 @@ void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan){
 	osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
 }
 
+void gyroinit(void){
+	CanTxMsgTypeDef tx_message;
+    
+    tx_message.StdId = 0x404;//send to gyro controll board
+	hcan2.pTxMsg->RTR = CAN_RTR_DATA;
+	hcan2.pTxMsg->IDE = CAN_ID_STD;
+	hcan2.pTxMsg->DLC = 8;
+
+    
+    tx_message.Data[0] = 0x00;
+    tx_message.Data[1] = 0x01;
+    tx_message.Data[2] = 0x02;
+    tx_message.Data[3] = 0x03;
+    tx_message.Data[4] = 0x04;
+    tx_message.Data[5] = 0x05;
+    tx_message.Data[6] = 0x06;
+    tx_message.Data[7] = 0x07;
+			ZGYROCAN.pTxMsg = &tx_message;
+			taskENTER_CRITICAL();
+			if(HAL_CAN_Transmit_IT(&ZGYROCAN) != HAL_OK){
+				fw_Warning();
+			}
+			taskEXIT_CRITICAL();
+}
 /********************************************************************************
    给底盘电调板发送指令，ID号为0x200８底盘返回ID为0x201-0x204
 *********************************************************************************/
@@ -289,7 +318,7 @@ void CanReceiveMsgProcess(CanRxMsgTypeDef * msg)
 //					LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_MOTOR5));
 //					 GMYawEncoder.ecd_bias = yaw_ecd_bias;
 					 EncoderProcess(&GMYawEncoder ,msg);    
-				}
+				}break;
 						// 比较保存编码器的值和偏差值，如果编码器的值和初始偏差之间差距超过阈值，将偏差值做处理，防止出现云台反方向运动
 					// if(can_count>=90 && can_count<=100)
 /*					if(GetWorkState() == PREPARE_STATE)   //准备阶段要求二者之间的差值一定不能大于阈值，否则肯定是出现了临界切换
@@ -326,8 +355,8 @@ void CanReceiveMsgProcess(CanRxMsgTypeDef * msg)
   			case ZGYRO_ID:
 				{
 //					LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_ZGYRO));
-					ZGyroModuleAngle = 0.01f*0.0001*((int32_t)(msg->Data[0]<<24)|(int32_t)(msg->Data[1]<<16) | (int32_t)(msg->Data[2]<<8) | (int32_t)(msg->Data[3])); 
-					}break;
+					ZGyroModuleAngle = 0.01f*((int32_t)(msg->Data[0]<<24)|(int32_t)(msg->Data[1]<<16) | (int32_t)(msg->Data[2]<<8) | (int32_t)(msg->Data[3])); 
+				}break;
 				
 				default:
 				{

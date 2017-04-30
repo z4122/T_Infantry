@@ -15,6 +15,7 @@
 
 uint16_t yawAngle = 0, pitchAngle = 0;
 extern xSemaphoreHandle motorCanReceiveSemaphore;
+extern float ZGyroModuleAngle;
 /*Can接收处理任务*/
 void canReceivelTask(void const * argument){
 	while(1){
@@ -24,6 +25,7 @@ void canReceivelTask(void const * argument){
 			CanRxMsgTypeDef *pData = IOPool_pGetReadData(motorCanRxIOPool, MOTORYAW_ID);
 			
 			yawAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
+			//fw_printfln("data0 %d data1 %d", pData->Data[0],pData->Data[1]);
 			CanReceiveMsgProcess(pData);
 		}
 		if(IOPool_hasNextRead(motorCanRxIOPool, MOTORPITCH_ID)){
@@ -60,8 +62,7 @@ void canReceivelTask(void const * argument){
 		if(IOPool_hasNextRead(ZGYROCanRxIOPool, ZGYRO_ID)){
 			IOPool_getNextRead(ZGYROCanRxIOPool, ZGYRO_ID);
 			CanRxMsgTypeDef *pData = IOPool_pGetReadData(ZGYROCanRxIOPool, MOTORYAW_ID);
-			
-			yawAngle = ((uint16_t)pData->Data[0] << 8) + (uint16_t)pData->Data[1];
+			fw_printfln("ZGYROCAN received");
 			CanReceiveMsgProcess(pData);
 		}
 //		int16_t yawZeroAngle = 1075;
@@ -128,16 +129,17 @@ void GMControlTask(void const * argument){
 //angle		
 		WorkStateFSM();
 	  WorkStateSwitchProcess();
-		//fw_printfln("yawAngle%d",yawAngle);
+
 		yawRealAngle = (yawAngle - yawZeroAngle) * 360 / 8191.0;
 		yawRealAngle = (yawRealAngle > 180) ? yawRealAngle - 360 : yawRealAngle;
 		yawRealAngle = (yawRealAngle < -180) ? yawRealAngle + 360 : yawRealAngle;
+		//fw_printfln("yawAngle%d",yawAngle);
 		//fw_printfln("yawRealAngle%f",yawRealAngle);
 		//fw_printfln("------------------");
-		//fw_printfln("pitchAngle:     %d",pitchAngle);
 		float pitchRealAngle = (pitchZeroAngle - pitchAngle) * 360 / 8191.0;
 		pitchRealAngle = (pitchRealAngle > 180) ? pitchRealAngle - 360 : pitchRealAngle;
 		pitchRealAngle = (pitchRealAngle < -180) ? pitchRealAngle + 360 : pitchRealAngle;
+		//fw_printfln("pitchAngle:     %d",pitchAngle);
 		//fw_printfln("pitchRealAngle: %f",pitchRealAngle);
 		//fw_printfln("------------------");
 		if( GetShootMode() == AUTO){
@@ -220,8 +222,8 @@ void GMControlTask(void const * argument){
 			pitchReady = 1;
 	 	//position		
 			yawPositionPID.target = yawAngleTarget*1.5;
-	//		yawPositionPID.feedback = yawRealAngle;
-	    yawPositionPID.feedback = (ZGyroModuleAngle - 71.8);
+			yawPositionPID.feedback = yawRealAngle;
+	    //yawPositionPID.feedback = (ZGyroModuleAngle - 71.8);
 			yawPositionPID.Calc(&yawPositionPID);
 			//speed
 			yawSpeedPID.target = yawPositionPID.output;
@@ -248,7 +250,7 @@ void GMControlTask(void const * argument){
 		IOPool_getNextWrite(motorCanTxIOPool);
 		pitchReady = yawReady = 0;
 		xSemaphoreGive(motorCanTransmitSemaphore);
-		if(countwhile >= 100){
+		if(countwhile >= 1000){
 			countwhile = 0;
 //			fw_printfln("%f",yawAngleTarget);
 //			fw_printfln("%d",yawIntensity);
@@ -256,6 +258,10 @@ void GMControlTask(void const * argument){
 			//fw_printfln("pitchAngle:     %d",pitchAngle);
 			//fw_printfln("pitchRealAngle: %f",pitchRealAngle);
 		//fw_printfln("------------------");
+			fw_printfln("yawAngle: %d",yawAngle);
+			fw_printfln("yawRealAngle: %f",yawRealAngle);
+			fw_printfln("ZGyroModuleAngle: %f",ZGyroModuleAngle);
+			fw_printfln("------------------");
 		}else{
 			countwhile++;
 		}
@@ -287,10 +293,12 @@ void motorCanTransmitTask(void const * argument){
 			//fw_printf("w2");
 			IOPool_getNextRead(motorCanTxIOPool, MOTORGIMBAL_ID);
 			motorCan.pTxMsg = IOPool_pGetReadData(motorCanTxIOPool, MOTORGIMBAL_ID);
+			taskENTER_CRITICAL();
 			if(HAL_CAN_Transmit_IT(&motorCan) != HAL_OK){
 				fw_Warning();
 				osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
 			}
+			taskEXIT_CRITICAL();
 		}
 		if(IOPool_hasNextRead(motorCanTxIOPool, MOTORCM_ID)){
 			//fw_printf("m1");
@@ -298,10 +306,12 @@ void motorCanTransmitTask(void const * argument){
 			//fw_printf("m2");
 			IOPool_getNextRead(motorCanTxIOPool, MOTORCM_ID);
 			motorCan.pTxMsg = IOPool_pGetReadData(motorCanTxIOPool, MOTORCM_ID);
+			taskENTER_CRITICAL();
 			if(HAL_CAN_Transmit_IT(&motorCan) != HAL_OK){
 				fw_Warning();
 				osSemaphoreRelease(motorCanTransmitSemaphoreHandle);
 			}
+			taskEXIT_CRITICAL();
 		}
 
 		if(isRcanStarted == 0){
@@ -316,7 +326,7 @@ void motorCanTransmitTask(void const * argument){
 				isRcanStarted = 1;
 			}
 		}
-		
+				
 	}
 }
 void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed portCHAR *pcTaskName )

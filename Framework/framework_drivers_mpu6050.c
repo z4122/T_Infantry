@@ -363,8 +363,8 @@ void printMPU6050Task(void const * argument){
 			gYroY = mygetqval[4] - (-0.5);
 			gYroZ = mygetqval[5];
 			
-#define Kp 3.0f
-#define Ki 0.005f 
+#define Kp 2.0f
+#define Ki 0.01f 
 #define M_PI  (float)3.1415926535
 			static uint32_t lastUpdate, now;
 			static float exInt, eyInt, ezInt;
@@ -468,18 +468,7 @@ void printMPU6050Task(void const * argument){
 			angles[2] = atan2(2 * q[2] * q[3] + 2 * q[0] * q[1], -2 * q[1] * q[1] - 2 * q[2] * q[2] + 1)* 180/M_PI; // roll       -pi-----pi  
 
 			static int countPrint = 0;
-			if(countPrint > 1000){
-				countPrint = 0;
-				
-//				fw_printf("mx max = %d | min = %d\r\n", mymaxmx, myminmx);
-//				fw_printf("my max = %d | min = %d\r\n", mymaxmy, myminmy);
-//				fw_printf("mz max = %d | min = %d\r\n", mymaxmz, myminmz);
-//				fw_printf("========================\r\n");
-				
-//				fw_printf("now = %d \r\n", now);
-//				fw_printf("xxx = %d \r\n", 2147483647);
-//				fw_printf("halfT = %f \r\n", halfT);
-				static float last_yaw_temp, yaw_temp;
+			static float last_yaw_temp, yaw_temp;
 				static int yaw_count = 0;
 				last_yaw_temp = yaw_temp;
 				yaw_temp = angles[0]; 
@@ -492,7 +481,18 @@ void printMPU6050Task(void const * argument){
 					yaw_count++;
 				}
 				yaw_angle = yaw_temp + yaw_count*360;
+			if(countPrint > 1000){
+				countPrint = 0;
 				
+//				fw_printf("mx max = %d | min = %d\r\n", mymaxmx, myminmx);
+//				fw_printf("my max = %d | min = %d\r\n", mymaxmy, myminmy);
+//				fw_printf("mz max = %d | min = %d\r\n", mymaxmz, myminmz);
+//				fw_printf("========================\r\n");
+				
+//				fw_printf("now = %d \r\n", now);
+//				fw_printf("xxx = %d \r\n", 2147483647);
+//				fw_printf("halfT = %f \r\n", halfT);
+							
 //				fw_printf("yaw_angle = %f | \r\n", yaw_angle);
 //				fw_printf("angles0 = %f | ", angles[0]);
 //				fw_printf("angles1 = %f | ", angles[1]);
