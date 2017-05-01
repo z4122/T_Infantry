@@ -32,11 +32,17 @@ extern RampGen_t FBSpeedRamp  ;   //mouseÇ°ºóÒÆ¶¯Ð±ÆÂ
 extern RC_Ctl_t RC_CtrlData; 
 extern xSemaphoreHandle xSemaphore_rcuart;
 extern float yawAngleTarget, pitchAngleTarget;
+TickType_t lastcount_rc;
+TickType_t thiscount_rc;
 void RControlTask(void const * argument){
 	uint8_t data[18];
 			static int countwhile = 0;
 	while(1){
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
+		thiscount_rc = xTaskGetTickCount();
+		fw_printfln("%d",thiscount_rc);
+	//	if(thiscount_rc - lastcount_rc < 8){
+			lastcount_rc = thiscount_rc;
 		if(IOPool_hasNextRead(rcUartIOPool, 0)){
 			IOPool_getNextRead(rcUartIOPool, 0);
 	
