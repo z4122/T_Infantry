@@ -6,6 +6,7 @@
 #include "ramp.h"
 #include "tim.h"
 #include "framework_tasks_cmcontrol.h"
+#include "framework_drivers_laser.h"
 
 #define MINMAX(value, min, max) value = (value < min) ? min : (value > max ? max : value)
 /*****Begin define ioPool*****/
@@ -142,14 +143,14 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);
 				friction_wheel_state = FRICTION_WHEEL_START_TURNNING;	 
-	//			LASER_ON(); 
+				LASER_ON(); 
 			}				 		
 		}break;
 		case FRICTION_WHEEL_START_TURNNING:
 		{
 			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   //¸ÕÆô¶¯¾Í±»¹Ø±Õ
 			{
-//				LASER_OFF();
+				LASER_OFF();
 				SetShootState(NOSHOOTING);
 				SetFrictionWheelSpeed(1000);
 				friction_wheel_state = FRICTION_WHEEL_OFF;
@@ -171,7 +172,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 		{
 			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   //¹Ø±ÕÄ¦²ÁÂÖ
 			{
-//				LASER_OFF();
+				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
@@ -201,7 +202,7 @@ void MouseShootControl(Mouse *mouse)
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);
 				friction_wheel_state = FRICTION_WHEEL_START_TURNNING;	 
-//				LASER_ON(); 
+  			LASER_ON(); 
 				closeDelayCount = 0;
 			}				 		
 		}break;
@@ -217,7 +218,7 @@ void MouseShootControl(Mouse *mouse)
 			}
 			if(closeDelayCount>50)   //¹Ø±ÕÄ¦²ÁÂÖ
 			{
-//				LASER_OFF();
+				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
@@ -247,7 +248,7 @@ void MouseShootControl(Mouse *mouse)
 			
 			if(closeDelayCount>50)   //¹Ø±ÕÄ¦²ÁÂÖ
 			{
-//				LASER_OFF();
+				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
