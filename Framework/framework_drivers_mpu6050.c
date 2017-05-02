@@ -351,9 +351,9 @@ void printMPU6050Task(void const * argument){
 			mygetqval[4] = (float)mygy / 32.8f;
 			mygetqval[5] = (float)mygz / 32.8f;
 			
-			mygetqval[6] = (float)mymx - 22.0f;
-			mygetqval[7] = (float)mymy - 0.5f;
-			mygetqval[8] = (float)mymz - 177.5f;
+			mygetqval[6] = (float)mymx + 28.5f;
+			mygetqval[7] = (float)mymy + 200.5f;
+			mygetqval[8] = (float)mymz + 200.5f;
 			
 			minmax_refresh( mymx, &mx_min, &mx_max);
 			minmax_refresh( mymy, &my_min, &my_max);
@@ -481,12 +481,12 @@ void printMPU6050Task(void const * argument){
 					yaw_count++;
 				}
 				yaw_angle = yaw_temp + yaw_count*360;
-			if(countPrint > 1000){
+			if(countPrint > 500){
 				countPrint = 0;
 				
-//				fw_printf("mx max = %d | min = %d\r\n", mymaxmx, myminmx);
-//				fw_printf("my max = %d | min = %d\r\n", mymaxmy, myminmy);
-//				fw_printf("mz max = %d | min = %d\r\n", mymaxmz, myminmz);
+//				fw_printf("mx max = %d | min = %d\r\n", mx_max, mx_min);
+//				fw_printf("my max = %d | min = %d\r\n", my_max, my_min);
+//				fw_printf("mz max = %d | min = %d\r\n", my_max, my_min);
 //				fw_printf("========================\r\n");
 				
 //				fw_printf("now = %d \r\n", now);
@@ -498,6 +498,11 @@ void printMPU6050Task(void const * argument){
 //				fw_printf("angles1 = %f | ", angles[1]);
 //				fw_printf("angles2 = %f\r\n", angles[2]);
 //				fw_printf("========================\r\n");
+				
+			fw_printf("mx = %f | ", mx);
+			fw_printf("my = %f | ", my);
+			fw_printf("mz = %f\r\n", mz);
+			fw_printf("========================\r\n");
 				
 //				fw_printf("ax = %d | ", myax);
 //				fw_printf("ay = %d | ", myay);
@@ -530,10 +535,6 @@ void printMPU6050Task(void const * argument){
 //			fw_printf("gy = %d | ", gy);
 //			fw_printf("gz = %d\r\n", gz);
 //			
-//			fw_printf("mx = %d | ", mx);
-//			fw_printf("my = %d | ", my);
-//			fw_printf("mz = %d\r\n", mz);
-//			fw_printf("========================\r\n");
 		}
 		//osDelay(500);
 	}

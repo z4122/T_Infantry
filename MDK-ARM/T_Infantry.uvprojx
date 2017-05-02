@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F405xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;               ../Drivers/STM32F4xx_HAL_Driver/Inc;               ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;               ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;               ../Drivers/CMSIS/Device/ST/STM32F4xx/Include;               ../Middlewares/Third_Party/FreeRTOS/Source/include;               ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;               ../Drivers/CMSIS/Include;               ..\Framework</IncludePath>
+              <IncludePath>../Inc;                  ../Drivers/STM32F4xx_HAL_Driver/Inc;                  ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;                  ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;                  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include;                  ../Middlewares/Third_Party/FreeRTOS/Source/include;                  ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;                  ../Drivers/CMSIS/Include;                  ..\Framework</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -778,6 +778,11 @@
               <FileName>RMLib.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\Framework\RMLib.lib</FilePath>
+            </File>
+            <File>
+              <FileName>framework_drivers_laser.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\framework_drivers_laser.h</FilePath>
             </File>
           </Files>
         </Group>

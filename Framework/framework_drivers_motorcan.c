@@ -77,11 +77,10 @@ extern uint8_t isRcanStarted;
 extern uint8_t isRcanStarted_AM;
 CanRxMsgTypeDef AMCanRxMsg;
 void motorInit(){
-	motorCan.pRxMsg = IOPool_pGetWriteData(motorCanRxIOPool);
-	
-	/*##-- Configure the CAN2 Filter ###########################################*/
-	CAN_FilterConfTypeDef  sFilterConfig;
-	sFilterConfig.FilterNumber = 14;//14 - 27
+	ZGYROCAN.pRxMsg = IOPool_pGetWriteData(ZGYROCanRxIOPool);
+	/*##-- Configure the CAN1 Filter ###########################################*/
+	CAN_FilterConfTypeDef sFilterConfig;
+	sFilterConfig.FilterNumber = 0;
 	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
 	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
 	sFilterConfig.FilterIdHigh = 0x0000;
@@ -91,17 +90,16 @@ void motorInit(){
   sFilterConfig.FilterFIFOAssignment = 0;
   sFilterConfig.FilterActivation = ENABLE;
   sFilterConfig.BankNumber = 14;
-  HAL_CAN_ConfigFilter(&motorCan, &sFilterConfig);
-	
-	if(HAL_CAN_Receive_IT(&motorCan, CAN_FIFO0) != HAL_OK){
+  HAL_CAN_ConfigFilter(&ZGYROCAN, &sFilterConfig);
+	if(HAL_CAN_Receive_IT(&ZGYROCAN, CAN_FIFO0) != HAL_OK){
 		fw_Error_Handler(); 
 	}
-	isRcanStarted = 1;
+	isRcanStarted_AM = 1;
 	
-	ZGYROCAN.pRxMsg = IOPool_pGetWriteData(ZGYROCanRxIOPool);
-	/*##-- Configure the CAN1 Filter ###########################################*/
-	CAN_FilterConfTypeDef sFilterConfig2;
-	sFilterConfig2.FilterNumber = 0;
+	motorCan.pRxMsg = IOPool_pGetWriteData(motorCanRxIOPool);
+	/*##-- Configure the CAN2 Filter ###########################################*/
+	CAN_FilterConfTypeDef  sFilterConfig2;
+	sFilterConfig2.FilterNumber = 14;//14 - 27
 	sFilterConfig2.FilterMode = CAN_FILTERMODE_IDMASK;
 	sFilterConfig2.FilterScale = CAN_FILTERSCALE_32BIT;
 	sFilterConfig2.FilterIdHigh = 0x0000;
@@ -110,15 +108,15 @@ void motorInit(){
   sFilterConfig2.FilterMaskIdLow = 0x0000;
   sFilterConfig2.FilterFIFOAssignment = 0;
   sFilterConfig2.FilterActivation = ENABLE;
-  sFilterConfig2.BankNumber = 14;
-//  HAL_CAN_ConfigFilter(&ZGYROCAN, &sFilterConfig2);
-	
-	if(HAL_CAN_Receive_IT(&ZGYROCAN, CAN_FIFO0) != HAL_OK){
+  sFilterConfig.BankNumber = 14;
+  HAL_CAN_ConfigFilter(&motorCan, &sFilterConfig2);
+	if(HAL_CAN_Receive_IT(&motorCan, CAN_FIFO0) != HAL_OK){
 		fw_Error_Handler(); 
 	}
-	isRcanStarted_AM = 1;
+	isRcanStarted = 1;
 	
-	gyroinit();
+
+	//gyroinit();
 }
 
 
@@ -127,13 +125,6 @@ extern xSemaphoreHandle motorCanReceiveSemaphore;
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
-	/*		static int countwhilec = 0;
-		if(countwhilec >= 6000){
-			countwhilec = 0;
-				fw_printfln("can receive 6000");
-		}else{
-			countwhilec++;
-		}*/
 	if(hcan == &motorCan){
 	IOPool_getNextWrite(motorCanRxIOPool);
 	motorCan.pRxMsg = IOPool_pGetWriteData(motorCanRxIOPool);
@@ -170,7 +161,7 @@ void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan){
 void gyroinit(void){
 	CanTxMsgTypeDef tx_message;
     
-    tx_message.StdId = 0x404;//send to gyro controll board
+  tx_message.StdId = 0x404;//send to gyro controll board
 	hcan2.pTxMsg->RTR = CAN_RTR_DATA;
 	hcan2.pTxMsg->IDE = CAN_ID_STD;
 	hcan2.pTxMsg->DLC = 8;
