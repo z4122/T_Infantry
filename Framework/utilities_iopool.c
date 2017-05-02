@@ -1,7 +1,7 @@
-#include "framework_iopool.h"
+#include "utilities_iopool.h"
 
 extern void Error_Handler(void);
-#include "framework_debug.h"
+#include "utilities_debug.h"
 
 ReadPoolIndex_t getReadPoolIndexPrototype(Id_t id, uint8_t readPoolSize, const Id_t* const readPoolMap){
 	ReadPoolIndex_t i;

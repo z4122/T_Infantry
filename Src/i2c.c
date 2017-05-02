@@ -82,27 +82,55 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
   if(i2cHandle->Instance==I2C1)
   {
   /* USER CODE BEGIN I2C1_MspInit 0 */
+//		GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
+//		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+//		GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+//		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+//		
+//		int gpio8 = HAL_GPIO_ReadPin(GPIOB, 8);
+//		int gpio9 = HAL_GPIO_ReadPin(GPIOB, 9);
+//		if(gpio8 == 0 && gpio9 == 0){
+//			fw_printfln("0");
+//		}else if(gpio8 == 1 && gpio9 == 1){
+//			fw_printfln("1");
+//		}else if(gpio8 == 0 && gpio9 == 1){
+//			fw_printfln("2");
+//		}else if(gpio8 == 1 && gpio9 == 0){
+//			fw_printfln("3");
+//		}else{
+//			fw_printfln("4");
+//		}
 		
 //		//GPIO配置为输出
 //		GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
-//		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;//GPIO_MODE_OUTPUT_OD GPIO_MODE_OUTPUT_PP
 //		GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
 //		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+//		HAL_GPIO_WritePin(GPIOB, 8, GPIO_PIN_RESET);
+//		HAL_GPIO_WritePin(GPIOB, 9, GPIO_PIN_RESET);
 //		//强制上拉
-//		HAL_GPIO_WritePin(GPIOB, 8, GPIO_PIN_SET);
+//		for(int count = 0; count != 8; count++){
+//			HAL_GPIO_WritePin(GPIOB, 8, GPIO_PIN_RESET);
+//			for(int i = 0; i < 1; i++){int a = 420; while(a--);}
+//			HAL_GPIO_WritePin(GPIOB, 8, GPIO_PIN_SET);
+//			for(int i = 0; i < 1; i++){int a = 420; while(a--);}
+//		}
+//		HAL_GPIO_WritePin(GPIOB, 9, GPIO_PIN_RESET);
+//		for(int i = 0; i < 1; i++){int a = 420; while(a--);}
 //		HAL_GPIO_WritePin(GPIOB, 9, GPIO_PIN_SET);
 //		
-//		for(int i=0; i < 100; i++)
-//		{
-//			int a=42000; //at 168MHz 42000 is ok
-//			while(a--);
-//		}
+////		for(int i=0; i < 1000; i++)
+////		{
+////			int a=42000; //at 168MHz 42000 is ok
+////			while(a--);
+////		}
 //		
 //		//复位I2C控制器
-//		i2cHandle->Instance->CR1 = I2C_CR1_SWRST;
+//		i2cHandle->Instance->CR1 |= I2C_CR1_SWRST;
 //		//解除复位
-//		i2cHandle->Instance->CR1 = 0;
-		
+//		i2cHandle->Instance->CR1 &= !I2C_CR1_SWRST;
+//		fw_printfln("gpioi2c");
+
   /* USER CODE END I2C1_MspInit 0 */
   
     /**I2C1 GPIO Configuration    
