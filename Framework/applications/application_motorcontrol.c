@@ -1,9 +1,10 @@
 #include "application_motorcontrol.h"
-
+#include "drivers_uartrc_user.h"
 #include "can.h"
 #include "drivers_canmotor_user.h"
 #include "rtos_semaphore.h"
 #include "utilities_debug.h"
+#include "tasks_cmcontrol.h"
 //typedef struct{
 //	CAN_HandleTypeDef  *canNum;
 //	uint32_t id;
@@ -15,12 +16,6 @@ void setMotor(MotorId motorId, int16_t Intensity){
 	
 	static int16_t GMYAWIntensity = 0, GMPITCHIntensity = 0;
 	static int8_t GMReady = 0;
-	
-	static int16_t AM1UDFLIntensity = 0, AM1UDFRIntensity = 0, AM1UDBLIntensity = 0, AM1UDBRIntensity = 0;
-	static int8_t AM1Ready = 0;
-	
-	static int16_t AM2PLATEIntensity = 0, AM2GETBULLETIntensity = 0;
-	static int8_t AM2Ready = 0;
 	
 	switch(motorId){
 		case CMFL:
@@ -43,29 +38,17 @@ void setMotor(MotorId motorId, int16_t Intensity){
 			if(GMReady & 0x2){GMReady = 0x3;}else{GMReady |= 0x2;}
 			GMPITCHIntensity = Intensity;break;
 			
-		case AM1UDFL:
-			if(AM1Ready & 0x1){AM1Ready = 0xF;}else{AM1Ready |= 0x1;}
-			AM1UDFLIntensity = Intensity;break;
-		case AM1UDFR:
-			if(AM1Ready & 0x2){AM1Ready = 0xF;}else{AM1Ready |= 0x2;}
-			AM1UDFRIntensity = Intensity;break;
-		case AM1UDBL:
-			if(AM1Ready & 0x4){AM1Ready = 0xF;}else{AM1Ready |= 0x4;}
-			AM1UDBLIntensity = Intensity;break;
-		case AM1UDBR:
-			if(AM1Ready & 0x8){AM1Ready = 0xF;}else{AM1Ready |= 0x8;}
-			AM1UDBRIntensity = Intensity;break;
-			
-		case AM2PLATE:
-			if(AM2Ready & 0x1){AM2Ready = 0x3;}else{AM2Ready |= 0x1;}
-			AM2PLATEIntensity = Intensity;break;
-		case AM2GETBULLET:
-			if(AM2Ready & 0x2){AM2Ready = 0x3;}else{AM2Ready |= 0x2;}
-			AM2GETBULLETIntensity = Intensity;break;
 		default:
 			fw_Error_Handler();
 	}
-	
+	if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY){
+			CMFLIntensity = 0;
+			CMFRIntensity = 0;
+			CMBLIntensity = 0;
+			CMBRIntensity = 0;
+			GMYAWIntensity = 0;
+			GMPITCHIntensity = 0;
+		}
 	if(CMReady == 0xF){
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(CMTxIOPool);
 		//pData->StdId = CM_TXID;
@@ -104,41 +87,22 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		}
 	}
 	
-	if(AM1Ready == 0xF){
-		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(AM1TxIOPool);
-		//pData->StdId = AM1_TXID;
-		pData->Data[0] = (uint8_t)(AM1UDFLIntensity >> 8);
-		pData->Data[1] = (uint8_t)AM1UDFLIntensity;
-		pData->Data[2] = (uint8_t)(AM1UDFRIntensity >> 8);
-		pData->Data[3] = (uint8_t)AM1UDFRIntensity;
-		pData->Data[4] = (uint8_t)(AM1UDBLIntensity >> 8);
-		pData->Data[5] = (uint8_t)AM1UDBLIntensity;
-		pData->Data[6] = (uint8_t)(AM1UDBRIntensity >> 8);
-		pData->Data[7] = (uint8_t)AM1UDBRIntensity;
-		IOPool_getNextWrite(AM1TxIOPool);
-		AM1Ready = 0;
-		AM1UDFLIntensity = AM1UDFRIntensity = AM1UDBLIntensity = AM1UDBRIntensity = 0;
-		if(osSemaphoreRelease(AMCanHaveTransmitSemaphoreHandle) == osErrorOS){
+}
+
+void GYRO_RST(void)
+{
+		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(ZGYROTxIOPool);
+		pData->StdId = ZGYRO_TXID;
+		pData->Data[0] = 0x00;
+		pData->Data[1] = 0x01;
+		pData->Data[2] = 0x02;
+		pData->Data[3] = 0x03;
+		pData->Data[4] = 0x04;
+		pData->Data[5] = 0x05;
+		pData->Data[6] = 0x06;
+		pData->Data[7] = 0x07;
+		IOPool_getNextWrite(ZGYROTxIOPool);
+		if(osSemaphoreRelease(ZGYROCanHaveTransmitSemaphoreHandle) == osErrorOS){
 			fw_Warning();
 		}
-	}
-	
-	if(AM2Ready == 0x3){
-		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(AM2TxIOPool);
-		//pData->StdId = AM2_TXID;
-		pData->Data[0] = (uint8_t)(AM2PLATEIntensity >> 8);
-		pData->Data[1] = (uint8_t)AM2PLATEIntensity;
-		pData->Data[2] = (uint8_t)(AM2GETBULLETIntensity >> 8);
-		pData->Data[3] = (uint8_t)AM2GETBULLETIntensity;
-		pData->Data[4] = 0;
-		pData->Data[5] = 0;
-		pData->Data[6] = 0;
-		pData->Data[7] = 0;
-		IOPool_getNextWrite(AM2TxIOPool);
-		AM2Ready = 0;
-		AM2PLATEIntensity = AM2GETBULLETIntensity = 0;
-		if(osSemaphoreRelease(AMCanHaveTransmitSemaphoreHandle) == osErrorOS){}
-	}
-		
-	
 }

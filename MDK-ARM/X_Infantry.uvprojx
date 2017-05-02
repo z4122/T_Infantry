@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F427xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;          ../Drivers/STM32F4xx_HAL_Driver/Inc;          ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;          ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;          ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;          ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;          ../Drivers/CMSIS/Device/ST/STM32F4xx/Include;          ../Middlewares/Third_Party/FreeRTOS/Source/include;          ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;          ../Drivers/CMSIS/Include;          ..\Framework;          ..\Framework\utilities;          ..\Framework\rtos;          ..\Framework\drivers;          ..\Framework\applications;          ..\Framework\peripheral</IncludePath>
+              <IncludePath>../Inc;            ../Drivers/STM32F4xx_HAL_Driver/Inc;            ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;            ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;            ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;            ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;            ../Drivers/CMSIS/Device/ST/STM32F4xx/Include;            ../Middlewares/Third_Party/FreeRTOS/Source/include;            ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;            ../Drivers/CMSIS/Include;            ..\Framework;            ..\Framework\utilities;            ..\Framework\rtos;            ..\Framework\drivers;            ..\Framework\applications;            ..\Framework\peripheral</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -744,6 +744,11 @@
               <FileType>5</FileType>
               <FilePath>..\Framework\peripheral\peripheral_tim.h</FilePath>
             </File>
+            <File>
+              <FileName>peripheral_laser.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\peripheral\peripheral_laser.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -934,6 +939,26 @@
               <FileType>5</FileType>
               <FilePath>..\Framework\drivers\drivers_sonar_user.h</FilePath>
             </File>
+            <File>
+              <FileName>drivers_ramp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\drivers\drivers_ramp.h</FilePath>
+            </File>
+            <File>
+              <FileName>RMLib.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\Framework\drivers\RMLib.lib</FilePath>
+            </File>
+            <File>
+              <FileName>pid_regulator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\drivers\pid_regulator.h</FilePath>
+            </File>
+            <File>
+              <FileName>pid_regulator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\drivers\pid_regulator.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -948,16 +973,6 @@
               <FileName>tasks_motor.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\applications\tasks_motor.h</FilePath>
-            </File>
-            <File>
-              <FileName>application_pidfunc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\applications\application_pidfunc.c</FilePath>
-            </File>
-            <File>
-              <FileName>application_pidfunc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\applications\application_pidfunc.h</FilePath>
             </File>
             <File>
               <FileName>application_motorcontrol.c</FileName>
@@ -988,6 +1003,26 @@
               <FileName>application_quaternion.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\applications\application_quaternion.h</FilePath>
+            </File>
+            <File>
+              <FileName>tasks_remotecontrol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\applications\tasks_remotecontrol.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks_remotecontrol.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\applications\tasks_remotecontrol.h</FilePath>
+            </File>
+            <File>
+              <FileName>tasks_cmcontrol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\applications\tasks_cmcontrol.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks_cmcontrol.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\applications\tasks_cmcontrol.h</FilePath>
             </File>
           </Files>
         </Group>

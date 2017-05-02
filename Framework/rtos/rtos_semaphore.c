@@ -2,15 +2,15 @@
 #include "rtos_init.h"
 
 osSemaphoreId CMGMCanHaveTransmitSemaphoreHandle;
-osSemaphoreId AMCanHaveTransmitSemaphoreHandle;
+osSemaphoreId ZGYROCanHaveTransmitSemaphoreHandle;
 
 osSemaphoreId CMGMCanTransmitSemaphoreHandle;
-osSemaphoreId AMCanTransmitSemaphoreHandle;
+osSemaphoreId ZGYROCanTransmitSemaphoreHandle;
 
 osSemaphoreId motorCanReceiveSemaphoreHandle;
 
 osSemaphoreId CMGMCanRefreshSemaphoreHandle;
-osSemaphoreId AMCanRefreshSemaphoreHandle;
+osSemaphoreId ZGYROCanRefreshSemaphoreHandle;
 
 osSemaphoreId imurefreshGimbalSemaphoreHandle;
 
@@ -18,24 +18,27 @@ osSemaphoreId imurefreshGimbalSemaphoreHandle;
 osSemaphoreId refreshMPU6500SemaphoreHandle;
 osSemaphoreId refreshIMUSemaphoreHandle;
 
+xSemaphoreHandle xSemaphore_uart;
+xSemaphoreHandle xSemaphore_rcuart;
+
 void rtos_addSemaphores(){
 	osSemaphoreDef(CMGMCanTransmitSemaphore);
 	CMGMCanTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(CMGMCanTransmitSemaphore), 1);
-	osSemaphoreDef(AMCanTransmitSemaphore);
-	AMCanTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(AMCanTransmitSemaphore), 1);
+	osSemaphoreDef(ZGYROCanTransmitSemaphore);
+	ZGYROCanTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(ZGYROCanTransmitSemaphore), 1);
 	
 	osSemaphoreDef(motorCanReceiveSemaphore);
 	motorCanReceiveSemaphoreHandle = osSemaphoreCreate(osSemaphore(motorCanReceiveSemaphore), 1);
 	
 	osSemaphoreDef(CMGMCanHaveTransmitSemaphore);
 	CMGMCanHaveTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(CMGMCanHaveTransmitSemaphore), 1);
-	osSemaphoreDef(AMCanHaveTransmitSemaphore);
-	AMCanHaveTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(AMCanHaveTransmitSemaphore), 1);
+	osSemaphoreDef(ZGYROCanHaveTransmitSemaphore);
+	ZGYROCanHaveTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(ZGYROCanHaveTransmitSemaphore), 1);
 
 	osSemaphoreDef(CMGMCanRefreshSemaphore);
 	CMGMCanRefreshSemaphoreHandle = osSemaphoreCreate(osSemaphore(CMGMCanRefreshSemaphore), 1);
-	osSemaphoreDef(AMCanRefreshSemaphore);
-	AMCanRefreshSemaphoreHandle = osSemaphoreCreate(osSemaphore(AMCanRefreshSemaphore), 1);
+	osSemaphoreDef(ZGYROCanRefreshSemaphore);
+	ZGYROCanRefreshSemaphoreHandle = osSemaphoreCreate(osSemaphore(ZGYROCanRefreshSemaphore), 1);
 	
 	osSemaphoreDef(imurefreshGimbalSemaphore);
 	imurefreshGimbalSemaphoreHandle = osSemaphoreCreate(osSemaphore(imurefreshGimbalSemaphore), 1);
@@ -46,4 +49,7 @@ void rtos_addSemaphores(){
 	refreshMPU6500SemaphoreHandle = osSemaphoreCreate(osSemaphore(refreshMPU6500Semaphore), 1);
 	osSemaphoreDef(refreshIMUSemaphore);
 	refreshIMUSemaphoreHandle = osSemaphoreCreate(osSemaphore(refreshIMUSemaphore), 1);
+	
+	vSemaphoreCreateBinary(xSemaphore_uart);
+	vSemaphoreCreateBinary(xSemaphore_rcuart);
 }

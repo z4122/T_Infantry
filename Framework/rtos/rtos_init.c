@@ -3,9 +3,10 @@
 #include "utilities_debug.h"
 #include "drivers_canmotor_low.h"
 //#include "drivers_mpu6050_low.h"
+#include "peripheral_tim.h"
 #include "drivers_uartupper_low.h"
 #include "drivers_uartrc_low.h"
-
+#include "tasks_cmcontrol.h"
 #include "drivers_imu_low.h"
 #include "utilities_tim.h"
 
@@ -24,8 +25,9 @@ void rtos_init(){
 	fw_userTimeEnable();
 	MPU6500_Init();
 	IST8310_Init();
-	rcInit();
 	ctrlUartInit();
+	UserTimerInit();
+	CMControtLoopTaskInit();
 	motorInit();
 //	mpu6050Init();
 //	Init_Quaternion();

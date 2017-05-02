@@ -6,8 +6,9 @@
 
 //#include "utilities_iopool.h"
 #include "drivers_led_low.h"
-//#include "tasks_remotecontrol.h"
+#include "tasks_remotecontrol.h"
 #include "tasks_upper.h"
+#include "tasks_cmcontrol.h"
 #include "drivers_canmotor_low.h"
 #include "tasks_motor.h"
 #include "drivers_sonar_low.h"
@@ -24,11 +25,11 @@ osThreadId buzzerTaskHandle;
 //IMU
 osThreadId printIMUTaskHandle;
 //UART
-osThreadId printRcTaskHandle;
+osThreadId RControlTaskHandle;
 osThreadId getCtrlUartTaskHandle;
 //Motor
-osThreadId CMGMControlTaskHandle;
-osThreadId AMControlTaskHandle;
+osThreadId GMControlTaskHandle;
+osThreadId TimerTaskHandle;
 
 osThreadId CMGMCanTransmitTaskHandle;
 osThreadId AMCanTransmitTaskHandle;
@@ -56,33 +57,21 @@ void rtos_addThreads(){
   printIMUTaskHandle = osThreadCreate(osThread(printIMUTask), NULL);
 
 	
-//	osThreadDef(printRcTask, printRcTask, osPriorityNormal, 0, 128);
-//  printRcTaskHandle = osThreadCreate(osThread(printRcTask), NULL);
+	osThreadDef(RControlTask, RControlTask, osPriorityAboveNormal , 0, 512);
+  RControlTaskHandle = osThreadCreate(osThread(RControlTask), NULL);
 	
 	osThreadDef(getCtrlUartTask, getCtrlUartTask, osPriorityNormal, 0, 512);
   getCtrlUartTaskHandle = osThreadCreate(osThread(getCtrlUartTask), NULL);
 
-	osThreadDef(CMGMC_Task, CMGMControlTask, osPriorityAboveNormal, 0, 640);
-  CMGMControlTaskHandle = osThreadCreate(osThread(CMGMC_Task), NULL);
-	osThreadDef(AMC_Task, AMControlTask, osPriorityAboveNormal, 0, 640);
-  AMControlTaskHandle = osThreadCreate(osThread(AMC_Task), NULL);
+	osThreadDef(GMC_Task, CMGMControlTask, osPriorityAboveNormal, 0, 640);
+  GMControlTaskHandle = osThreadCreate(osThread(GMC_Task), NULL);
+	
+	osThreadDef(Timer_Task, Timer_2ms_lTask, osPriorityAboveNormal, 0, 256);
+  TimerTaskHandle = osThreadCreate(osThread(Timer_Task), NULL);
 	
 	osThreadDef(CMGMC_T_Task, CMGMCanTransmitTask, osPriorityRealtime, 0, 512);
   CMGMCanTransmitTaskHandle = osThreadCreate(osThread(CMGMC_T_Task), NULL);
-	osThreadDef(AMC_T_Task, AMCanTransmitTask, osPriorityRealtime, 0, 512);
+	osThreadDef(AMC_T_Task, ZGYROCanTransmitTask, osPriorityRealtime, 0, 512);
   AMCanTransmitTaskHandle = osThreadCreate(osThread(AMC_T_Task), NULL);
-	
-//	osThreadDef(sonarTask, sonarTask, osPriorityNormal, 0, 128);
-//  sonarTaskHandle = osThreadCreate(osThread(sonarTask), NULL);
 
-//	fw_printfln("ledGreenTaskHandle = %x", (uint16_t)ledGreenTaskHandle);
-//	fw_printfln("ledRedTaskHandle = %x", (uint16_t)ledRedTaskHandle);
-//	fw_printfln("buzzerTaskHandle = %x", (uint16_t)buzzerTaskHandle);
-//	fw_printfln("printIMUTaskHandle = %x", (uint16_t)printIMUTaskHandle);
-//	fw_printfln("printRcTaskHandle = %x", (uint16_t)printRcTaskHandle);
-//	fw_printfln("printCtrlUartTaskHandle = %x", (uint16_t)printCtrlUartTaskHandle);
-//	fw_printfln("CMGMControlTaskHandle = %x", (uint16_t)CMGMControlTaskHandle);
-//	fw_printfln("AMControlTaskHandle = %x", (uint16_t)AMControlTaskHandle);
-//	fw_printfln("CMGMCanTransmitTaskHandle = %x", (uint16_t)CMGMCanTransmitTaskHandle);
-//	fw_printfln("AMCanTransmitTaskHandle = %x", (uint16_t)AMCanTransmitTaskHandle);
 }

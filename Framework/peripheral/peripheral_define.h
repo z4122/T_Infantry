@@ -12,6 +12,10 @@
 #define CTRL_UART huart3
 
 #define CMGMMOTOR_CAN hcan1
-#define AUXMOTOR_CAN hcan2
+#define ZGYRO_CAN hcan2
+
+#define FRICTION_TIM htim12
+#define PLATE_ENCODER_TIM htimx
+#define PLATE_MOTOR_TIM htimx
 
 #endif

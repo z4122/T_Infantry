@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 
-typedef enum {CMFL, CMFR, CMBL, CMBR, GMYAW, GMPITCH, AM1UDFL, AM1UDFR, AM1UDBL, AM1UDBR, AM2PLATE, AM2GETBULLET} MotorId;
+typedef enum {CMFL, CMFR, CMBL, CMBR, GMYAW, GMPITCH} MotorId;
 
 void setMotor(MotorId motorId, int16_t Intensity);
 

@@ -2,6 +2,7 @@
 #define DRIVERS_CANMOTOR_USER_H
 
 #include "utilities_iopool.h"
+#include "drivers_canmotor_low.h"
 #include "can.h"
 
 //RxID
@@ -13,18 +14,13 @@
 #define GMYAW_RXID 0x205u
 #define GMPITCH_RXID 0x206u
 
-#define AMUDFL_RXID 0x201u
-#define AMUDFR_RXID 0x202u
-#define AMUDBL_RXID 0x203u
-#define AMUDBR_RXID 0x204u
-#define AMPLATE_RXID 0x205u
-#define AMGETBULLET_RXID 0x206u
+#define ZGYRO_RXID   0x401u
 
 //TxID
 #define CM_TXID 0x200u
 #define GM_TXID 0x1FFu
-#define AM1_TXID 0x200u
-#define AM2_TXID 0x1FFu
+
+#define ZGYRO_TXID   0x401u
 
 //RxIOPool
 typedef struct{
@@ -46,19 +42,18 @@ IOPoolDeclare(CMFRRxIOPool, Motor820RRxMsg_t);
 IOPoolDeclare(CMBLRxIOPool, Motor820RRxMsg_t);
 IOPoolDeclare(CMBRRxIOPool, Motor820RRxMsg_t);
 
-//820R--[0,1]Angle;[2,3]RotateSpeed;
-IOPoolDeclare(AMUDFLRxIOPool, Motor820RRxMsg_t);
-IOPoolDeclare(AMUDFRRxIOPool, Motor820RRxMsg_t);
-IOPoolDeclare(AMUDBLRxIOPool, Motor820RRxMsg_t);
-IOPoolDeclare(AMUDBRRxIOPool, Motor820RRxMsg_t);
-IOPoolDeclare(AMPLATERxIOPool, Motor820RRxMsg_t);
-IOPoolDeclare(AMGETBULLETRxIOPool, Motor820RRxMsg_t);
 
 //TxIOPool
 IOPoolDeclare(CMTxIOPool, CanTxMsgTypeDef);
 IOPoolDeclare(GMTxIOPool, CanTxMsgTypeDef);
-IOPoolDeclare(AM1TxIOPool, CanTxMsgTypeDef);
-IOPoolDeclare(AM2TxIOPool, CanTxMsgTypeDef);
+IOPoolDeclare(ZGYROTxIOPool, CanTxMsgTypeDef);
 
+
+void motorInit(void);
+void Set_CM_Speed(int16_t cm1_iq, int16_t cm2_iq, int16_t cm3_iq, int16_t cm4_iq);
+
+void CANReceiveMsgProcess_820R(Motor820RRxMsg_t * msg,volatile Encoder * CMxEncoder);
+void EncoderProcess(volatile Encoder *v, Motor820RRxMsg_t * msg);
+void GetEncoderBias(volatile Encoder *v, Motor820RRxMsg_t * msg);
 
 #endif

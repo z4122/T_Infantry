@@ -9,11 +9,11 @@ extern osThreadId buzzerTaskHandle;
 //IMU
 extern osThreadId printIMUTaskHandle;
 //UART
-extern osThreadId printRcTaskHandle;
+extern osThreadId RControlTaskHandle;;
 extern osThreadId getCtrlUartTaskHandle;
 //Motor
-extern osThreadId CMGMControlTaskHandle;
-extern osThreadId AMControlTaskHandle;
+extern osThreadId GMControlTaskHandle;
+extern osThreadId TimerTaskHandle;
 
 extern osThreadId CMGMCanTransmitTaskHandle;
 extern osThreadId AMCanTransmitTaskHandle;
