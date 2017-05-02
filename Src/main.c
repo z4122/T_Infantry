@@ -46,9 +46,10 @@
 #include "cmsis_os.h"
 #include "can.h"
 #include "dma.h"
-#include "i2c.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
+#include "usb_device.h"
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
@@ -96,13 +97,21 @@ int main(void)
   MX_DMA_Init();
   MX_CAN1_Init();
   MX_CAN2_Init();
-  MX_USART3_UART_Init();
-  MX_USART1_UART_Init();
-  MX_I2C1_Init();
+  MX_SPI5_Init();
   MX_TIM2_Init();
+  MX_TIM4_Init();
+  MX_TIM5_Init();
+  MX_TIM6_Init();
+  MX_TIM8_Init();
+  MX_TIM12_Init();
+  MX_USART1_UART_Init();
+  MX_USART2_UART_Init();
+  MX_USART3_UART_Init();
+  MX_USART6_UART_Init();
+  MX_TIM3_Init();
 
   /* USER CODE BEGIN 2 */
-	
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -146,10 +155,10 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 25;
+  RCC_OscInitStruct.PLL.PLLM = 12;
   RCC_OscInitStruct.PLL.PLLN = 336;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 4;
+  RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -197,12 +206,12 @@ void Error_Handler(void)
   while(1) 
   {
 		fw_printfln("ERROR HANDLE");
-		uint16_t delayTime = 1000;
-		for(uint16_t i = 0; i < delayTime; i++)
-		{
-			uint16_t a = 42000; //at 168MHz 42000 is ok
-			while(a--);
-		}
+ 		uint16_t delayTime = 1000;
+ 		for(uint16_t i = 0; i < delayTime; i++)
+ 		{
+ 			uint16_t a = 42000; //at 168MHz 42000 is ok
+ 			while(a--);
+ 		}
   }
   /* USER CODE END Error_Handler */ 
 }
