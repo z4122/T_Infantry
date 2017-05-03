@@ -21,11 +21,11 @@ void rtos_init(){
 //		while(a--);
 //	}
 	playMusicWhenInit();
-	
 	fw_userTimeEnable();
 	MPU6500_Init();
 	IST8310_Init();
 	ctrlUartInit();
+	RemoteTaskInit();
 	UserTimerInit();
 	CMControtLoopTaskInit();
 	motorInit();

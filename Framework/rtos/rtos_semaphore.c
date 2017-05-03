@@ -20,7 +20,7 @@ osSemaphoreId refreshIMUSemaphoreHandle;
 
 xSemaphoreHandle xSemaphore_uart;
 xSemaphoreHandle xSemaphore_rcuart;
-
+xSemaphoreHandle motorCanTransmitSemaphore;
 void rtos_addSemaphores(){
 	osSemaphoreDef(CMGMCanTransmitSemaphore);
 	CMGMCanTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(CMGMCanTransmitSemaphore), 1);
@@ -52,4 +52,5 @@ void rtos_addSemaphores(){
 	
 	vSemaphoreCreateBinary(xSemaphore_uart);
 	vSemaphoreCreateBinary(xSemaphore_rcuart);
+	motorCanTransmitSemaphore = xSemaphoreCreateCounting(10,0);
 }

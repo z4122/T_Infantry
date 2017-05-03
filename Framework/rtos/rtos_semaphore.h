@@ -24,6 +24,6 @@ extern osSemaphoreId refreshIMUSemaphoreHandle;
 
 extern xSemaphoreHandle xSemaphore_uart;
 extern xSemaphoreHandle xSemaphore_rcuart;
-
+extern xSemaphoreHandle motorCanTransmitSemaphore;
 
 #endif

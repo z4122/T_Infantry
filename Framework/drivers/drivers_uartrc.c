@@ -11,6 +11,7 @@
 #include "peripheral_tim.h"
 #include <stdlib.h>
 #include <math.h>
+#include "utilities_debug.h"
 
 #include "peripheral_define.h"
 
@@ -27,6 +28,7 @@ void rcInit(){
 void rcUartRxCpltCallback(){
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE; 
+	fw_printfln("rcuart receive");
 	IOPool_getNextWrite(rcUartIOPool);
 	HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 	xSemaphoreGiveFromISR(xSemaphore_rcuart, &xHigherPriorityTaskWoken);

@@ -20,7 +20,7 @@
 #define CM_TXID 0x200u
 #define GM_TXID 0x1FFu
 
-#define ZGYRO_TXID   0x401u
+#define ZGYRO_TXID   0x404u
 
 //RxIOPool
 typedef struct{

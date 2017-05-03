@@ -63,7 +63,7 @@ void rtos_addThreads(){
 	osThreadDef(getCtrlUartTask, getCtrlUartTask, osPriorityAboveNormal, 0, 512);
   getCtrlUartTaskHandle = osThreadCreate(osThread(getCtrlUartTask), NULL);
 
-	osThreadDef(GMC_Task, CMGMControlTask, osPriorityAboveNormal, 0, 640);
+	osThreadDef(GMC_Task, CMGMControlTask, osPriorityAboveNormal, 0, 1024);
   GMControlTaskHandle = osThreadCreate(osThread(GMC_Task), NULL);
 	
 	osThreadDef(Timer_Task, Timer_2ms_lTask, osPriorityAboveNormal, 0, 256);
@@ -73,5 +73,4 @@ void rtos_addThreads(){
   CMGMCanTransmitTaskHandle = osThreadCreate(osThread(CMGMC_T_Task), NULL);
 	osThreadDef(AMC_T_Task, ZGYROCanTransmitTask, osPriorityRealtime, 0, 512);
   AMCanTransmitTaskHandle = osThreadCreate(osThread(AMC_T_Task), NULL);
-
 }
