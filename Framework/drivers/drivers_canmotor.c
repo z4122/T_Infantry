@@ -55,7 +55,7 @@ NaiveIOPoolDefine(GMTxIOPool, DataPoolInit);
 NaiveIOPoolDefine(ZGYROTxIOPool, DataPoolInit);
 #undef DataPoolInit 
 
-#define CanRxGetU16(canRxMsg, num) (((uint16_t)canRxMsg.Data[num * 2] << 8) + (uint16_t)canRxMsg.Data[num * 2 + 1])
+#define CanRxGetU16(canRxMsg, num) (((uint16_t)canRxMsg.Data[num * 2] << 8) | (uint16_t)canRxMsg.Data[num * 2 + 1])
 
 uint8_t isRcanStarted_CMGM = 0, isRcanStarted_ZGYRO = 0;
 
@@ -158,7 +158,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 				//LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_ZGYRO));
 			CanRxMsgTypeDef *msg =	&ZGYROCanRxMsg;
 			ZGyroModuleAngle = -0.01f*((int32_t)(msg->Data[0]<<24)|(int32_t)(msg->Data[1]<<16) | (int32_t)(msg->Data[2]<<8) | (int32_t)(msg->Data[3])); 
-			}
+			}break;
 				
 			default:
 			fw_Error_Handler();
@@ -179,7 +179,9 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 
 void CMGMCanTransmitTask(void const * argument){
 	while(1){
-		osSemaphoreWait(CMGMCanHaveTransmitSemaphoreHandle, osWaitForever);//osWaitForever
+//		osSemaphoreWait(CMGMCanHaveTransmitSemaphoreHandle, osWaitForever);//osWaitForever
+		fw_printfln("in cantransmit");
+		xSemaphoreTake(motorCanTransmitSemaphore, osWaitForever);
 		//fw_printfln("osWaitForeverCMGMCanHaveTransmitSemaphoreHandle");
 		if(IOPool_hasNextRead(CMTxIOPool, 0)){
 			osSemaphoreWait(CMGMCanTransmitSemaphoreHandle, osWaitForever);
@@ -345,5 +347,5 @@ void GetEncoderBias(volatile Encoder *v, Motor820RRxMsg_t * msg)
 void CANReceiveMsgProcess_820R(Motor820RRxMsg_t * msg, volatile Encoder * CMxEncoder)
 {      
     can_count++;
-		(can_count<=50) ? GetEncoderBias(&CM1Encoder ,msg):EncoderProcess(&CM1Encoder ,msg);       //获取到编码器的初始偏差值            
+		(can_count<=50) ? GetEncoderBias(CMxEncoder ,msg):EncoderProcess(CMxEncoder ,msg);       //获取到编码器的初始偏差值            
 }

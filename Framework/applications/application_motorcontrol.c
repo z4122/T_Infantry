@@ -1,6 +1,7 @@
 #include "application_motorcontrol.h"
 #include "drivers_uartrc_user.h"
 #include "can.h"
+#include "peripheral_define.h"
 #include "drivers_canmotor_user.h"
 #include "rtos_semaphore.h"
 #include "utilities_debug.h"
@@ -41,17 +42,17 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		default:
 			fw_Error_Handler();
 	}
-	if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY){
-			CMFLIntensity = 0;
-			CMFRIntensity = 0;
-			CMBLIntensity = 0;
-			CMBRIntensity = 0;
-			GMYAWIntensity = 0;
-			GMPITCHIntensity = 0;
-		}
+//	if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY){
+//			CMFLIntensity = 0;
+//			CMFRIntensity = 0;
+//			CMBLIntensity = 0;
+//			CMBRIntensity = 0;
+//			GMYAWIntensity = 0;
+//			GMPITCHIntensity = 0;
+//		}
 	if(CMReady == 0xF){
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(CMTxIOPool);
-		//pData->StdId = CM_TXID;
+		pData->StdId = CM_TXID;
 		pData->Data[0] = (uint8_t)(CMFLIntensity >> 8);
 		pData->Data[1] = (uint8_t)CMFLIntensity;
 		pData->Data[2] = (uint8_t)(CMFRIntensity >> 8);
@@ -62,15 +63,26 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		pData->Data[7] = (uint8_t)CMBRIntensity;
 		IOPool_getNextWrite(CMTxIOPool);
 		CMReady = 0;
-		CMFLIntensity = CMFRIntensity = CMBLIntensity = CMBRIntensity = 0;
+//		CMFLIntensity = CMFRIntensity = CMBLIntensity = CMBRIntensity = 0;
 		if(osSemaphoreRelease(CMGMCanHaveTransmitSemaphoreHandle) == osErrorOS){
-			fw_Warning();
+//			fw_Warning();
 		}
-	}
+		if(IOPool_hasNextRead(CMTxIOPool, 0)){
+			osSemaphoreWait(CMGMCanTransmitSemaphoreHandle, osWaitForever);
+			IOPool_getNextRead(CMTxIOPool, 0);
+			CMGMMOTOR_CAN.pTxMsg = IOPool_pGetReadData(CMTxIOPool, 0);
+			taskENTER_CRITICAL();
+			if(HAL_CAN_Transmit_IT(&CMGMMOTOR_CAN) != HAL_OK){
+				fw_Warning();
+				osSemaphoreRelease(CMGMCanTransmitSemaphoreHandle);
+			}
+			taskEXIT_CRITICAL();
+		}
+ }
 	
 	if(GMReady == 0x3){
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(GMTxIOPool);
-		//pData->StdId = GM_TXID;
+		pData->StdId = GM_TXID;
 		pData->Data[0] = (uint8_t)(GMYAWIntensity >> 8);
 		pData->Data[1] = (uint8_t)GMYAWIntensity;
 		pData->Data[2] = (uint8_t)(GMPITCHIntensity >> 8);
@@ -81,13 +93,26 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		pData->Data[7] = 0;
 		IOPool_getNextWrite(GMTxIOPool);
 		GMReady = 0;
-		GMYAWIntensity = GMPITCHIntensity = 0;
-		if(osSemaphoreRelease(CMGMCanHaveTransmitSemaphoreHandle) == osErrorOS){
-			fw_Warning();
+//		GMYAWIntensity = GMPITCHIntensity = 0;
+//		if(osSemaphoreRelease(CMGMCanHaveTransmitSemaphoreHandle) == osErrorOS){
+//	//		fw_Warning();
+//		}
+		xSemaphoreGive(motorCanTransmitSemaphore);
+		if(IOPool_hasNextRead(GMTxIOPool, 0)){
+			osSemaphoreWait(CMGMCanTransmitSemaphoreHandle, osWaitForever);
+			IOPool_getNextRead(GMTxIOPool, 0);
+			CMGMMOTOR_CAN.pTxMsg = IOPool_pGetReadData(GMTxIOPool, 0);
+			taskENTER_CRITICAL();
+			if(HAL_CAN_Transmit_IT(&CMGMMOTOR_CAN) != HAL_OK){
+				fw_Warning();
+				osSemaphoreRelease(CMGMCanTransmitSemaphoreHandle);
+			}
+			taskEXIT_CRITICAL();
 		}
 	}
-	
 }
+	
+
 
 void GYRO_RST(void)
 {

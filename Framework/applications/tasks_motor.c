@@ -55,7 +55,7 @@ void CMGMControlTask(void const * argument){
 	while(1){
 		//osSemaphoreWait(imurefreshGimbalSemaphoreHandle, osWaitForever);
 		osSemaphoreWait(CMGMCanRefreshSemaphoreHandle, osWaitForever);
-			if(IOPool_hasNextRead(upperIOPool, 0)){
+		if(IOPool_hasNextRead(upperIOPool, 0)){
 				IOPool_getNextRead(upperIOPool, 0);
 				yawAdd = IOPool_pGetReadData(upperIOPool, 0)->yawAdd;
 				pitchAdd = IOPool_pGetReadData(upperIOPool, 0)->pitchAdd;
@@ -68,13 +68,14 @@ void CMGMControlTask(void const * argument){
 			int16_t yawIntensity = 0;
 			
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
-			//fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
-			Motor820RRxMsg_t* tempData; tempData->angle = IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle;
-			CANReceiveMsgProcess_820R(tempData, &GMYawEncoder);
+//			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
+			Motor820RRxMsg_t tempData; tempData.angle = IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle;
+			tempData.RotateSpeed = 0;
+			CANReceiveMsgProcess_820R(&tempData, &GMYawEncoder);
 			//µ×ÅÌ¸úËæ±àÂëÆ÷Ðý×ªPID¼ÆËã
 		 CMRotatePID.ref = 48;
 		 CMRotatePID.fdb = GMYawEncoder.ecd_angle;
-//		fw_printfln("%f",GMYawEncoder.ecd_angle );
+		//	fw_printfln("GMYAWEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle );
 		 CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 				 ChassisSpeedRef.rotate_ref = 0;
@@ -86,12 +87,13 @@ void CMGMControlTask(void const * argument){
 
 			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget,yawRealAngle,-gYroZs);
 
+//      fw_printfln("yawIntensity:%d", yawIntensity);
 			setMotor(GMYAW, yawIntensity);
 		}
 //ÔÆÌ¨pitchÖá	
 		if(IOPool_hasNextRead(GMPITCHRxIOPool, 0)){
 			
-			uint16_t pitchZeroAngle = 6300;
+			uint16_t pitchZeroAngle = 3180;
 			float pitchRealAngle = 0.0;
 			int16_t pitchIntensity = 0;
 			
@@ -99,12 +101,13 @@ void CMGMControlTask(void const * argument){
 			//fw_printfln("PitAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
 			pitchRealAngle = (IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - pitchZeroAngle) * 360 / 8192.0;
 			NORMALIZE_ANGLE180(pitchRealAngle);
+		//	fw_printfln("pitchRealAngle:%f",pitchRealAngle);
 			
 			if(GetShootMode() == AUTO)		pitchAngleTarget = pitchRealAngle + (pitchAdd*0.8f) + 2.7f;
 			MINMAX(pitchAngleTarget, -25, 25);
-			
-			pitchIntensity = PID_PROCESS_Double(pitchPositionPID,pitchSpeedPID,pitchAngleTarget,pitchRealAngle,-gYroXs);
-					
+			pitchIntensity = PID_PROCESS_Double(pitchPositionPID,pitchSpeedPID,pitchAngleTarget,-pitchRealAngle,-gYroXs);
+
+			//		fw_printfln("pitchIntensity:%d", pitchIntensity);
 			setMotor(GMPITCH, pitchIntensity);
 		}
 //µ×ÅÌµç»ú 1 2 3 4	
@@ -115,6 +118,8 @@ void CMGMControlTask(void const * argument){
 		 
 		  CM1SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
 		  CM1SpeedPID.fdb = CM1Encoder.filter_rate;
+//		 fw_printfln("CM1SpeedPID.ref:%f",CM1SpeedPID.ref);
+//		 fw_printfln("CM1Encoder.filter_rate:%d",CM1Encoder.filter_rate);
 		  CM1SpeedPID.Calc(&CM1SpeedPID);
 		  setMotor(CMFL, CHASSIS_SPEED_ATTENUATION * CM1SpeedPID.output);
 		}
@@ -124,7 +129,7 @@ void CMGMControlTask(void const * argument){
 			CANReceiveMsgProcess_820R(pData, &CM2Encoder);
 			
 			CM2SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-		  CM2SpeedPID.fdb = CM2Encoder.filter_rate;
+			CM2SpeedPID.fdb = CM2Encoder.filter_rate;
 		  CM2SpeedPID.Calc(&CM2SpeedPID);
 		  setMotor(CMFR, CHASSIS_SPEED_ATTENUATION * CM2SpeedPID.output);
 		}
@@ -134,7 +139,7 @@ void CMGMControlTask(void const * argument){
 			CANReceiveMsgProcess_820R(pData, &CM3Encoder);
 			
 			CM3SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-		  CM3SpeedPID.fdb = CM3Encoder.filter_rate;
+			CM3SpeedPID.fdb = CM3Encoder.filter_rate;
 		  CM3SpeedPID.Calc(&CM3SpeedPID);
 		  setMotor(CMBL, CHASSIS_SPEED_ATTENUATION * CM3SpeedPID.output);
 		}
