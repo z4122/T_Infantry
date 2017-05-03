@@ -52,20 +52,20 @@ RampGen_t FBSpeedRamp = RAMP_GEN_DAFAULT;   //mouseÇ°ºóÒÆ¶¯Ð±ÆÂ
 
 void RemoteTaskInit()
 {
-	//Ð±ÆÂ³õÊ¼»¯
+
 	frictionRamp.SetScale(&frictionRamp, FRICTION_RAMP_TICK_COUNT);
 	LRSpeedRamp.SetScale(&LRSpeedRamp, MOUSE_LR_RAMP_TICK_COUNT);
 	FBSpeedRamp.SetScale(&FBSpeedRamp, MOUSR_FB_RAMP_TICK_COUNT);
 	frictionRamp.ResetCounter(&frictionRamp);
 	LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 	FBSpeedRamp.ResetCounter(&FBSpeedRamp);
-	//µ×ÅÌÔÆÌ¨¸ø¶¨Öµ³õÊ¼»¯
+
 	GimbalRef.pitch_angle_dynamic_ref = 0.0f;
 	GimbalRef.yaw_angle_dynamic_ref = 0.0f;
 	ChassisSpeedRef.forward_back_ref = 0.0f;
 	ChassisSpeedRef.left_right_ref = 0.0f;
 	ChassisSpeedRef.rotate_ref = 0.0f;
-	//Ä¦²ÁÂÖÔËÐÐ×´Ì¬³õÊ¼»¯
+
 	SetFrictionState(FRICTION_WHEEL_OFF);
 }
 /*拨杆数据处理*/

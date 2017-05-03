@@ -29,6 +29,7 @@ void rtos_init(){
 	UserTimerInit();
 	CMControtLoopTaskInit();
 	motorInit();
+	rcInit();
 //	mpu6050Init();
 //	Init_Quaternion();
 	fw_printfln("init success");
