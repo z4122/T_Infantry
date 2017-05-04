@@ -1,5 +1,6 @@
 #include "rtos_init.h"
 
+#include "application_motorcontrol.h"
 #include "utilities_debug.h"
 #include "drivers_canmotor_low.h"
 //#include "drivers_mpu6050_low.h"
@@ -28,6 +29,7 @@ void rtos_init(){
 	RemoteTaskInit();
 	UserTimerInit();
 	CMControtLoopTaskInit();
+	GYRO_RST();
 	motorInit();
 	rcInit();
 //	mpu6050Init();

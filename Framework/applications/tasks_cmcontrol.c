@@ -3,6 +3,7 @@
 #include "drivers_uartrc_low.h"
 #include "drivers_uartrc_user.h"
 #include "tasks_remotecontrol.h"
+#include "application_motorcontrol.h"
 #include "tasks_cmcontrol.h"
 #include "drivers_canmotor_low.h"
 #include "drivers_canmotor_user.h"
@@ -43,28 +44,33 @@ extern float ZGyroModuleAngle;
 float ZGyroModuleAngleMAX;
 float ZGyroModuleAngleMIN;
 extern float yawRealAngle;
-
+extern uint8_t GYRO_RESTED;
 void Timer_2ms_lTask(void const * argument)
 {
 	portTickType xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
+	static int countwhile = 0;
+	static int countwhile1 = 0;
 //	unsigned portBASE_TYPE StackResidue; //栈剩余
 	while(1)  {       //motor control frequency 2ms
 //监控任务
 //		SuperviseTask();    
 		WorkStateFSM();
 	  WorkStateSwitchProcess();
-		static int countwhile = 0;
 		if(countwhile >= 500){//定时 1S
 		countwhile = 0;
 			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
+//				fw_printfln("GMYAWEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle );
 //			fw_printfln("in CMcontrol_task");
 //		StackResidue = uxTaskGetStackHighWaterMark( GMControlTaskHandle );
 //		fw_printfln("GM%ld",StackResidue);
 		}else{
 			countwhile++;
 		}
-
+    if(countwhile1 < 700){
+			if(GYRO_RESTED == 0)GYRO_RST();
+		}
+		else{countwhile1++;}
 		ShooterMControlLoop();       //发射机构控制任务
 		
 		vTaskDelayUntil( &xLastWakeTime, ( 2 / portTICK_RATE_MS ) );

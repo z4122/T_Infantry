@@ -44,22 +44,23 @@ extern volatile Encoder GMYawEncoder;
 //extern uint16_t pitchAngle, yawAngle;
 //extern uint32_t flAngle, frAngle, blAngle, brAngle;
 //extern uint16_t flSpeed, frSpeed, blSpeed, brSpeed;
-
+extern uint8_t CReceive;
+extern int GYRO_RESETED;
+extern float ZGyroModuleAngle;
 float yawAngleTarget = 0.0;
 float pitchAngleTarget = 0.0;
-		
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 void CMGMControlTask(void const * argument){
 	static float yawAdd;
 	static float pitchAdd;
 	while(1){
-		//osSemaphoreWait(imurefreshGimbalSemaphoreHandle, osWaitForever);
+//  osSemaphoreWait(imurefreshGimbalSemaphoreHandle, osWaitForever);
 		osSemaphoreWait(CMGMCanRefreshSemaphoreHandle, osWaitForever);
 		if(IOPool_hasNextRead(upperIOPool, 0)){
-				IOPool_getNextRead(upperIOPool, 0);
-				yawAdd = IOPool_pGetReadData(upperIOPool, 0)->yawAdd;
-				pitchAdd = IOPool_pGetReadData(upperIOPool, 0)->pitchAdd;
-		  }
+		IOPool_getNextRead(upperIOPool, 0);
+		yawAdd = IOPool_pGetReadData(upperIOPool, 0)->yawAdd;
+		pitchAdd = IOPool_pGetReadData(upperIOPool, 0)->pitchAdd;
+		}
 //ÔÆÌ¨yawÖá
 		if(IOPool_hasNextRead(GMYAWRxIOPool, 0)){
 			
@@ -73,18 +74,22 @@ void CMGMControlTask(void const * argument){
 			tempData.RotateSpeed = 0;
 			CANReceiveMsgProcess_820R(&tempData, &GMYawEncoder);
 			//µ×ÅÌ¸úËæ±àÂëÆ÷Ðý×ªPID¼ÆËã
-		 CMRotatePID.ref = 48;
+		 CMRotatePID.ref = -2.5;
 		 CMRotatePID.fdb = GMYawEncoder.ecd_angle;
-		//	fw_printfln("GMYAWEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle );
-		 CMRotatePID.Calc(&CMRotatePID);   
+	   CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-				 ChassisSpeedRef.rotate_ref = 0;
+		//		 ChassisSpeedRef.rotate_ref = 0;
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0;
 			NORMALIZE_ANGLE180(yawRealAngle);
-			
-			if(GetShootMode() == AUTO)	yawAngleTarget = yawRealAngle - (yawAdd * 0.5f);
+//			fw_printfln("yawRealAngle:%f",yawRealAngle);
+				if((GetShootMode() == AUTO) && (CReceive != 0))	{
+//				yawAngleTarget = yawRealAngle - (yawAdd * 0.5f);
+				yawAngleTarget = yawRealAngle - yawAdd ;
+				CReceive--;
+			}
+						
 			MINMAX(yawAngleTarget, -45, 45);
-
+//      if(GYRO_RESETED)yawRealAngle = ZGyroModuleAngle;
 			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget,yawRealAngle,-gYroZs);
 
 //      fw_printfln("yawIntensity:%d", yawIntensity);
@@ -99,13 +104,18 @@ void CMGMControlTask(void const * argument){
 			
 			IOPool_getNextRead(GMPITCHRxIOPool, 0);
 			//fw_printfln("PitAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
-			pitchRealAngle = (IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - pitchZeroAngle) * 360 / 8192.0;
+			pitchRealAngle = -(IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - pitchZeroAngle) * 360 / 8192.0;
 			NORMALIZE_ANGLE180(pitchRealAngle);
-		//	fw_printfln("pitchRealAngle:%f",pitchRealAngle);
-			
-			if(GetShootMode() == AUTO)		pitchAngleTarget = pitchRealAngle + (pitchAdd*0.8f) + 2.7f;
+//			fw_printfln("pitchRealAngle:%f",pitchRealAngle);
+		if((GetShootMode() == AUTO) && (CReceive != 0))	{
+//					fw_printfln("pitchRealAngle:%f",pitchRealAngle );
+//					fw_printfln("pitchAdd:%f",pitchAdd );
+//				pitchAngleTarget = pitchRealAngle + (pitchAdd*0.8f) + 2.7f;
+					pitchAngleTarget = pitchRealAngle + pitchAdd ;
+				CReceive --;
+			}
 			MINMAX(pitchAngleTarget, -25, 25);
-			pitchIntensity = PID_PROCESS_Double(pitchPositionPID,pitchSpeedPID,pitchAngleTarget,-pitchRealAngle,-gYroXs);
+			pitchIntensity = PID_PROCESS_Double(pitchPositionPID,pitchSpeedPID,pitchAngleTarget,pitchRealAngle,-gYroXs);
 
 			//		fw_printfln("pitchIntensity:%d", pitchIntensity);
 			setMotor(GMPITCH, pitchIntensity);

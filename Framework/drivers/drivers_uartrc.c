@@ -26,15 +26,25 @@ void rcInit(){
 }
 
 void rcUartRxCpltCallback(){
+	static TickType_t lastcount_rc;
+	static TickType_t thiscount_rc;
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE; 
-	fw_printfln("rcuart receive");
+		  thiscount_rc = xTaskGetTickCountFromISR();
+	//		fw_printfln("thiscount_rc:  %d", thiscount_rc);
+  if((thiscount_rc - lastcount_rc) < 15){
 	IOPool_getNextWrite(rcUartIOPool);
 	HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 	xSemaphoreGiveFromISR(xSemaphore_rcuart, &xHigherPriorityTaskWoken);
 	if( xHigherPriorityTaskWoken == pdTRUE ){
    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+	 }
+ }
+	else{
+		HAL_UART_AbortReceive(&RC_UART);
+		HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 	}
+	lastcount_rc = thiscount_rc;
 }
 
 

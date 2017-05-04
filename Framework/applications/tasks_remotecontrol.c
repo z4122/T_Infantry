@@ -35,8 +35,7 @@ extern float yawAngleTarget, pitchAngleTarget;
 void RControlTask(void const * argument){
 	uint8_t data[18];
 	static int countwhile = 0;
-//	static TickType_t lastcount_rc;
-//	static TickType_t thiscount_rc;
+
 	while(1){
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
 		if(IOPool_hasNextRead(rcUartIOPool, 0)){
@@ -45,29 +44,27 @@ void RControlTask(void const * argument){
 			for(uint8_t i = 0; i != 18; ++i){
 				data[i] = pData[i];
 			}
-//		  thiscount_rc = xTaskGetTickCount();
-//			fw_printfln("thiscount_rc:  %d", thiscount_rc);
-//			lastcount_rc = thiscount_rc;
+
 			RemoteDataProcess(data);
 			
 			if(countwhile >= 300){
 			countwhile = 0;
-			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
-				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
-				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
-				fw_printf("ch3 = %d \r\n", RC_CtrlData.rc.ch3);
-				
-				fw_printf("s1 = %d | ", RC_CtrlData.rc.s1);
-				fw_printf("s2 = %d \r\n", RC_CtrlData.rc.s2);
-				
-				fw_printf("x = %d | ", RC_CtrlData.mouse.x);
-				fw_printf("y = %d | ", RC_CtrlData.mouse.y);
-				fw_printf("z = %d | ", RC_CtrlData.mouse.z);
-				fw_printf("l = %d | ", RC_CtrlData.mouse.press_l);
-				fw_printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
-				
-				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
-				fw_printf("===========\r\n");
+//			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
+//				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
+//				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
+//				fw_printf("ch3 = %d \r\n", RC_CtrlData.rc.ch3);
+//				
+//				fw_printf("s1 = %d | ", RC_CtrlData.rc.s1);
+//				fw_printf("s2 = %d \r\n", RC_CtrlData.rc.s2);
+//				
+//				fw_printf("x = %d | ", RC_CtrlData.mouse.x);
+//				fw_printf("y = %d | ", RC_CtrlData.mouse.y);
+//				fw_printf("z = %d | ", RC_CtrlData.mouse.z);
+//				fw_printf("l = %d | ", RC_CtrlData.mouse.press_l);
+//				fw_printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
+//				
+//				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
+//				fw_printf("===========\r\n");
 		}else{
 			countwhile++;
 		}

@@ -11,51 +11,32 @@
 
 NaiveIOPoolDefine(ctrlUartIOPool, {0});
 
-uint8_t ctrlUartFlag = byte_EOF; //Ö¡´íÎóºó£¬µÈ´ýÖÕÖ¹×Ö½Ú
-uint8_t lastctrlUartFlag = byte_EOF; 
+
 xdata_ctrlUart ctrlData; //ÃîËã½ÓÊÕ±äÁ¿
 
 void ctrlUartRxCpltCallback(){
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
-//  
-			fw_printfln("normal normal normal");
-			IOPool_getNextWrite(ctrlUartIOPool);
-			IOPool_getNextRead(ctrlUartIOPool, 0);
-			uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
-			ctrlData = xUartprocess( pData );
-			 if( ctrlData.Success == 1) 	{
-			 ctrlUartFlag = byte_EOF;	
-			 if(HAL_UART_Receive_DMA(&CTRL_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+	IOPool_getNextWrite(ctrlUartIOPool);
+	IOPool_getNextRead(ctrlUartIOPool, 0);
+	uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
+	ctrlData = xUartprocess( pData );
+	 if( ctrlData.Success == 1) 	{
+		 if(HAL_UART_Receive_DMA(&CTRL_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
 				fw_Warning();
-			  Error_Handler(); }
-			  xSemaphoreGiveFromISR(xSemaphore_uart, &xHigherPriorityTaskWoken);	
-				}				
-				else 	{ctrlUartFlag = 0;		
+				Error_Handler(); }
+				xSemaphoreGiveFromISR(xSemaphore_uart, &xHigherPriorityTaskWoken);	
+			}				
+			else{
 			 HAL_UART_AbortReceive(&CTRL_UART);
-			 printf("dataprocess error\r\n");			
-			if(HAL_UART_Receive_DMA(&CTRL_UART, &ctrlUartFlag, 1) != HAL_OK){
+			 printf("dataprocess error\r\n");		
+			if(HAL_UART_Receive_DMA(&CTRL_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
 				fw_Warning();
-			 	Error_Handler();
-			}
-			}
-	 
-//		else{
-//			
-//			if(HAL_UART_Receive_DMA(&CTRL_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
-//		fw_Warning();		
-//		Error_Handler(); }
-//				}		
-	 if( xHigherPriorityTaskWoken == pdTRUE ){
-   portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-	}
-		
-  
-//	else{//ÈôctrlUartFlag ²»ÊÇ½áÎ²×Ö½Ú£¬×èÈû¶ÁÈ¡
-//    if(HAL_UART_Receive_DMA(&CTRL_UART, &ctrlUartFlag, 1) != HAL_OK){
-//		Error_Handler();}
-//	}
-	lastctrlUartFlag = ctrlUartFlag;
+				Error_Handler(); }						
+			 }
+ if( xHigherPriorityTaskWoken == pdTRUE ){
+ portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+}
 }
 
 

@@ -6,5 +6,5 @@
 typedef enum {CMFL, CMFR, CMBL, CMBR, GMYAW, GMPITCH} MotorId;
 
 void setMotor(MotorId motorId, int16_t Intensity);
-
+void GYRO_RST(void);
 #endif

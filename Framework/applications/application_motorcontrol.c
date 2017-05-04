@@ -42,14 +42,14 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		default:
 			fw_Error_Handler();
 	}
-//	if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY){
-//			CMFLIntensity = 0;
-//			CMFRIntensity = 0;
-//			CMBLIntensity = 0;
-//			CMBRIntensity = 0;
-//			GMYAWIntensity = 0;
-//			GMPITCHIntensity = 0;
-//		}
+	if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY){
+			CMFLIntensity = 0;
+			CMFRIntensity = 0;
+			CMBLIntensity = 0;
+			CMBRIntensity = 0;
+			GMYAWIntensity = 0;
+			GMPITCHIntensity = 0;
+		}
 	if(CMReady == 0xF){
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(CMTxIOPool);
 		pData->StdId = CM_TXID;
@@ -113,7 +113,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 }
 	
 
-
+uint8_t GYRO_RESTED = 0;
 void GYRO_RST(void)
 {
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(ZGYROTxIOPool);
@@ -127,7 +127,19 @@ void GYRO_RST(void)
 		pData->Data[6] = 0x06;
 		pData->Data[7] = 0x07;
 		IOPool_getNextWrite(ZGYROTxIOPool);
-		if(osSemaphoreRelease(ZGYROCanHaveTransmitSemaphoreHandle) == osErrorOS){
-			fw_Warning();
+//		if(osSemaphoreRelease(ZGYROCanHaveTransmitSemaphoreHandle) == osErrorOS){
+//			fw_Warning();
+//		}
+	if(IOPool_hasNextRead(ZGYROTxIOPool, 0)){
+			osSemaphoreWait(ZGYROCanTransmitSemaphoreHandle, osWaitForever);
+			IOPool_getNextRead(ZGYROTxIOPool, 0);
+			ZGYRO_CAN.pTxMsg = IOPool_pGetReadData(ZGYROTxIOPool, 0);
+			taskENTER_CRITICAL();
+			if(HAL_CAN_Transmit_IT(&ZGYRO_CAN) != HAL_OK){
+				fw_Warning();
+				osSemaphoreRelease(ZGYROCanTransmitSemaphoreHandle);
+			}
+			taskEXIT_CRITICAL();
 		}
+	GYRO_RESTED = 1;
 }
