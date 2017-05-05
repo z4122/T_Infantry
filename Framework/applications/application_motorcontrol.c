@@ -113,7 +113,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 }
 	
 
-uint8_t GYRO_RESTED = 0;
+uint8_t GYRO_RESETED = 0;
 void GYRO_RST(void)
 {
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(ZGYROTxIOPool);
@@ -141,5 +141,5 @@ void GYRO_RST(void)
 			}
 			taskEXIT_CRITICAL();
 		}
-	GYRO_RESTED = 1;
+	GYRO_RESETED = 1;
 }

@@ -29,7 +29,6 @@ void rtos_init(){
 	RemoteTaskInit();
 	UserTimerInit();
 	CMControtLoopTaskInit();
-	GYRO_RST();
 	motorInit();
 	rcInit();
 //	mpu6050Init();

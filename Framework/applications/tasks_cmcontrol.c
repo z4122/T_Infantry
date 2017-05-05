@@ -44,7 +44,7 @@ extern float ZGyroModuleAngle;
 float ZGyroModuleAngleMAX;
 float ZGyroModuleAngleMIN;
 extern float yawRealAngle;
-extern uint8_t GYRO_RESTED;
+extern uint8_t GYRO_RESETED;
 void Timer_2ms_lTask(void const * argument)
 {
 	portTickType xLastWakeTime;
@@ -67,8 +67,12 @@ void Timer_2ms_lTask(void const * argument)
 		}else{
 			countwhile++;
 		}
-    if(countwhile1 < 700){
-			if(GYRO_RESTED == 0)GYRO_RST();
+    if(countwhile1 > 700){
+			if(GYRO_RESETED == 0)GYRO_RST();
+		}
+		else{countwhile1++;}
+		if(countwhile1 > 1400){
+			GYRO_RESETED = 2;
 		}
 		else{countwhile1++;}
 		ShooterMControlLoop();       //发射机构控制任务

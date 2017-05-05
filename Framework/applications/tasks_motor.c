@@ -45,7 +45,7 @@ extern volatile Encoder GMYawEncoder;
 //extern uint32_t flAngle, frAngle, blAngle, brAngle;
 //extern uint16_t flSpeed, frSpeed, blSpeed, brSpeed;
 extern uint8_t CReceive;
-extern int GYRO_RESETED;
+extern uint8_t GYRO_RESETED;
 extern float ZGyroModuleAngle;
 float yawAngleTarget = 0.0;
 float pitchAngleTarget = 0.0;
@@ -81,6 +81,7 @@ void CMGMControlTask(void const * argument){
 		//		 ChassisSpeedRef.rotate_ref = 0;
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0;
 			NORMALIZE_ANGLE180(yawRealAngle);
+			if(GYRO_RESETED == 2) yawRealAngle = -ZGyroModuleAngle;
 //			fw_printfln("yawRealAngle:%f",yawRealAngle);
 				if((GetShootMode() == AUTO) && (CReceive != 0))	{
 //				yawAngleTarget = yawRealAngle - (yawAdd * 0.5f);
@@ -88,8 +89,7 @@ void CMGMControlTask(void const * argument){
 				CReceive--;
 			}
 						
-			MINMAX(yawAngleTarget, -45, 45);
-//      if(GYRO_RESETED)yawRealAngle = ZGyroModuleAngle;
+//			MINMAX(yawAngleTarget, -45, 45);
 			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget,yawRealAngle,-gYroZs);
 
 //      fw_printfln("yawIntensity:%d", yawIntensity);
