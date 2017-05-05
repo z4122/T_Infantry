@@ -67,11 +67,11 @@ void Timer_2ms_lTask(void const * argument)
 		}else{
 			countwhile++;
 		}
-    if(countwhile1 > 700){
+    if(countwhile1 > 1000){
 			if(GYRO_RESETED == 0)GYRO_RST();
 		}
 		else{countwhile1++;}
-		if(countwhile1 > 1400){
+		if(countwhile1 > 2000){
 			GYRO_RESETED = 2;
 		}
 		else{countwhile1++;}

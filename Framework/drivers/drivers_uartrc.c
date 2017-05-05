@@ -30,9 +30,9 @@ void rcUartRxCpltCallback(){
 	static TickType_t thiscount_rc;
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE; 
-		  thiscount_rc = xTaskGetTickCountFromISR();
-	//		fw_printfln("thiscount_rc:  %d", thiscount_rc);
-  if((thiscount_rc - lastcount_rc) < 15){
+	thiscount_rc = xTaskGetTickCountFromISR();
+//	fw_printfln("(thiscount_rc - lastcount_rc):  %d", (thiscount_rc - lastcount_rc));
+  if((thiscount_rc - lastcount_rc) <= 14){
 	IOPool_getNextWrite(rcUartIOPool);
 	HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 	xSemaphoreGiveFromISR(xSemaphore_rcuart, &xHigherPriorityTaskWoken);
