@@ -60,6 +60,9 @@ void Timer_2ms_lTask(void const * argument)
 		if(countwhile >= 500){//¶¨Ê± 1S
 		countwhile = 0;
 			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
+//			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
+//			fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
+//			fw_printfln("PitAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
 //				fw_printfln("GMYAWEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle );
 //			fw_printfln("in CMcontrol_task");
 //		StackResidue = uxTaskGetStackHighWaterMark( GMControlTaskHandle );

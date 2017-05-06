@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "utilities_debug.h"
+#include  "tim.h"
 
 #include "peripheral_define.h"
 
@@ -312,8 +313,8 @@ void SetFrictionState(FrictionWheelState_e v)
 }
 void SetFrictionWheelSpeed(uint16_t x)
 {
-//	__HAL_TIM_SET_COMPARE(&FRICTION_TIM, TIM_CHANNEL_1, x);
-//	__HAL_TIM_SET_COMPARE(&FRICTION_TIM, TIM_CHANNEL_2, x);
+	__HAL_TIM_SET_COMPARE(&FRICTION_TIM, TIM_CHANNEL_1, x);
+	__HAL_TIM_SET_COMPARE(&FRICTION_TIM, TIM_CHANNEL_2, x);
 }
 Shoot_Mode_e shootMode = MANUL;
 

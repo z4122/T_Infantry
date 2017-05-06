@@ -17,6 +17,7 @@ xdata_ctrlUart ctrlData; //ÃîËã½ÓÊÕ±äÁ¿
 void ctrlUartRxCpltCallback(){
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
+//	fw_printfln("upper received");
 	IOPool_getNextWrite(ctrlUartIOPool);
 	IOPool_getNextRead(ctrlUartIOPool, 0);
 	uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;

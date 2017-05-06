@@ -30,6 +30,7 @@ void getCtrlUartTask(void const * argument){
 		if( ctrlData.Success == 1) {
 			yawAdd = ((float)ctrlData.dev_yaw - 9000)/100;
 			pitchAdd = ((float)ctrlData.dev_pitch - 5000)/100;
+//			yawAdd = 0;
 //			fw_printfln("yawAdd:%f",yawAdd);
 //			fw_printfln("pitchAdd:%f",pitchAdd);
 			IOPool_pGetWriteData(upperIOPool)->yawAdd = yawAdd;

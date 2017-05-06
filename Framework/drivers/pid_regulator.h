@@ -2,7 +2,7 @@
 #define _PID_REGULATOR_H_
 #include "stm32f4xx.h"
 #define fw_PID_INIT(Kp, Ki, Kd, KpMax, KiMax, KdMax, OutputMax) { \
-	0.0, 0.0, 0.0, 0.0, 0.0, \
+	0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ,\
 	Kp, Ki, Kd, 0.0, 0.0, 0.0, \
 	KpMax, KiMax, KdMax, 0.0, \
 	OutputMax, \
@@ -14,6 +14,7 @@ typedef struct fw_PID_Regulator_t
 	float feedback;
 	float errorCurr;
 	float errorSum;
+	uint16_t SumCount;
 	float errorLast;
 	float kp;
 	float ki;
