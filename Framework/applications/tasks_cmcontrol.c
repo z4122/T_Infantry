@@ -48,7 +48,7 @@ float ZGyroModuleAngleMIN;
 extern float yawRealAngle;
 extern uint8_t GYRO_RESETED;
 extern float pitchRealAngle;
-
+extern float gYroZs;
 //*********debug by ZY*********
 typedef struct{
 	uint16_t head;
@@ -60,9 +60,9 @@ typedef struct{
 }data_to_PC;
 
 
-uint8_t data_send_to_PC[13];
+uint8_t data_send_to_PC[17];
 data_to_PC my_data_to_PC;
-void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw)
+void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float zySpd)
 {
 //	my_data_to_PC.head=0xAAAA;
 //	my_data_to_PC.id=0xF1;
@@ -86,7 +86,7 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw)
 	data_send_to_PC[0]=0xAA;
 	data_send_to_PC[1]=0xAA;
 	data_send_to_PC[2]=0xF1;
-	data_send_to_PC[3]=0x08;
+	data_send_to_PC[3]=12;
 	pTemp=(uint8_t *)&zyPitch;
 	for(i=0;i<4;i++)
 	{
@@ -99,17 +99,22 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw)
 		 data_send_to_PC[8+i]=pTemp[3-i];
 	}
 	
-	data_send_to_PC[12]=0;
-	for(i=0;i<12;i++)
+	pTemp=(uint8_t *)&zySpd;
+	for(i=0;i<4;i++)
 	{
-		 data_send_to_PC[12]+=data_send_to_PC[i];
+		 data_send_to_PC[12+i]=pTemp[3-i];
 	}
 	
-	HAL_UART_Transmit(huart,data_send_to_PC,13,1000);
+	data_send_to_PC[16]=0;
+	for(i=0;i<16;i++)
+	{
+		 data_send_to_PC[16]+=data_send_to_PC[i];
+	}
+	
+	HAL_UART_Transmit(huart,data_send_to_PC,17,1000);
 }
 
 //*********debug by ZY*********
-
 void Timer_2ms_lTask(void const * argument)
 {
 	portTickType xLastWakeTime;
@@ -125,7 +130,7 @@ void Timer_2ms_lTask(void const * argument)
 	  WorkStateSwitchProcess();
 		if(countwhile >= 500){//定时 1S
 		countwhile = 0;
-			//fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
+			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
 //			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
 //			fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 //			fw_printfln("PitAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
@@ -146,7 +151,7 @@ void Timer_2ms_lTask(void const * argument)
 		else{countwhile1++;}
 		if(countwhile2 >= 5){//定时 1S
 		countwhile2 = 0;
-		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle);
+//		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);
 			//printf("pitch:%f *** yaw:%f",pitchRealAngle,ZGyroModuleAngle);
 //		HAL_UART_Transmit(&DEBUG_UART,txbuf,strlen((char *)txbuf),1000);
 //  ZGyroModuleAngle
@@ -291,7 +296,40 @@ void CMControlLoop(void)
 	CM1SpeedPID.Calc(&CM1SpeedPID);
 	CM2SpeedPID.Calc(&CM2SpeedPID);
 	CM3SpeedPID.Calc(&CM3SpeedPID);
-	CM4SpeedPID.Calc(&CM4SpeedPID);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CM4SpeedPID.Calc(&CM4SpeedPID);
 	
 	 if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY)   //||Is_Serious_Error()|| dead_lock_flag == 1紧急停车，编码器校准，无控制输入时都会使底盘控制停止
 	 {

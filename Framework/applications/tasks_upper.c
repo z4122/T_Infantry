@@ -24,7 +24,7 @@ float pitchAdd = 0;
 void getCtrlUartTask(void const * argument){
 	while(1){
 		xSemaphoreTake(xSemaphore_uart, osWaitForever);
-//		fw_printfln("CtrlUartTask processing");
+		fw_printfln("Ctrl");
 		uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
 		ctrlData = xUartprocess( pData );
 		if( ctrlData.Success == 1) {
@@ -36,7 +36,9 @@ void getCtrlUartTask(void const * argument){
 			IOPool_pGetWriteData(upperIOPool)->yawAdd = yawAdd;
 			IOPool_pGetWriteData(upperIOPool)->pitchAdd = pitchAdd;
 			IOPool_getNextWrite(upperIOPool);
+			if((yawAdd != 0) || (pitchAdd != 0)){
 			CReceive = 2;
+			}
 		} 
 		else {
 			yawAdd = 0;

@@ -7,7 +7,7 @@ void fw_PID_Reset(fw_PID_Regulator_t *pid){
 
 void fw_PID_Calc(fw_PID_Regulator_t *pid){
 	pid->errorCurr = pid->target - pid->feedback;
-	if(pid->SumCount <=200){
+	if(pid->SumCount <=250){
 		pid->errorSum += pid->target - pid->feedback;
 		pid->SumCount++;
 		}
