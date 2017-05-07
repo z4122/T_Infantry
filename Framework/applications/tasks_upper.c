@@ -18,13 +18,15 @@ extern xdata_ctrlUart ctrlData;
 extern uint16_t x;
 uint8_t CReceive = 0;
 float yawAdd = 0;
+float last_yawAdd = 0;
+float yaw_speed = 0;
 float pitchAdd = 0;
 
 //extern float yawAngleTarget, pitchAngleTarget;
 void getCtrlUartTask(void const * argument){
 	while(1){
 		xSemaphoreTake(xSemaphore_uart, osWaitForever);
-		fw_printfln("Ctrl");
+//		fw_printfln("Ctrl");
 		uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
 		ctrlData = xUartprocess( pData );
 		if( ctrlData.Success == 1) {
@@ -33,10 +35,13 @@ void getCtrlUartTask(void const * argument){
 //			yawAdd = 0;
 //			fw_printfln("yawAdd:%f",yawAdd);
 //			fw_printfln("pitchAdd:%f",pitchAdd);
-			IOPool_pGetWriteData(upperIOPool)->yawAdd = yawAdd;
+//´óÉñ¸¸ Öµpitch5.33    yaw9.7
+			if((yawAdd != 0) || (pitchAdd != 0)){
+			yaw_speed = yawAdd - last_yawAdd;
+			IOPool_pGetWriteData(upperIOPool)->yawAdd = yawAdd + 2.0f*yaw_speed;
 			IOPool_pGetWriteData(upperIOPool)->pitchAdd = pitchAdd;
 			IOPool_getNextWrite(upperIOPool);
-			if((yawAdd != 0) || (pitchAdd != 0)){
+			last_yawAdd = yawAdd;
 			CReceive = 2;
 			}
 		} 

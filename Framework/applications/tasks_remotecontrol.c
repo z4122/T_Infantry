@@ -111,9 +111,10 @@ void RemoteDataProcess(uint8_t *pData)
 			
 			//鼠标键盘控制模式
 			//暂时为自动瞄准模式
-			//MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
+//			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
 			SetShootMode(AUTO);
+//			RemoteShootControl(&switch1, RC_CtrlData.rc.s1);
 		}break;
 		case STOP:
 		{
@@ -148,7 +149,7 @@ void RemoteControlProcess(Remote *rc)
     GimbalRef.pitch_speed_ref = rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET;    //speed_ref仅做输入量判断用
     GimbalRef.yaw_speed_ref   = (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET);
 	//射击-摩擦轮，拨盘电机状态
-	RemoteShootControl(&switch1, rc->s1);
+//	RemoteShootControl(&switch1, rc->s1);
 		
 
 }

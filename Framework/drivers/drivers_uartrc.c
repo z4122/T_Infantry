@@ -13,9 +13,11 @@
 #include <math.h>
 #include "utilities_debug.h"
 #include  "tim.h"
-
+#include "drivers_uartrc_low.h"
+#include "drivers_uartrc_user.h"
 #include "peripheral_define.h"
-
+#include "drivers_uartupper_low.h"
+#include "drivers_uartupper_user.h"
 NaiveIOPoolDefine(rcUartIOPool, {0});
 
 void rcInit(){
@@ -156,6 +158,12 @@ input: RemoteSwitch_t *sw, include the switch info
 void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val) 
 {
 	GetRemoteSwitchAction(sw, val);
+	if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   //´Ó¹Ø±Õµ½start turning
+			{
+		if(HAL_UART_Receive_DMA(&CTRL_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+					fw_Warning();
+					Error_Handler(); }
+			}		
 	switch(friction_wheel_state)
 	{
 		case FRICTION_WHEEL_OFF:
