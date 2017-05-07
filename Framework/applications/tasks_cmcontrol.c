@@ -16,6 +16,8 @@
 #include "semphr.h"
 #include "cmsis_os.h"
 #include "task.h"
+#include "usart.h"
+#include "peripheral_define.h"
 
 
 extern PID_Regulator_t CMRotatePID ; 
@@ -45,12 +47,76 @@ float ZGyroModuleAngleMAX;
 float ZGyroModuleAngleMIN;
 extern float yawRealAngle;
 extern uint8_t GYRO_RESETED;
+extern float pitchRealAngle;
+
+//*********debug by ZY*********
+typedef struct{
+	uint16_t head;
+	uint8_t id;
+	uint8_t dlc;
+	float dataPitch;
+	float dataYaw;
+	uint8_t checkSum;
+}data_to_PC;
+
+
+uint8_t data_send_to_PC[13];
+data_to_PC my_data_to_PC;
+void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw)
+{
+//	my_data_to_PC.head=0xAAAA;
+//	my_data_to_PC.id=0xF1;
+//	my_data_to_PC.dlc=8;
+//	my_data_to_PC.dataPitch=zyPitch;
+//	my_data_to_PC.dataYaw=zyYaw;
+//	
+//	uint8_t * pTemp;
+//	//uint8_t temp;
+//	int i;
+//	my_data_to_PC.checkSum=0;
+//	pTemp = (uint8_t *)&(my_data_to_PC);  
+//	for(i=0;i<12;i++)
+//	{
+//		 my_data_to_PC.checkSum+=pTemp[i];
+//	}
+	
+	
+	uint8_t * pTemp;
+	int i;
+	data_send_to_PC[0]=0xAA;
+	data_send_to_PC[1]=0xAA;
+	data_send_to_PC[2]=0xF1;
+	data_send_to_PC[3]=0x08;
+	pTemp=(uint8_t *)&zyPitch;
+	for(i=0;i<4;i++)
+	{
+		 data_send_to_PC[4+i]=pTemp[3-i];
+	}
+	
+	pTemp=(uint8_t *)&zyYaw;
+	for(i=0;i<4;i++)
+	{
+		 data_send_to_PC[8+i]=pTemp[3-i];
+	}
+	
+	data_send_to_PC[12]=0;
+	for(i=0;i<12;i++)
+	{
+		 data_send_to_PC[12]+=data_send_to_PC[i];
+	}
+	
+	HAL_UART_Transmit(huart,data_send_to_PC,13,1000);
+}
+
+//*********debug by ZY*********
+
 void Timer_2ms_lTask(void const * argument)
 {
 	portTickType xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
 	static int countwhile = 0;
 	static int countwhile1 = 0;
+	static int countwhile2 = 0;
 //	unsigned portBASE_TYPE StackResidue; //栈剩余
 	while(1)  {       //motor control frequency 2ms
 //监控任务
@@ -59,7 +125,7 @@ void Timer_2ms_lTask(void const * argument)
 	  WorkStateSwitchProcess();
 		if(countwhile >= 500){//定时 1S
 		countwhile = 0;
-			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
+			//fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
 //			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
 //			fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 //			fw_printfln("PitAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
@@ -78,6 +144,16 @@ void Timer_2ms_lTask(void const * argument)
 			GYRO_RESETED = 2;
 		}
 		else{countwhile1++;}
+		if(countwhile2 >= 5){//定时 1S
+		countwhile2 = 0;
+		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle);
+			//printf("pitch:%f *** yaw:%f",pitchRealAngle,ZGyroModuleAngle);
+//		HAL_UART_Transmit(&DEBUG_UART,txbuf,strlen((char *)txbuf),1000);
+//  ZGyroModuleAngle
+//			pitchRealAngle
+		}else{
+			countwhile2++;
+		}
 		ShooterMControlLoop();       //发射机构控制任务
 		
 		vTaskDelayUntil( &xLastWakeTime, ( 2 / portTICK_RATE_MS ) );

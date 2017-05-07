@@ -11,6 +11,8 @@
 #include "pid_regulator.h"
 #include "application_motorcontrol.h"
 #include "drivers_sonar_user.h"
+#include "usart.h"
+#include "peripheral_define.h"
 
 #include "stdint.h"
 
@@ -41,6 +43,8 @@ extern volatile Encoder CM4Encoder;
 extern volatile Encoder GMYawEncoder;
 //extern int forPidDebug;
 
+	float pitchRealAngle = 0.0;
+	
 //extern uint16_t pitchAngle, yawAngle;
 //extern uint32_t flAngle, frAngle, blAngle, brAngle;
 //extern uint16_t flSpeed, frSpeed, blSpeed, brSpeed;
@@ -80,8 +84,11 @@ void CMGMControlTask(void const * argument){
 				 ChassisSpeedRef.rotate_ref = 0;
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
 			NORMALIZE_ANGLE180(yawRealAngle);
-			if(GYRO_RESETED == 2) yawRealAngle = -ZGyroModuleAngle;
+			if(GYRO_RESETED == 2) {
+/******发送数据1  yaw角度*******/
+			yawRealAngle = -ZGyroModuleAngle;
 //		fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
+			}
 /*自瞄模式切换*/
 				if((GetShootMode() == AUTO) && (CReceive != 0))	{
 				yawAngleTarget = yawRealAngle - (yawAdd * 0.4f);
@@ -99,12 +106,12 @@ void CMGMControlTask(void const * argument){
 		if(IOPool_hasNextRead(GMPITCHRxIOPool, 0)){
 			
 			uint16_t pitchZeroAngle = 3180;
-			float pitchRealAngle = 0.0;
 			int16_t pitchIntensity = 0;
 			
 			IOPool_getNextRead(GMPITCHRxIOPool, 0);
 			pitchRealAngle = -(IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - pitchZeroAngle) * 360 / 8192.0;
 			NORMALIZE_ANGLE180(pitchRealAngle);
+/*******发送数据2 Pitch角度******/
 //			fw_printfln("pitchRealAngle:%f",pitchRealAngle);
 		if((GetShootMode() == AUTO) && (CReceive != 0))	{
 //					fw_printfln("pitchRealAngle:%f",pitchRealAngle );
