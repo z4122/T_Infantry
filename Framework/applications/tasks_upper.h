@@ -3,7 +3,8 @@
 
 #include "utilities_iopool.h"
 
-IOPoolDeclare(upperIOPool, struct{float yawAdd; float pitchAdd;});
+
+IOPoolDeclare(upperIOPool, struct{float yawAdd; float pitchAdd; uint8_t rune;});
 
 void getCtrlUartTask(void const * argument);
 

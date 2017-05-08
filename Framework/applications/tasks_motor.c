@@ -13,6 +13,7 @@
 #include "drivers_sonar_user.h"
 #include "usart.h"
 #include "peripheral_define.h"
+#include "drivers_uartupper_user.h"
 
 #include "stdint.h"
 
@@ -43,12 +44,13 @@ extern volatile Encoder CM4Encoder;
 extern volatile Encoder GMYawEncoder;
 //extern int forPidDebug;
 
-	float pitchRealAngle = 0.0;
-	
+float pitchRealAngle = 0.0;
+extern Location_Number_s Location_Number[];
 //extern uint16_t pitchAngle, yawAngle;
 //extern uint32_t flAngle, frAngle, blAngle, brAngle;
 //extern uint16_t flSpeed, frSpeed, blSpeed, brSpeed;
 extern uint8_t CReceive;
+extern uint8_t rune_flag;
 extern uint8_t GYRO_RESETED;
 extern float ZGyroModuleAngle;
 float yawAngleTarget = 0.0;
@@ -57,6 +59,7 @@ int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 void CMGMControlTask(void const * argument){
 	static float yawAdd;
 	static float pitchAdd;
+	static uint8_t rune;
 	while(1){
 //  osSemaphoreWait(imurefreshGimbalSemaphoreHandle, osWaitForever);
 		osSemaphoreWait(CMGMCanRefreshSemaphoreHandle, osWaitForever);
@@ -64,6 +67,7 @@ void CMGMControlTask(void const * argument){
 		IOPool_getNextRead(upperIOPool, 0);
 		yawAdd = IOPool_pGetReadData(upperIOPool, 0)->yawAdd;
 		pitchAdd = IOPool_pGetReadData(upperIOPool, 0)->pitchAdd;
+		rune = IOPool_pGetReadData(upperIOPool, 0)->rune;
 		}
 /*云台yaw轴*/
 		if(IOPool_hasNextRead(GMYAWRxIOPool, 0)){
@@ -90,11 +94,22 @@ void CMGMControlTask(void const * argument){
 //		fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 			}
 /*自瞄模式切换*/
-				if((GetShootMode() == AUTO) && (CReceive != 0))	{
+			if(GetShootMode() == AUTO) {
+				if((GetLocateState() == Locating) && (CReceive != 0))	{
 //				yawAngleTarget = yawRealAngle - (yawAdd *0.21f);
-				yawAngleTarget = yawRealAngle - (yawAdd *0.2f);
+				yawAngleTarget = yawRealAngle - yawAdd ;
+				fw_printfln("yawAdd:%f",yawAdd );
 				CReceive--;
-			}
+				}
+				else if((GetLocateState() == Located) && (rune_flag != 0)){
+					if(GetRuneState() == AIMING){
+						fw_printfln("rune:%d", rune);
+						yawAngleTarget = Location_Number[rune - 1].yaw_position;
+						rune_flag--;
+					}
+				}
+		  }
+		
 						
 //			MINMAX(yawAngleTarget, -45, 45);
 			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget,yawRealAngle,-gYroZs);
@@ -113,10 +128,12 @@ void CMGMControlTask(void const * argument){
 			NORMALIZE_ANGLE180(pitchRealAngle);
 /*******发送数据2 Pitch角度******/
 //			fw_printfln("pitchRealAngle:%f",pitchRealAngle);
-		if((GetShootMode() == AUTO) && (CReceive != 0))	{
+			if(GetShootMode() == AUTO) {
+				if((GetLocateState() == Locating) && (CReceive != 0))	{
+//				yawAngleTarget = yawRealAngle - (yawAdd *0.21f);
 //					fw_printfln("pitchRealAngle:%f",pitchRealAngle );
-//					fw_printfln("pitchAdd:%f",pitchAdd );
-			pitchAngleTarget = pitchRealAngle + (0.3f*pitchAdd) ;
+					fw_printfln("pitchAdd:%f",pitchAdd );
+			pitchAngleTarget = pitchRealAngle + pitchAdd ;
 //			if(pitchAdd >= 0){
 //				pitchAngleTarget = pitchRealAngle + (0.1f*pitchAdd) ;//0.665
 //			}
@@ -125,7 +142,27 @@ void CMGMControlTask(void const * argument){
 //			}
 //					pitchAngleTarget = pitchRealAngle + pitchAdd ;
 				CReceive --;
-			}
+				}
+				else if((GetLocateState() == Located) && (rune_flag != 0)){
+					if(GetRuneState() == AIMING){
+						pitchAngleTarget = Location_Number[rune - 1].pitch_position;
+						rune_flag--;
+					}
+				}
+		  }
+//		if((GetShootMode() == AUTO) && (CReceive != 0))	{
+////					fw_printfln("pitchRealAngle:%f",pitchRealAngle );
+////					fw_printfln("pitchAdd:%f",pitchAdd );
+//			pitchAngleTarget = pitchRealAngle + (0.3f*pitchAdd) ;
+////			if(pitchAdd >= 0){
+////				pitchAngleTarget = pitchRealAngle + (0.1f*pitchAdd) ;//0.665
+////			}
+////			else{
+////				pitchAngleTarget = pitchRealAngle + (0.08f*pitchAdd) ;//0.62
+////			}
+////					pitchAngleTarget = pitchRealAngle + pitchAdd ;
+//				CReceive --;
+//			}
 			MINMAX(pitchAngleTarget, -25, 25);
 			pitchIntensity = PID_PROCESS_Double(pitchPositionPID,pitchSpeedPID,pitchAngleTarget,pitchRealAngle,-gYroXs);
 			//		fw_printfln("pitchIntensity:%d", pitchIntensity);

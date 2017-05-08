@@ -82,8 +82,8 @@ void vSendUart(xdata_ctrlUart data){
 	tempdata[2] = data.dev_yaw & 0x00ff;
   tempdata[3] = data.dev_pitch >> 8;
 	tempdata[4] = data.dev_pitch & 0x00ff;	
-	tempdata[5] = data.target_vl >> 8;
-	tempdata[6] = data.target_vl & 0x00ff;
+	tempdata[5] = data.rune;
+	tempdata[6] = data.rune_locate;
 	tempdata[7] = data.target_dis >> 8;
 	tempdata[8] = data.target_dis & 0x00ff;
 	tempdata[9] = data.DLC;
@@ -137,8 +137,48 @@ xdata_ctrlUart xUartprocess(uint8_t *pData){
 		else To_return.Success = 1;
 		To_return.dev_yaw    = (*(pData + 1) << 8) + *(pData + 2);
 		To_return.dev_pitch  = (*(pData + 3) << 8) + *(pData + 4);
-		To_return.target_vl  = (*(pData + 5) << 8) + *(pData + 6);
+		To_return.rune       = *(pData + 5);
+		To_return.rune_locate  = *(pData + 6);
 		To_return.target_dis = (*(pData + 7) << 8) + *(pData + 8);
 		To_return.DLC = *(pData + a - 1);
 		return To_return;
+}
+
+Locate_State_e LocateState = Locating;
+
+void SetLocateState(Locate_State_e v){
+	LocateState = v;
+}
+Locate_State_e GetLocateState(void){
+	return LocateState;
+}
+Rune_State_e RuneState = NOAIMING;
+
+void SetRuneState(Rune_State_e v){
+	RuneState = v;
+}
+Rune_State_e GetRuneState(void){
+	return RuneState;
+}
+
+float dis_yaw = 9.7;
+float dis_pitch = 5.33;
+float location_center_yaw = 0;
+float location_center_pitch = 0;
+
+Location_Number_s Location_Number[9] = {{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}};
+
+void vRefreshLocation(float yaw_center, float pitch_center){
+	Location_Number[0].pitch_position = location_center_pitch + dis_pitch;
+	Location_Number[1].yaw_position = location_center_yaw;
+	Location_Number[1].pitch_position = location_center_pitch + dis_pitch;
+	Location_Number[2].pitch_position = location_center_pitch + dis_pitch;
+	Location_Number[3].pitch_position = location_center_pitch;
+	Location_Number[4].yaw_position = location_center_yaw;
+	Location_Number[4].pitch_position = location_center_pitch;
+	Location_Number[5].pitch_position = location_center_pitch;
+	Location_Number[6].pitch_position = location_center_pitch - dis_pitch;
+	Location_Number[7].yaw_position = location_center_yaw;
+	Location_Number[7].pitch_position = location_center_pitch - dis_pitch;
+	Location_Number[8].pitch_position = location_center_pitch - dis_pitch;
 }
