@@ -149,9 +149,9 @@ void Timer_2ms_lTask(void const * argument)
 			GYRO_RESETED = 2;
 		}
 		else{countwhile1++;}
-		if(countwhile2 >= 5){//定时 1S
+		if(countwhile2 >= 5){//定时 10MS
 		countwhile2 = 0;
-//		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);
+		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);
 			//printf("pitch:%f *** yaw:%f",pitchRealAngle,ZGyroModuleAngle);
 //		HAL_UART_Transmit(&DEBUG_UART,txbuf,strlen((char *)txbuf),1000);
 //  ZGyroModuleAngle

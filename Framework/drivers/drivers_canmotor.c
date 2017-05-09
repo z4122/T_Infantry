@@ -180,7 +180,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 void CMGMCanTransmitTask(void const * argument){
 	while(1){
 //		osSemaphoreWait(CMGMCanHaveTransmitSemaphoreHandle, osWaitForever);//osWaitForever
-		fw_printfln("in cantransmit");
+//		fw_printfln("in cantransmit");
 		xSemaphoreTake(motorCanTransmitSemaphore, osWaitForever);
 		//fw_printfln("osWaitForeverCMGMCanHaveTransmitSemaphoreHandle");
 		if(IOPool_hasNextRead(CMTxIOPool, 0)){

@@ -169,16 +169,22 @@ float location_center_pitch = 0;
 Location_Number_s Location_Number[9] = {{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}};
 
 void vRefreshLocation(float yaw_center, float pitch_center){
+	Location_Number[0].yaw_position = location_center_yaw + dis_yaw;
 	Location_Number[0].pitch_position = location_center_pitch + dis_pitch;
 	Location_Number[1].yaw_position = location_center_yaw;
 	Location_Number[1].pitch_position = location_center_pitch + dis_pitch;
+	Location_Number[2].yaw_position = location_center_yaw - dis_yaw;
 	Location_Number[2].pitch_position = location_center_pitch + dis_pitch;
+	Location_Number[3].yaw_position = location_center_yaw + dis_yaw;
 	Location_Number[3].pitch_position = location_center_pitch;
 	Location_Number[4].yaw_position = location_center_yaw;
 	Location_Number[4].pitch_position = location_center_pitch;
+	Location_Number[5].yaw_position = location_center_yaw - dis_yaw;
 	Location_Number[5].pitch_position = location_center_pitch;
+	Location_Number[6].yaw_position = location_center_yaw + dis_yaw;
 	Location_Number[6].pitch_position = location_center_pitch - dis_pitch;
 	Location_Number[7].yaw_position = location_center_yaw;
 	Location_Number[7].pitch_position = location_center_pitch - dis_pitch;
+  Location_Number[8].yaw_position = location_center_yaw - dis_yaw;
 	Location_Number[8].pitch_position = location_center_pitch - dis_pitch;
 }
