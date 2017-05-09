@@ -137,8 +137,8 @@ xdata_ctrlUart xUartprocess(uint8_t *pData){
 		else To_return.Success = 1;
 		To_return.dev_yaw    = (*(pData + 1) << 8) + *(pData + 2);
 		To_return.dev_pitch  = (*(pData + 3) << 8) + *(pData + 4);
-		To_return.rune = *(pData + 5);
-		To_return.rune_locate     = *(pData + 6);
+		To_return.rune       = *(pData + 5);
+		To_return.rune_locate= *(pData + 6);
 		To_return.target_dis = (*(pData + 7) << 8) + *(pData + 8);
 		To_return.DLC = *(pData + a - 1);
 		return To_return;

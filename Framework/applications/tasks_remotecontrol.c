@@ -149,7 +149,7 @@ void RemoteControlProcess(Remote *rc)
     GimbalRef.pitch_speed_ref = rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET;    //speed_ref½ö×öÊäÈëÁ¿ÅÐ¶ÏÓÃ
     GimbalRef.yaw_speed_ref   = (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET);
 	//Éä»÷-Ä¦²ÁÂÖ£¬²¦ÅÌµç»ú×´Ì¬
-//	RemoteShootControl(&switch1, rc->s1);
+	RemoteShootControl(&switch1, rc->s1);
 		
 
 }
