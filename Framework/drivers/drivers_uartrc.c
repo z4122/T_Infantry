@@ -51,7 +51,7 @@ void rcUartRxCpltCallback(){
 //	__HAL_UART_CLEAR_FLAG(&RC_UART, UART_FLAG_IDLE);
 //	fw_printfln("flag2: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE));
 //	fw_printfln("(thiscount_rc - lastcount_rc):  %d", (thiscount_rc - lastcount_rc));
-  if((__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE) != 0) && (thiscount_rc - lastcount_rc) <= 14){
+  if( (thiscount_rc - lastcount_rc) <= 14){
 	IOPool_getNextWrite(rcUartIOPool);
 	HAL_UART_AbortReceive(&RC_UART);
 	HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
