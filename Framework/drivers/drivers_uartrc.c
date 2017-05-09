@@ -18,6 +18,7 @@
 #include "peripheral_define.h"
 #include "drivers_uartupper_low.h"
 #include "drivers_uartupper_user.h"
+#include "stm32f4xx_hal_uart.h"
 NaiveIOPoolDefine(rcUartIOPool, {0});
 
 void rcInit(){
@@ -32,6 +33,11 @@ void rcUartRxCpltCallback(){
 	static TickType_t lastcount_rc;
 	static TickType_t thiscount_rc;
 	static portBASE_TYPE xHigherPriorityTaskWoken;
+//	static HAL_UART_StateTypeDef uart_state;
+//	fw_printfln("flag: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE));
+  while(__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE) == 0){
+//		fw_Warning();
+	}
   xHigherPriorityTaskWoken = pdFALSE; 
 	thiscount_rc = xTaskGetTickCountFromISR();
 //	fw_printfln("(thiscount_rc - lastcount_rc):  %d", (thiscount_rc - lastcount_rc));
@@ -44,6 +50,7 @@ void rcUartRxCpltCallback(){
 	 }
  }
 	else{
+		fw_printfln("RC discarded");
 		HAL_UART_AbortReceive(&RC_UART);
 		HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 	}
