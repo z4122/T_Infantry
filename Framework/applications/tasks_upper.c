@@ -56,7 +56,7 @@ void getCtrlUartTask(void const * argument){
 				}
 				else if((ctrlData.rune_locate == 0) && (last_rune_locate != 0)){
 					SetLocateState(Located);
-//					fw_printfln("Located");
+					fw_printfln("Located");
 //					fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
 					vRefreshLocation( -ZGyroModuleAngle, pitchRealAngle);
 //					fw_printfln("pitchRealAngle:  %f",pitchRealAngle);
