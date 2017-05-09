@@ -26,6 +26,7 @@ void rcInit(){
 	if(HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18) != HAL_OK){
 			Error_Handler();
 	} 
+	__HAL_UART_ENABLE_IT(&RC_UART, UART_FLAG_IDLE);
 	RemoteTaskInit();
 }
 
@@ -33,16 +34,26 @@ void rcUartRxCpltCallback(){
 	static TickType_t lastcount_rc;
 	static TickType_t thiscount_rc;
 	static portBASE_TYPE xHigherPriorityTaskWoken;
-//	static HAL_UART_StateTypeDef uart_state;
-//	fw_printfln("flag: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE));
-  while(__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE) == 0){
-//		fw_Warning();
-	}
-  xHigherPriorityTaskWoken = pdFALSE; 
+	 xHigherPriorityTaskWoken = pdFALSE; 
 	thiscount_rc = xTaskGetTickCountFromISR();
+//	static HAL_UART_StateTypeDef uart_state;
+//	fw_printfln("flag: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_RXNE));
+//	while(__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE) == 0){
+//		fw_Warning();
+//	}
+//	__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE);
+//	fw_printfln("flag1: %d",__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE));
+//	__HAL_UART_CLEAR_PEFLAG(&RC_UART);
+//	fw_printfln("flag12: %d",__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE));
+//	fw_printfln("flag: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE));
+//	 while(__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE) == 0)
+//   {}
+//	__HAL_UART_CLEAR_FLAG(&RC_UART, UART_FLAG_IDLE);
+//	fw_printfln("flag2: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE));
 //	fw_printfln("(thiscount_rc - lastcount_rc):  %d", (thiscount_rc - lastcount_rc));
-  if((thiscount_rc - lastcount_rc) <= 14){
+  if((__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE) != 0) && (thiscount_rc - lastcount_rc) <= 14){
 	IOPool_getNextWrite(rcUartIOPool);
+	HAL_UART_AbortReceive(&RC_UART);
 	HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 	xSemaphoreGiveFromISR(xSemaphore_rcuart, &xHigherPriorityTaskWoken);
 	if( xHigherPriorityTaskWoken == pdTRUE ){
