@@ -26,16 +26,13 @@ void rcInit(){
 	if(HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18) != HAL_OK){
 			Error_Handler();
 	} 
-	__HAL_UART_ENABLE_IT(&RC_UART, UART_FLAG_IDLE);
+//	__HAL_UART_ENABLE_IT(&RC_UART, UART_FLAG_IDLE);
 	RemoteTaskInit();
 }
 
 void rcUartRxCpltCallback(){
-	static TickType_t lastcount_rc;
-	static TickType_t thiscount_rc;
 	static portBASE_TYPE xHigherPriorityTaskWoken;
 	 xHigherPriorityTaskWoken = pdFALSE; 
-	thiscount_rc = xTaskGetTickCountFromISR();
 //	static HAL_UART_StateTypeDef uart_state;
 //	fw_printfln("flag: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_RXNE));
 //	while(__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE) == 0){
@@ -51,22 +48,12 @@ void rcUartRxCpltCallback(){
 //	__HAL_UART_CLEAR_FLAG(&RC_UART, UART_FLAG_IDLE);
 //	fw_printfln("flag2: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE));
 //	fw_printfln("(thiscount_rc - lastcount_rc):  %d", (thiscount_rc - lastcount_rc));
-  if( (thiscount_rc - lastcount_rc) <= 14){
-	IOPool_getNextWrite(rcUartIOPool);
-	HAL_UART_AbortReceive(&RC_UART);
-	HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
-	xSemaphoreGiveFromISR(xSemaphore_rcuart, &xHigherPriorityTaskWoken);
+   xSemaphoreGiveFromISR(xSemaphore_rcuart, &xHigherPriorityTaskWoken);
 	if( xHigherPriorityTaskWoken == pdTRUE ){
    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 	 }
  }
-	else{
-		fw_printfln("RC discarded");
-		HAL_UART_AbortReceive(&RC_UART);
-		HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
-	}
-	lastcount_rc = thiscount_rc;
-}
+
 
 
 RC_Ctl_t RC_CtrlData;   //remote control data

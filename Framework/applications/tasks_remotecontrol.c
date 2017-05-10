@@ -7,7 +7,8 @@
 #include "drivers_ramp.h"
 #include "pid_regulator.h"
 #include "tasks_cmcontrol.h"
-
+#include "usart.h"
+#include "peripheral_define.h"
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
 {\
@@ -35,40 +36,55 @@ extern float yawAngleTarget, pitchAngleTarget;
 void RControlTask(void const * argument){
 	uint8_t data[18];
 	static int countwhile = 0;
-
+  static TickType_t lastcount_rc;
+	static TickType_t thiscount_rc;
+	static uint8_t first_frame = 0;
 	while(1){
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
-		if(IOPool_hasNextRead(rcUartIOPool, 0)){
-			IOPool_getNextRead(rcUartIOPool, 0);
-			uint8_t *pData = IOPool_pGetReadData(rcUartIOPool, 0)->ch;
-			for(uint8_t i = 0; i != 18; ++i){
-				data[i] = pData[i];
-			}
+		thiscount_rc = xTaskGetTickCount();
+		if( ((thiscount_rc - lastcount_rc) <= 14) && (first_frame == 1)){
+		IOPool_getNextWrite(rcUartIOPool);
+			if(IOPool_hasNextRead(rcUartIOPool, 0)){
+				IOPool_getNextRead(rcUartIOPool, 0);
+				uint8_t *pData = IOPool_pGetReadData(rcUartIOPool, 0)->ch;
+				for(uint8_t i = 0; i != 18; ++i){
+					data[i] = pData[i];
+				}
 
-			RemoteDataProcess(data);
-			
-			if(countwhile >= 300){
-			countwhile = 0;
-//			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
-//				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
-//				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
-//				fw_printf("ch3 = %d \r\n", RC_CtrlData.rc.ch3);
-//				
-//				fw_printf("s1 = %d | ", RC_CtrlData.rc.s1);
-//				fw_printf("s2 = %d \r\n", RC_CtrlData.rc.s2);
-//				
-//				fw_printf("x = %d | ", RC_CtrlData.mouse.x);
-//				fw_printf("y = %d | ", RC_CtrlData.mouse.y);
-//				fw_printf("z = %d | ", RC_CtrlData.mouse.z);
-//				fw_printf("l = %d | ", RC_CtrlData.mouse.press_l);
-//				fw_printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
-//				
-//				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
-//				fw_printf("===========\r\n");
-		}else{
-			countwhile++;
+				RemoteDataProcess(data);
+				HAL_UART_AbortReceive(&RC_UART);
+				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
+				if(countwhile >= 300){
+				countwhile = 0;
+	//			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
+	//				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
+	//				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
+	//				fw_printf("ch3 = %d \r\n", RC_CtrlData.rc.ch3);
+	//				
+	//				fw_printf("s1 = %d | ", RC_CtrlData.rc.s1);
+	//				fw_printf("s2 = %d \r\n", RC_CtrlData.rc.s2);
+	//				
+	//				fw_printf("x = %d | ", RC_CtrlData.mouse.x);
+	//				fw_printf("y = %d | ", RC_CtrlData.mouse.y);
+	//				fw_printf("z = %d | ", RC_CtrlData.mouse.z);
+	//				fw_printf("l = %d | ", RC_CtrlData.mouse.press_l);
+	//				fw_printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
+	//				
+	//				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
+	//				fw_printf("===========\r\n");
+				}else{
+					countwhile++;
+				}
+	    }
 		}
+		else{
+		fw_printfln("RC discarded");
+		first_frame = 1;
+		vTaskDelay(2 / portTICK_RATE_MS);
+		HAL_UART_AbortReceive(&RC_UART);
+		HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 		}
+		lastcount_rc = thiscount_rc;
 	}
 }
 
