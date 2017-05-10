@@ -42,7 +42,7 @@ void RControlTask(void const * argument){
 	while(1){
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
 		thiscount_rc = xTaskGetTickCount();
-		if( ((thiscount_rc - lastcount_rc) <= 14) && (first_frame == 1)){
+		if( ((thiscount_rc - lastcount_rc) <= 16) && (first_frame == 1)){
 		IOPool_getNextWrite(rcUartIOPool);
 			if(IOPool_hasNextRead(rcUartIOPool, 0)){
 				IOPool_getNextRead(rcUartIOPool, 0);
