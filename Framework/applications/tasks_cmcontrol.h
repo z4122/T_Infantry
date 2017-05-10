@@ -53,7 +53,7 @@ WorkState_e GetWorkState(void);
 	0,\
 	0,\
 	{0,0},\
-	220.f,\
+	3.f,\
 	0.0f,\
 	0.0f,\
 	0,\
