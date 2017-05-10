@@ -6,8 +6,8 @@
 #include "can.h"
 
 //RxID
-#define CMFL_RXID 0x202u
-#define CMFR_RXID 0x201u
+#define CMFL_RXID 0x201u
+#define CMFR_RXID 0x202u
 #define CMBL_RXID 0x203u
 #define CMBR_RXID 0x204u
 

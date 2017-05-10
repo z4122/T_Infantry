@@ -6,4 +6,5 @@
 #define Infantry_2
 void CMGMControlTask(void const * argument);
 
+
 #endif
