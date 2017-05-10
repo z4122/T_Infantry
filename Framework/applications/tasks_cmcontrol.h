@@ -53,9 +53,9 @@ WorkState_e GetWorkState(void);
 	0,\
 	0,\
 	{0,0},\
-	3.f,\
+	8.f,\
 	0.0f,\
-	0.0f,\
+	1.0f,\
 	0,\
 	0,\
 	0,\

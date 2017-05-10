@@ -165,14 +165,16 @@ void CMGMControlTask(void const * argument){
 		if(IOPool_hasNextRead(CMFLRxIOPool, 0)){
 			IOPool_getNextRead(CMFLRxIOPool, 0);
 			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMFLRxIOPool, 0);
+#ifdef Infantry_1_Aim
 			CANReceiveMsgProcess_820R(pData, &CM2Encoder);
-#ifndef Infantry_1_Aim
-			CM2SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-#else
 			CM2SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-#endif
-			CM2SpeedPID.ref = 60 * CM2SpeedPID.ref;
 			CM2SpeedPID.fdb = CM2Encoder.filter_rate;
+#else
+			CM2SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
+			CM2SpeedPID.ref = 60 * CM2SpeedPID.ref;
+			CANReceiveMsgProcess_820R(pData, &CM2Encoder);
+			CM2SpeedPID.fdb = pData->RotateSpeed;
+#endif
 		  CM2SpeedPID.Calc(&CM2SpeedPID);
 		  setMotor(CMFR, CHASSIS_SPEED_ATTENUATION * CM2SpeedPID.output);
 		}
@@ -180,13 +182,15 @@ void CMGMControlTask(void const * argument){
 			IOPool_getNextRead(CMFRRxIOPool, 0);
 			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMFRRxIOPool, 0);
 			CANReceiveMsgProcess_820R(pData, &CM1Encoder);
-#ifndef Infantry_1_Aim		 
-		  CM1SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
+#ifdef Infantry_1_Aim	
+			CANReceiveMsgProcess_820R(pData, &CM1Encoder);				
+		  CM1SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
+      CM1SpeedPID.fdb = CM1Encoder.filter_rate;
 #else
-			CM1SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;	
-#endif
+			CM1SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;	
 			CM1SpeedPID.ref = 60 * CM1SpeedPID.ref;
-			CM1SpeedPID.fdb = CM1Encoder.filter_rate;
+			CM1SpeedPID.fdb = pData->RotateSpeed;
+#endif
 //		 fw_printfln("CM1SpeedPID.ref:%f",CM1SpeedPID.ref);
 //		 fw_printfln("CM1Encoder.filter_rate:%d",CM1Encoder.filter_rate);
 		  CM1SpeedPID.Calc(&CM1SpeedPID);
@@ -195,22 +199,30 @@ void CMGMControlTask(void const * argument){
 		if(IOPool_hasNextRead(CMBLRxIOPool, 0)){
 			IOPool_getNextRead(CMBLRxIOPool, 0);
 			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMBLRxIOPool, 0);
+#ifdef Infantry_1_Aim
 			CANReceiveMsgProcess_820R(pData, &CM3Encoder);
-			
+			CM3SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
+			CM3SpeedPID.fdb = CM3Encoder.filter_rate;
+#else		
 			CM3SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
 			CM3SpeedPID.ref = 60 * CM3SpeedPID.ref;
-			CM3SpeedPID.fdb = CM3Encoder.filter_rate;
+			CM3SpeedPID.fdb = pData->RotateSpeed;
+#endif
 		  CM3SpeedPID.Calc(&CM3SpeedPID);
 		  setMotor(CMBL, CHASSIS_SPEED_ATTENUATION * CM3SpeedPID.output);
 		}
 		if(IOPool_hasNextRead(CMBRRxIOPool, 0)){
 			IOPool_getNextRead(CMBRRxIOPool, 0);
 			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMBRRxIOPool, 0);
+#ifdef Infantry_1_Aim
 			CANReceiveMsgProcess_820R(pData, &CM4Encoder);
-			
+			CM4SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
+			CM4SpeedPID.fdb = CM4Encoder.filter_rate;
+#else
 			CM4SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
 		  CM4SpeedPID.ref = 60 * CM4SpeedPID.ref;
-			CM4SpeedPID.fdb = CM4Encoder.filter_rate;
+#endif
+			CM4SpeedPID.fdb = pData->RotateSpeed;
 		  CM4SpeedPID.Calc(&CM4SpeedPID);
 		  setMotor(CMBR, CHASSIS_SPEED_ATTENUATION * CM4SpeedPID.output);
 		}

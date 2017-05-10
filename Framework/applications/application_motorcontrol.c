@@ -50,6 +50,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 			GMYAWIntensity = 0;
 			GMPITCHIntensity = 0;
 		}
+	CMBLIntensity = 0;
 	if(CMReady == 0xF){
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(CMTxIOPool);
 		pData->StdId = CM_TXID;
