@@ -60,9 +60,9 @@ typedef struct{
 }data_to_PC;
 
 
-uint8_t data_send_to_PC[21];
+uint8_t data_send_to_PC[17];
 data_to_PC my_data_to_PC;
-void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float zySpd, int32_t int_see)
+void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float zySpd)
 {
 //	my_data_to_PC.head=0xAAAA;
 //	my_data_to_PC.id=0xF1;
@@ -86,7 +86,7 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float z
 	data_send_to_PC[0]=0xAA;
 	data_send_to_PC[1]=0xAA;
 	data_send_to_PC[2]=0xF1;
-	data_send_to_PC[3]=16;
+	data_send_to_PC[3]=12;
 	pTemp=(uint8_t *)&zyPitch;
 	for(i=0;i<4;i++)
 	{
@@ -105,19 +105,13 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float z
 		 data_send_to_PC[12+i]=pTemp[3-i];
 	}
 	
-	pTemp=(uint8_t *)&int_see;
-	for(i=0;i<4;i++)
+	data_send_to_PC[16]=0;
+	for(i=0;i<16;i++)
 	{
-		 data_send_to_PC[16+i]=pTemp[3-i];
+		 data_send_to_PC[16]+=data_send_to_PC[i];
 	}
 	
-	data_send_to_PC[20]=0;
-	for(i=0;i<20;i++)
-	{
-		 data_send_to_PC[20]+=data_send_to_PC[i];
-	}
-	
-	HAL_UART_Transmit(huart,data_send_to_PC,21,1000);
+	HAL_UART_Transmit(huart,data_send_to_PC,17,1000);
 }
 
 //*********debug by ZY*********
@@ -157,7 +151,7 @@ void Timer_2ms_lTask(void const * argument)
 		else{countwhile1++;}
 		if(countwhile2 >= 5){//¶¨Ê± 10MS
 		countwhile2 = 0;
-		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs,CM1Encoder.filter_rate);
+//		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);
 			//printf("pitch:%f *** yaw:%f",pitchRealAngle,ZGyroModuleAngle);
 //		HAL_UART_Transmit(&DEBUG_UART,txbuf,strlen((char *)txbuf),1000);
 //  ZGyroModuleAngle
