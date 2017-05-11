@@ -30,7 +30,7 @@ WorkState_e GetWorkState(void);
 	0,\
 	0,\
 	{0,0},\
-	1.20f,\
+	1.4f,\
 	0.0f,\
 	0.0f,\
 	0,\
@@ -46,7 +46,29 @@ WorkState_e GetWorkState(void);
 	0,\
 	&PID_Calc,\
 	&PID_Reset,\
-}\
+}
+#define CHASSIS_MOTOR_ROTATE_PID_DEFAULT_old \
+{\
+	0,\
+	0,\
+	{0,0},\
+	1.2f,\
+	0.0f,\
+	0.0f,\
+	0,\
+	0,\
+	0,\
+	4900,\
+	1000,\
+	1500,\
+	0,\
+	5000,\
+	0,\
+	0,\
+	0,\
+	&PID_Calc,\
+	&PID_Reset,\
+}
 //D参数原来为0.4
 #define CHASSIS_MOTOR_SPEED_PID_DEFAULT \
 {\
@@ -69,8 +91,29 @@ WorkState_e GetWorkState(void);
 	0,\
 	&PID_Calc,\
 	&PID_Reset,\
-}\
-
+}
+#define CHASSIS_MOTOR_SPEED_PID_DEFAULT_old \
+{\
+	0,\
+	0,\
+	{0,0},\
+	220.f,\
+	0.0f,\
+	0.0f,\
+	0,\
+	0,\
+	0,\
+	4900,\
+	3500,\
+	1500,\
+	0,\
+	4950,\
+	0,\
+	0,\
+	0,\
+	&PID_Calc,\
+	&PID_Reset,\
+}
 #define SHOOT_MOTOR_POSITION_PID_DEFAULT \
 {\
 	0,\

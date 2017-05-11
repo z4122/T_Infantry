@@ -128,6 +128,7 @@ void Timer_2ms_lTask(void const * argument)
 //		SuperviseTask();    
 		WorkStateFSM();
 	  WorkStateSwitchProcess();
+//1s循环
 		if(countwhile >= 500){//定时 1S
 		countwhile = 0;
 			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
@@ -141,6 +142,7 @@ void Timer_2ms_lTask(void const * argument)
 		}else{
 			countwhile++;
 		}
+//陀螺仪复位计时
     if(countwhile1 > 1000){
 			if(GYRO_RESETED == 0)GYRO_RST();
 		}
@@ -149,13 +151,12 @@ void Timer_2ms_lTask(void const * argument)
 			GYRO_RESETED = 2;
 		}
 		else{countwhile1++;}
+//10ms循环
 		if(countwhile2 >= 5){//定时 10MS
 		countwhile2 = 0;
-//		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);
+//		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);//发送数据到上位机看波形
 			//printf("pitch:%f *** yaw:%f",pitchRealAngle,ZGyroModuleAngle);
 //		HAL_UART_Transmit(&DEBUG_UART,txbuf,strlen((char *)txbuf),1000);
-//  ZGyroModuleAngle
-//			pitchRealAngle
 		}else{
 			countwhile2++;
 		}
@@ -163,7 +164,7 @@ void Timer_2ms_lTask(void const * argument)
 		
 		vTaskDelayUntil( &xLastWakeTime, ( 2 / portTICK_RATE_MS ) );
 	}
-	}
+}
 	
 
 	static uint32_t time_tick_2ms = 0;

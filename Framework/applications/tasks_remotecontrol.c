@@ -51,7 +51,10 @@ void RControlTask(void const * argument){
 					data[i] = pData[i];
 				}
 
+//遥控器数据处理
 				RemoteDataProcess(data);
+				
+				
 				HAL_UART_AbortReceive(&RC_UART);
 				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 				if(countwhile >= 300){

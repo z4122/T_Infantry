@@ -24,7 +24,6 @@ fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
 #define yaw_zero 1075
-#define rotate_zero 2.0f
 #define pitch_zero 3180
 #endif
 #ifdef Infantry_2
@@ -33,15 +32,21 @@ fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
 #define yaw_zero 614
-#define rotate_zero 0.0f
 #define pitch_zero 2924
 #endif
+#ifdef Infantry_1_Aim
+PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT_old; 
+PID_Regulator_t CM1SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT_old;
+PID_Regulator_t CM2SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT_old;
+PID_Regulator_t CM3SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT_old;
+PID_Regulator_t CM4SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT_old;
+#else
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT; 
 PID_Regulator_t CM1SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
 PID_Regulator_t CM2SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
 PID_Regulator_t CM3SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
 PID_Regulator_t CM4SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
-
+#endif
 fw_PID_Regulator_t testPositionPID = fw_PID_INIT(6.0, 0.0, 0.0, 1000000.0, 1000000.0, 1000000.0, 1000000.0);
 fw_PID_Regulator_t testSpeedPID = fw_PID_INIT(1.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);//0.0, 0.00003
 
@@ -90,20 +95,23 @@ void CMGMControlTask(void const * argument){
 			int16_t yawIntensity = 0;
 			
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
-			Motor820RRxMsg_t tempData; tempData.angle = IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle;
-			tempData.RotateSpeed = 0;
-			CANReceiveMsgProcess_820R(&tempData, &GMYawEncoder);
-//				 ChassisSpeedRef.rotate_ref = 0;
+//			Motor820RRxMsg_t tempData; tempData.angle = IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle;
+//			tempData.RotateSpeed = 0;
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
 			NORMALIZE_ANGLE180(yawRealAngle);
 			if(GYRO_RESETED == 2) {
 /******发送数据1  yaw角度*******/
-			yawRealAngle = -ZGyroModuleAngle;
-				/*底盘跟随编码器旋转PID计算*/
-		 CMRotatePID.ref = rotate_zero;
-		 CMRotatePID.fdb = GMYawEncoder.ecd_angle;
+			
+/*底盘跟随编码器旋转PID计算*/
+//		 CANReceiveMsgProcess_820R(&tempData, &GMYawEncoder);
+		 CMRotatePID.ref = 0;
+		 CMRotatePID.fdb = yawRealAngle;
 	   CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+//陀螺仪值获取
+		 yawRealAngle = -ZGyroModuleAngle;
+						
+//				 ChassisSpeedRef.rotate_ref = 0;
 //		fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 			}
 /*自瞄模式切换*/
@@ -113,6 +121,7 @@ void CMGMControlTask(void const * argument){
 				fw_printfln("yawAdd:%f",yawAdd );
 				CReceive--;
 				}
+//大神符
 				else if((GetLocateState() == Located) && (rune_flag != 0)){
 					if(GetRuneState() == AIMING){
 						fw_printfln("rune:%d", rune);
@@ -140,6 +149,7 @@ void CMGMControlTask(void const * argument){
 			NORMALIZE_ANGLE180(pitchRealAngle);
 /*******发送数据2 Pitch角度******/
 //			fw_printfln("pitchRealAngle:%f",pitchRealAngle);
+//自瞄模式切换
 			if(GetShootMode() == AUTO) {
 				if((GetLocateState() == Locating) && (CReceive != 0))	{
 //				yawAngleTarget = yawRealAngle - (yawAdd *0.21f);
@@ -148,6 +158,7 @@ void CMGMControlTask(void const * argument){
 			pitchAngleTarget = pitchRealAngle + pitchAdd ;
 				CReceive --;
 				}
+//大神符
 				else if((GetLocateState() == Located) && (rune_flag != 0)){
 					if(GetRuneState() == AIMING){
 						pitchAngleTarget = Location_Number[rune - 1].pitch_position;
@@ -171,8 +182,7 @@ void CMGMControlTask(void const * argument){
 			CM2SpeedPID.fdb = CM2Encoder.filter_rate;
 #else
 			CM2SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-			CM2SpeedPID.ref = 60 * CM2SpeedPID.ref;
-			CANReceiveMsgProcess_820R(pData, &CM2Encoder);
+			CM2SpeedPID.ref = 160 * CM2SpeedPID.ref;
 			CM2SpeedPID.fdb = pData->RotateSpeed;
 #endif
 		  CM2SpeedPID.Calc(&CM2SpeedPID);
@@ -188,7 +198,7 @@ void CMGMControlTask(void const * argument){
       CM1SpeedPID.fdb = CM1Encoder.filter_rate;
 #else
 			CM1SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;	
-			CM1SpeedPID.ref = 60 * CM1SpeedPID.ref;
+			CM1SpeedPID.ref = 160 * CM1SpeedPID.ref;
 			CM1SpeedPID.fdb = pData->RotateSpeed;
 #endif
 //		 fw_printfln("CM1SpeedPID.ref:%f",CM1SpeedPID.ref);
@@ -205,7 +215,7 @@ void CMGMControlTask(void const * argument){
 			CM3SpeedPID.fdb = CM3Encoder.filter_rate;
 #else		
 			CM3SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-			CM3SpeedPID.ref = 60 * CM3SpeedPID.ref;
+			CM3SpeedPID.ref = 160 * CM3SpeedPID.ref;
 			CM3SpeedPID.fdb = pData->RotateSpeed;
 #endif
 		  CM3SpeedPID.Calc(&CM3SpeedPID);
@@ -220,7 +230,7 @@ void CMGMControlTask(void const * argument){
 			CM4SpeedPID.fdb = CM4Encoder.filter_rate;
 #else
 			CM4SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-		  CM4SpeedPID.ref = 60 * CM4SpeedPID.ref;
+		  CM4SpeedPID.ref = 160 * CM4SpeedPID.ref;
 #endif
 			CM4SpeedPID.fdb = pData->RotateSpeed;
 		  CM4SpeedPID.Calc(&CM4SpeedPID);
