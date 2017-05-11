@@ -959,6 +959,16 @@
               <FileType>1</FileType>
               <FilePath>..\Framework\drivers\pid_regulator.c</FilePath>
             </File>
+            <File>
+              <FileName>pwm_server_ motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\drivers\pwm_server_ motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>pwm_server_motor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\drivers\pwm_server_motor.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

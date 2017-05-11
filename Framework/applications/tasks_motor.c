@@ -34,6 +34,14 @@ fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10
 #define yaw_zero 614
 #define pitch_zero 2924
 #endif
+#ifdef Infantry_3
+fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(4.0, 0, 2.5, 10000.0, 10000.0, 10000.0, 10000.0);
+fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(2.0, 0.5, 0.7, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
+fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 5900.0);
+fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(35.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 9800.0);
+#define yaw_zero 720
+#define pitch_zero 5003
+#endif
 #ifdef Infantry_1_Aim
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT_old; 
 PID_Regulator_t CM1SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT_old;
@@ -108,6 +116,7 @@ void CMGMControlTask(void const * argument){
 		 CMRotatePID.fdb = yawRealAngle;
 	   CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+				ChassisSpeedRef.rotate_ref = 0;
 //陀螺仪值获取
 		 yawRealAngle = -ZGyroModuleAngle;
 						
