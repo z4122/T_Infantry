@@ -240,18 +240,25 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		{
 			if(GetSlabState() == CLOSE)
 			{
-				pwm_server_motor_set_angle(0,180.f);
+				pwm_server_motor_set_angle(0,45.f);
 				SetSlabState(OPEN);
 			}
-		if(key->v == 8208)
+//			else if(GetSlabState() == OPEN)
+//			{
+//				pwm_server_motor_set_angle(0,0.f);
+//				SetSlabState(CLOSE);
+//			}
+		}
+		if(key->v == 8208){
 			if(GetSlabState() == OPEN)
 			{
-				pwm_server_motor_set_angle(0,0.f);
+				pwm_server_motor_set_angle(0,180.f);
 				SetSlabState(CLOSE);
 			}
 		}
 		
-	}
+		
+	
 	//step2: gimbal ref calc
  /*   if(GetWorkState() == NORMAL_STATE)
     {
@@ -267,6 +274,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
     GimbalRef.pitch_speed_ref = mouse->y;    //speed_ref仅做输入量判断用
     GimbalRef.yaw_speed_ref   = mouse->x;
 	  MouseShootControl(mouse);
+	}
 	
 }
 
