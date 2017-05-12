@@ -9,6 +9,7 @@
 #include "tasks_cmcontrol.h"
 #include "usart.h"
 #include "peripheral_define.h"
+#include "pwm_server_motor.h"
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
 {\
@@ -113,7 +114,7 @@ void RemoteDataProcess(uint8_t *pData)
     RC_CtrlData.mouse.press_l = pData[12];
     RC_CtrlData.mouse.press_r = pData[13];
  
-    RC_CtrlData.key.v = ((int16_t)pData[14]);// | ((int16_t)pData[15] << 8);
+    RC_CtrlData.key.v = ((int16_t)pData[14]) | ((int16_t)pData[15] << 8);
 		
 		SetInputMode(&RC_CtrlData.rc);
 	
@@ -130,9 +131,9 @@ void RemoteDataProcess(uint8_t *pData)
 			
 			//鼠标键盘控制模式
 			//暂时为自动瞄准模式
-//			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
+			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
-			SetShootMode(AUTO);
+//			SetShootMode(AUTO);
 //			RemoteShootControl(&switch1, RC_CtrlData.rc.s1);
 		}break;
 		case STOP:
@@ -153,6 +154,10 @@ void RemoteControlProcess(Remote *rc)
 			if(GetShootMode() == MANUL){  
 			pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
       yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
+#ifdef Infantry_3
+			pitchAngleTarget += 0.5f*(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+      yawAngleTarget   -= 0.5f*(rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
+#endif
 			}
 			}
 
@@ -180,16 +185,21 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 	static uint16_t left_right_speed = 0;
     if(GetWorkState()!=PREPARE_STATE)
     {
-					VAL_LIMIT(mouse->x, -150, 150); 
+		VAL_LIMIT(mouse->x, -150, 150); 
 		VAL_LIMIT(mouse->y, -150, 150); 
 		
         pitchAngleTarget -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  //(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
         yawAngleTarget    -= mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
-		//speed mode: normal speed/high speed
+		//speed mode: normal speed/high speed 
 		if(key->v & 0x10)
 		{
 			forward_back_speed =  HIGH_FORWARD_BACK_SPEED;
 			left_right_speed = HIGH_LEFT_RIGHT_SPEED;
+		}
+		else if(key->v & 0x20)
+		{
+			forward_back_speed =  LOW_FORWARD_BACK_SPEED;
+			left_right_speed = LOW_LEFT_RIGHT_SPEED;
 		}
 		else
 		{
@@ -225,6 +235,22 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			ChassisSpeedRef.left_right_ref = 0;
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 		}
+	
+		if(key->v == 8192)
+		{
+			if(GetSlabState() == CLOSE)
+			{
+				pwm_server_motor_set_angle(0,180.f);
+				SetSlabState(OPEN);
+			}
+		if(key->v == 8208)
+			if(GetSlabState() == OPEN)
+			{
+				pwm_server_motor_set_angle(0,0.f);
+				SetSlabState(CLOSE);
+			}
+		}
+		
 	}
 	//step2: gimbal ref calc
  /*   if(GetWorkState() == NORMAL_STATE)

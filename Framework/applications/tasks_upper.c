@@ -57,9 +57,9 @@ void getCtrlUartTask(void const * argument){
 				else if((ctrlData.rune_locate == 0) && (last_rune_locate != 0)){
 					SetLocateState(Located);
 					fw_printfln("Located");
-//					fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
+					fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
 					vRefreshLocation( -ZGyroModuleAngle, pitchRealAngle);
-//					fw_printfln("pitchRealAngle:  %f",pitchRealAngle);
+					fw_printfln("pitchRealAngle:  %f",pitchRealAngle);
 				 }
 				last_rune_locate = ctrlData.rune_locate;
 //´óÉñ·û´ò»÷
@@ -71,13 +71,13 @@ void getCtrlUartTask(void const * argument){
 				IOPool_pGetWriteData(upperIOPool)->rune = 0;
 				SetRuneState(NOAIMING);
 				}
-				IOPool_getNextWrite(upperIOPool);
-				if((ctrlData.rune != last_rune) || (ctrlData.rune == 10)){
+ 				if((ctrlData.rune != last_rune) || (ctrlData.rune == 10)){
 					rune_flag = 2;
 					if(ctrlData.rune == 10){
 						IOPool_pGetWriteData(upperIOPool)->rune = last_rune;
 					}
 				}
+				IOPool_getNextWrite(upperIOPool);
 				last_rune = ctrlData.rune;
 			} 
 			else {

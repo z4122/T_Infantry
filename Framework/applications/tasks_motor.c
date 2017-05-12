@@ -116,11 +116,10 @@ void CMGMControlTask(void const * argument){
 		 CMRotatePID.fdb = yawRealAngle;
 	   CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-				ChassisSpeedRef.rotate_ref = 0;
+//				ChassisSpeedRef.rotate_ref = 0;
 //陀螺仪值获取
 		 yawRealAngle = -ZGyroModuleAngle;
 						
-//				 ChassisSpeedRef.rotate_ref = 0;
 //		fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 			}
 /*自瞄模式切换*/

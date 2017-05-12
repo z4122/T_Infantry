@@ -219,7 +219,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 	 
 void MouseShootControl(Mouse *mouse)
 {
-	int16_t closeDelayCount = 0;   //ÓÒ¼ü¹Ø±ÕÄ¦²ÁÂÖ3sÑÓÊ±¼ÆÊý
+	static int16_t closeDelayCount = 0;   //ÓÒ¼ü¹Ø±ÕÄ¦²ÁÂÖ3sÑÓÊ±¼ÆÊý
 	switch(friction_wheel_state)
 	{
 		case FRICTION_WHEEL_OFF:
@@ -346,7 +346,26 @@ void SetEmergencyFlag(Emergency_Flag v)
 	emergency_Flag = v;
 }
 
+Move_Speed_e movespeed = NORMAL_s;
 
+Move_Speed_e GetMoveSpeed()
+{
+	return movespeed;
+}
 
+void SetMoveSpeed(Move_Speed_e v)
+{
+	movespeed = v;
+}
 
+Slab_Mode_e slabmode = CLOSE;
 
+Slab_Mode_e GetSlabState()
+{
+	return slabmode;
+}
+
+void SetSlabState(Slab_Mode_e v)
+{
+	slabmode = v;
+}
