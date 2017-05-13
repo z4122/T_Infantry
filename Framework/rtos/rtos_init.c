@@ -10,9 +10,11 @@
 #include "tasks_cmcontrol.h"
 #include "drivers_imu_low.h"
 #include "utilities_tim.h"
+#include "tim.h"
 
 #include "drivers_buzzer_low.h"
 
+extern void PMInit(void);
 uint8_t isInited = 0;
 void rtos_init(){
   //wait for devices
@@ -31,7 +33,10 @@ void rtos_init(){
 	CMControtLoopTaskInit();
 	rcInit();
 	motorInit();
+	PMInit();
 //	mpu6050Init();
 //	Init_Quaternion();
 	fw_printfln("init success");
 }
+
+
