@@ -10,6 +10,7 @@
 #include "usart.h"
 #include "peripheral_define.h"
 #include "pwm_server_motor.h"
+#include "tasks_motor.h"
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
 {\
@@ -240,7 +241,9 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		{
 			if(GetSlabState() == CLOSE)
 			{
-				pwm_server_motor_set_angle(0,45.f);
+#ifdef Infantry_3
+				pwm_server_motor_set_angle(0,0.f);
+#endif
 				SetSlabState(OPEN);
 			}
 //			else if(GetSlabState() == OPEN)
@@ -252,7 +255,9 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		if(key->v == 8208){
 			if(GetSlabState() == OPEN)
 			{
-				pwm_server_motor_set_angle(0,180.f);
+#ifdef Infantry_3
+				pwm_server_motor_set_angle(0,110.f);
+#endif
 				SetSlabState(CLOSE);
 			}
 		}
