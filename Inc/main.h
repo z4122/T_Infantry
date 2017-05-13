@@ -51,6 +51,9 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define LASER_Pin GPIO_PIN_13
+#define LASER_GPIO_Port GPIOG
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
