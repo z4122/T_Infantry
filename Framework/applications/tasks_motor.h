@@ -3,8 +3,8 @@
 
 //#define MOTOR_ARMED
 //#define Infantry_1_Aim
-//#define Infantry_2
-#define Infantry_3
+//#define Infantry_2//À¶³µ
+#define Infantry_3//R±ê
 void CMGMControlTask(void const * argument);
 
 #endif
