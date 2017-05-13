@@ -143,11 +143,11 @@ void Timer_2ms_lTask(void const * argument)
 			countwhile++;
 		}
 //ÍÓÂÝÒÇ¸´Î»¼ÆÊ±
-    if(countwhile1 > 1000){
+    if(countwhile1 > 2000){
 			if(GYRO_RESETED == 0)GYRO_RST();
 		}
 		else{countwhile1++;}
-		if(countwhile1 > 1700){
+		if(countwhile1 > 4000){
 			GYRO_RESETED = 2;
 		}
 		else{countwhile1++;}
