@@ -115,6 +115,7 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float z
 }
 
 //*********debug by ZY*********
+extern int EncoderCnt;
 void Timer_2ms_lTask(void const * argument)
 {
 	portTickType xLastWakeTime;
@@ -122,6 +123,7 @@ void Timer_2ms_lTask(void const * argument)
 	static int countwhile = 0;
 	static int countwhile1 = 0;
 	static int countwhile2 = 0;
+	static int countwhile3 = 0;
 //	unsigned portBASE_TYPE StackResidue; //栈剩余
 	while(1)  {       //motor control frequency 2ms
 //监控任务
@@ -160,6 +162,36 @@ void Timer_2ms_lTask(void const * argument)
 		}else{
 			countwhile2++;
 		}
+		if(countwhile3 >=25 && GetShootState() == SHOOTING){
+			countwhile3 = 0;
+			//先检测是否卡弹，而后根据情况更新拨盘电机PID	
+			if(EncoderCnt<3){		//产生卡弹
+				//清空计数器
+				//EncoderCnt = 0;			
+				//卡弹之后直接反转
+				HAL_GPIO_TogglePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin);
+				HAL_GPIO_TogglePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin);
+				ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
+				fw_printfln("ref = %d",PID_SHOOT_MOTOR_SPEED);
+				ShootMotorSpeedPID.fdb = EncoderCnt;
+				fw_printfln("fdb = %d",EncoderCnt);
+				EncoderCnt = 0;
+				//ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
+				ShootMotorSpeedPID.output = 1*(ShootMotorSpeedPID.ref-ShootMotorSpeedPID.fdb);
+			}
+			else{	//如果没有卡弹,更新PID
+				ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
+				fw_printfln("ref = %d",PID_SHOOT_MOTOR_SPEED);
+				ShootMotorSpeedPID.fdb = EncoderCnt;
+				fw_printfln("fdb = %d",EncoderCnt);
+				EncoderCnt = 0;
+				//ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
+				ShootMotorSpeedPID.output = 1*(ShootMotorSpeedPID.ref-ShootMotorSpeedPID.fdb);
+				//ShootMotorSpeedPID.Calc(&ShootMotorSpeedPID);	
+			}
+		}
+		else countwhile3++;
+		
 		ShooterMControlLoop();       //发射机构控制任务
 		
 		vTaskDelayUntil( &xLastWakeTime, ( 2 / portTICK_RATE_MS ) );
@@ -368,11 +400,22 @@ void ShooterMControlLoop(void)
 {				      
 	if(GetShootState() == SHOOTING)
 	{
-		ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;	
+//			
+		int temp = (TIM4->CCR1 + ShootMotorSpeedPID.output);//
+		//fw_printfln("PID_Output = %f",ShootMotorSpeedPID.output);
+		fw_printfln("temp: %d",temp);
+		ShootMotorSpeedPID.output = 0;
+		
+		if(temp>950) temp = 950;//700
+		else if(temp<-1) temp = 0;
+		TIM4->CCR1 = temp;//500500
+		
 	}
 	else
 	{
 		ShootMotorSpeedPID.ref = 0;		
+		TIM4->CCR1 = 0;
+		//fw_printfln("NoShooting");
 	}
 	
 //	ShootMotorSpeedPID.fdb = GetQuadEncoderDiff();   
