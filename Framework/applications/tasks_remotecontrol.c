@@ -273,15 +273,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			//fw_printfln("CLOSE");	
 			}
 		}
-		//Å¤Ñü
-		if(key->v & 256)  // key: r
-		{
-			twist_state = 1;
-		}
-		if(key->v & 272)  // key: r+Shift
-		{
-			twist_state = 0;
-		}
+		
 		
 	
 	//step2: gimbal ref calc

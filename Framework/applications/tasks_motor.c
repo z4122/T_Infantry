@@ -83,8 +83,6 @@ extern float ZGyroModuleAngle;
 float yawAngleTarget = 0.0;
 float pitchAngleTarget = 0.0;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
-
-int twist_state = 0;
 void CMGMControlTask(void const * argument){
 	static float yawAdd;
 	static float pitchAdd;
@@ -107,49 +105,22 @@ void CMGMControlTask(void const * argument){
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
 //			Motor820RRxMsg_t tempData; tempData.angle = IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle;
 //			tempData.RotateSpeed = 0;
-			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;//此时yawrealangle是利用编码器与零点编码器位置做差得到的云台与底盘之间的夹角
+			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
 			NORMALIZE_ANGLE180(yawRealAngle);
 			if(GYRO_RESETED == 2) {
 /******发送数据1  yaw角度*******/
 			
 /*底盘跟随编码器旋转PID计算*/
 //		 CANReceiveMsgProcess_820R(&tempData, &GMYawEncoder);
-				
-	//判断是否扭腰
-
-      uint16_t twist_count = 0;
-				
-			if (twist_state == 1)
-			{
-				if( (twist_count / 200)%2 ==1 )
-				{
-			     CMRotatePID.ref = 60;   //不知实际角度值
-		       CMRotatePID.fdb = yawRealAngle;
-					twist_count= twist_count+1;
-				}
-				else
-				{
-					 CMRotatePID.ref = -60;   //不知实际角度值
-		       CMRotatePID.fdb = yawRealAngle;	
-					twist_count= twist_count+1;
-				}
-	         CMRotatePID.Calc(&CMRotatePID);   
-		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-					
-			}				
-			else
-			{				
 		 CMRotatePID.ref = 0;
 		 CMRotatePID.fdb = yawRealAngle;
 	   CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-			}
 //				ChassisSpeedRef.rotate_ref = 0;
 //陀螺仪值获取
-		 yawRealAngle = -ZGyroModuleAngle;  //此时yawrealangle为单轴陀螺仪返回的初始位置标定后的绝对角度
+		 yawRealAngle = -ZGyroModuleAngle;
 						
 		//fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
-			
 			}
 /*自瞄模式切换*/
 			if(GetShootMode() == AUTO) {
@@ -210,9 +181,6 @@ void CMGMControlTask(void const * argument){
 		}
 //底盘电机 1 2 3 4	
 //		ChassisSpeedRef.rotate_ref = 0;//取消底盘跟随
-		
-		
-		
 
 		if(IOPool_hasNextRead(CMFLRxIOPool, 0)){
 			IOPool_getNextRead(CMFLRxIOPool, 0);
