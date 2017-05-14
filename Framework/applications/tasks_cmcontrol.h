@@ -22,7 +22,7 @@ typedef enum
 
 WorkState_e GetWorkState(void);
 
-#define PID_SHOOT_MOTOR_SPEED      (50)
+#define PID_SHOOT_MOTOR_SPEED      (30)
 #define CHASSIS_SPEED_ATTENUATION   (1.30f)
 #define PREPARE_TIME_TICK_MS 500      //prapare time in ms*2
 #define CHASSIS_MOTOR_ROTATE_PID_DEFAULT \

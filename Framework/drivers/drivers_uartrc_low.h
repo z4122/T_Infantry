@@ -21,7 +21,7 @@ void rcInit(void);
 #define STICK_TO_CHASSIS_SPEED_REF_FACT     0.45f
 #define STICK_TO_PITCH_ANGLE_INC_FACT       0.008f
 #define STICK_TO_YAW_ANGLE_INC_FACT         0.008f
-#define FRICTION_WHEEL_MAX_DUTY             1800
+#define FRICTION_WHEEL_MAX_DUTY             1400
 
 //mouse control parameters
 #define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 3
