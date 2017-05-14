@@ -19,9 +19,9 @@ void rcInit(void);
 #define REMOTE_CONTROLLER_STICK_OFFSET      1024u   
 #define RC_FRAME_LENGTH                     18u
 #define STICK_TO_CHASSIS_SPEED_REF_FACT     0.45f
-#define STICK_TO_PITCH_ANGLE_INC_FACT       0.003f
-#define STICK_TO_YAW_ANGLE_INC_FACT         0.003f
-#define FRICTION_WHEEL_MAX_DUTY             1400
+#define STICK_TO_PITCH_ANGLE_INC_FACT       0.008f
+#define STICK_TO_YAW_ANGLE_INC_FACT         0.008f
+#define FRICTION_WHEEL_MAX_DUTY             1401
 
 //mouse control parameters
 #define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 3
