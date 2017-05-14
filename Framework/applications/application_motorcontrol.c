@@ -6,13 +6,14 @@
 #include "rtos_semaphore.h"
 #include "utilities_debug.h"
 #include "tasks_cmcontrol.h"
+#include "math.h"
 //typedef struct{
 //	CAN_HandleTypeDef  *canNum;
 //	uint32_t id;
 //}MotorCanNumId;
-
+int16_t CMFLIntensity = 0, CMFRIntensity = 0, CMBLIntensity = 0, CMBRIntensity = 0;
 void setMotor(MotorId motorId, int16_t Intensity){
-	static int16_t CMFLIntensity = 0, CMFRIntensity = 0, CMBLIntensity = 0, CMBRIntensity = 0;
+//	static int16_t CMFLIntensity = 0, CMFRIntensity = 0, CMBLIntensity = 0, CMBRIntensity = 0;
 	static int8_t CMReady = 0;
 	
 	static int16_t GMYAWIntensity = 0, GMPITCHIntensity = 0;
@@ -42,6 +43,88 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		default:
 			fw_Error_Handler();
 	}
+	
+	//	电流功率限制
+//	uint16_t CM_current_max = 24000;
+//	
+//	uint16_t CMFLIntensity_max =6000;
+//	uint16_t CMFRIntensity_max =6000;
+//	uint16_t CMBLIntensity_max =6000;
+//	uint16_t CMBRIntensity_max =6000;
+//	uint16_t sum = (CMFLIntensity + CMFRIntensity + CMBLIntensity + CMBRIntensity);
+//	
+//	if (CMFLIntensity > CMFLIntensity_max)
+//	{
+//		CMFLIntensity = (CMFLIntensity /sum) * CM_current_max;
+//	}
+//	else if(CMFRIntensity > CMFRIntensity_max)
+//	{
+//	  CMFRIntensity = (CMFRIntensity /sum) * CM_current_max;
+//	}
+//	else if(CMBLIntensity > CMBLIntensity_max)
+//	{
+//	  CMBLIntensity = (CMBLIntensity /sum) * CM_current_max;
+//	}
+//	else if(CMBRIntensity > CMBRIntensity_max)
+//	{
+//	  CMBRIntensity = (CMBRIntensity /sum) * CM_current_max;
+//	}
+	
+	
+		float CM_current_max = 16000.f;
+	
+	float CMFLIntensity_max =5500.f;
+	float CMFRIntensity_max =5500.f;
+	float CMBLIntensity_max =5500.f;
+	float CMBRIntensity_max =5500.f;
+	float sum = (fabs(CMFLIntensity) + fabs(CMFRIntensity) + fabs(CMBLIntensity) + fabs(CMBRIntensity));
+	
+	if ((CMFLIntensity > CMFLIntensity_max))
+	{
+		CMFLIntensity = CMFLIntensity_max;
+	}
+	else if ((CMFLIntensity < -CMFLIntensity_max))
+	{
+		CMFLIntensity = -CMFLIntensity_max;
+	}
+	if(CMFRIntensity > CMFRIntensity_max)
+	{
+	  CMFRIntensity = CMFRIntensity_max;
+	}
+	else if(CMFRIntensity < -CMFRIntensity_max)
+	{
+	  CMFRIntensity = -CMFRIntensity_max;
+	}
+	if(CMBLIntensity > CMBLIntensity_max)
+	{
+	  CMBLIntensity = CMBLIntensity_max;
+	}
+	else if(CMBLIntensity < -CMBLIntensity_max)
+	{
+	  CMBLIntensity = -CMBLIntensity_max;
+	}
+	if(CMBRIntensity > CMBRIntensity_max)
+	{
+	  CMBRIntensity = CMBRIntensity_max;
+	}
+	else	if(CMBRIntensity < -CMBRIntensity_max)
+	{
+	  CMBRIntensity = -CMBRIntensity_max;
+	}
+	if( sum > CM_current_max){
+		CMFLIntensity = (CM_current_max/sum)*CMFLIntensity;
+		CMFRIntensity = (CM_current_max/sum)*CMFRIntensity;
+		CMBLIntensity = (CM_current_max/sum)*CMBLIntensity;
+		CMBRIntensity = (CM_current_max/sum)*CMBRIntensity;
+	}
+//	//底盘调试
+//	    CMFLIntensity = 7500;
+//			CMFRIntensity = 7500;
+//			CMBLIntensity = 7500;
+//			CMBRIntensity = 7500;
+	
+	
+	
 	if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY){
 			CMFLIntensity = 0;
 			CMFRIntensity = 0;
@@ -53,6 +136,9 @@ void setMotor(MotorId motorId, int16_t Intensity){
 	if(CMReady == 0xF){
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(CMTxIOPool);
 		pData->StdId = CM_TXID;
+		
+		
+		
 		pData->Data[0] = (uint8_t)(CMFLIntensity >> 8);
 		pData->Data[1] = (uint8_t)CMFLIntensity;
 		pData->Data[2] = (uint8_t)(CMFRIntensity >> 8);
@@ -61,6 +147,10 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		pData->Data[5] = (uint8_t)CMBLIntensity;
 		pData->Data[6] = (uint8_t)(CMBRIntensity >> 8);
 		pData->Data[7] = (uint8_t)CMBRIntensity;
+    
+		
+		fw_printfln("CMFLIntensity:%d",CMFLIntensity);		
+		
 		IOPool_getNextWrite(CMTxIOPool);
 		CMReady = 0;
 //		CMFLIntensity = CMFRIntensity = CMBLIntensity = CMBRIntensity = 0;
