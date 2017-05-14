@@ -120,7 +120,7 @@ void CMGMControlTask(void const * argument){
 //陀螺仪值获取
 		 yawRealAngle = -ZGyroModuleAngle;
 						
-//		fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
+		//fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 			}
 /*自瞄模式切换*/
 			if(GetShootMode() == AUTO) {
@@ -180,6 +180,7 @@ void CMGMControlTask(void const * argument){
 			setMotor(GMPITCH, pitchIntensity);
 		}
 //底盘电机 1 2 3 4	
+//		ChassisSpeedRef.rotate_ref = 0;//取消底盘跟随
 
 		if(IOPool_hasNextRead(CMFLRxIOPool, 0)){
 			IOPool_getNextRead(CMFLRxIOPool, 0);
@@ -195,6 +196,8 @@ void CMGMControlTask(void const * argument){
 #endif
 		  CM2SpeedPID.Calc(&CM2SpeedPID);
 		  setMotor(CMFR, CHASSIS_SPEED_ATTENUATION * CM2SpeedPID.output);
+			
+			//fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 		}
 		  if(IOPool_hasNextRead(CMFRRxIOPool, 0)){
 			IOPool_getNextRead(CMFRRxIOPool, 0);
