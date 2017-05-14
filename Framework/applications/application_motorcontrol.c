@@ -8,6 +8,7 @@
 #include "tasks_cmcontrol.h"
 #include "math.h"
 #include <math.h>
+#include <stdlib.h>
 //typedef struct{
 //	CAN_HandleTypeDef  *canNum;
 //	uint32_t id;
@@ -150,7 +151,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		pData->Data[7] = (uint8_t)CMBRIntensity;
     
 		
-		fw_printfln("CMFLIntensity:%d",CMFLIntensity);		
+//		fw_printfln("CMFLIntensity:%d",CMFLIntensity);		
 		
 		IOPool_getNextWrite(CMTxIOPool);
 		CMReady = 0;

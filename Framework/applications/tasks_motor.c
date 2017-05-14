@@ -174,7 +174,7 @@ void CMGMControlTask(void const * argument){
 					}
 				}
 		  }
-			MINMAX(pitchAngleTarget, -25, 25);
+			MINMAX(pitchAngleTarget, -12.0f, 21);
 			pitchIntensity = PID_PROCESS_Double(pitchPositionPID,pitchSpeedPID,pitchAngleTarget,pitchRealAngle,-gYroXs);
 			//		fw_printfln("pitchIntensity:%d", pitchIntensity);
 			setMotor(GMPITCH, pitchIntensity);
