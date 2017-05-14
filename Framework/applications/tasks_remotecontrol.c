@@ -11,6 +11,7 @@
 #include "peripheral_define.h"
 #include "pwm_server_motor.h"
 #include "tasks_motor.h"
+#include "utilities_minmax.h"
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
 {\
@@ -25,11 +26,11 @@ else if(val>=max)\
 extern ChassisSpeed_Ref_t ChassisSpeedRef;
 extern Gimbal_Ref_t GimbalRef;
 extern FrictionWheelState_e friction_wheel_state ;
-static RemoteSwitch_t switch1;   //Ò£¿ØÆ÷×ó²à²¦¸Ë
+static RemoteSwitch_t switch1;   //é¥æŽ§å™¨å·¦ä¾§æ‹¨æ†
 
-extern RampGen_t frictionRamp ;  //Ä¦²ÁÂÖÐ±ÆÂ
-extern RampGen_t LRSpeedRamp ;   //mouse×óÓÒÒÆ¶¯Ð±ÆÂ
-extern RampGen_t FBSpeedRamp  ;   //mouseÇ°ºóÒÆ¶¯Ð±ÆÂ
+extern RampGen_t frictionRamp ;  //æ‘©æ“¦è½®æ–œå¡
+extern RampGen_t LRSpeedRamp ;   //mouseå·¦å³ç§»åŠ¨æ–œå¡
+extern RampGen_t FBSpeedRamp  ;   //mouseå‰åŽç§»åŠ¨æ–œå¡
 
 extern RC_Ctl_t RC_CtrlData; 
 extern xSemaphoreHandle xSemaphore_rcuart;
@@ -53,7 +54,7 @@ void RControlTask(void const * argument){
 					data[i] = pData[i];
 				}
 
-//Ò£¿ØÆ÷Êý¾Ý´¦Àí
+//é¥æŽ§å™¨æ•°æ®å¤„ç†
 				RemoteDataProcess(data);
 				
 				HAL_UART_AbortReceive(&RC_UART);
@@ -131,8 +132,8 @@ void RemoteDataProcess(uint8_t *pData)
 		case KEY_MOUSE_INPUT:
 		{
 			
-			//Êó±ê¼üÅÌ¿ØÖÆÄ£Ê½
-			//ÔÝÊ±Îª×Ô¶¯Ãé×¼Ä£Ê½
+			//é¼ æ ‡é”®ç›˜æŽ§åˆ¶æ¨¡å¼
+			//æš‚æ—¶ä¸ºè‡ªåŠ¨çž„å‡†æ¨¡å¼
 							if(GYRO_RESETED == 2){
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
@@ -143,11 +144,11 @@ void RemoteDataProcess(uint8_t *pData)
 		case STOP:
 		{
 			SetEmergencyFlag(EMERGENCY);
-			//½ô¼±Í£³µ
+			//ç´§æ€¥åœè½¦
 		}break;
 	}
 }
-//Ò£¿ØÆ÷¿ØÖÆÄ£Ê½´¦Àí
+//é¥æŽ§å™¨æŽ§åˆ¶æ¨¡å¼å¤„ç†
 void RemoteControlProcess(Remote *rc)
 {
     if(GetWorkState()!=PREPARE_STATE)
@@ -155,6 +156,7 @@ void RemoteControlProcess(Remote *rc)
 			SetShootMode(MANUL);
         ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
         ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
+			MINMAX(rc->ch2, 700, 1300);
 			if(GetShootMode() == MANUL){  
 			pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
       yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
@@ -174,14 +176,14 @@ void RemoteControlProcess(Remote *rc)
 		}
 	
 	/* not used to control, just as a flag */ 
-    GimbalRef.pitch_speed_ref = rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET;    //speed_ref½ö×öÊäÈëÁ¿ÅÐ¶ÏÓÃ
+    GimbalRef.pitch_speed_ref = rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET;    //speed_refä»…åšè¾“å…¥é‡åˆ¤æ–­ç”¨
     GimbalRef.yaw_speed_ref   = (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET);
-	//Éä»÷-Ä¦²ÁÂÖ£¬²¦ÅÌµç»ú×´Ì¬
+	//å°„å‡»-æ‘©æ“¦è½®ï¼Œæ‹¨ç›˜ç”µæœºçŠ¶æ€
 	RemoteShootControl(&switch1, rc->s1);
 		
 
 }
-//¼üÅÌÊó±ê¿ØÖÆÄ£Ê½´¦Àí
+//é”®ç›˜é¼ æ ‡æŽ§åˆ¶æ¨¡å¼å¤„ç†
 
 void MouseKeyControlProcess(Mouse *mouse, Key *key)
 {
@@ -243,9 +245,9 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		if(key->v == 8192)//c
 		{
 			if(GetSlabState() == CLOSE)
-			{
+		{
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,0.f);
+				pwm_server_motor_set_angle(0,30.f);
 #endif
 #ifdef Infantry_2
 				pwm_server_motor_set_angle(0,50.f);
@@ -264,7 +266,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			if(GetSlabState() == OPEN)
 			{
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,110.f);
+				pwm_server_motor_set_angle(0,180.f);
 #endif
 #ifdef Infantry_2
 				pwm_server_motor_set_angle(0,180.f);
@@ -273,7 +275,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			//fw_printfln("CLOSE");	
 			}
 		}
-		
+
 		
 	
 	//step2: gimbal ref calc
@@ -288,7 +290,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 	}
 	*/
 	/* not used to control, just as a flag */ 
-    GimbalRef.pitch_speed_ref = mouse->y;    //speed_ref½ö×öÊäÈëÁ¿ÅÐ¶ÏÓÃ
+    GimbalRef.pitch_speed_ref = mouse->y;    //speed_refä»…åšè¾“å…¥é‡åˆ¤æ–­ç”¨
     GimbalRef.yaw_speed_ref   = mouse->x;
 	  MouseShootControl(mouse);
 	}
