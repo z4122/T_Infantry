@@ -7,6 +7,7 @@
 #include "utilities_debug.h"
 #include "tasks_cmcontrol.h"
 #include "math.h"
+#include <math.h>
 //typedef struct{
 //	CAN_HandleTypeDef  *canNum;
 //	uint32_t id;
@@ -71,7 +72,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 //	}
 	
 	
-		float CM_current_max = 16000.f;
+		float CM_current_max = 18000.f;
 	
 	float CMFLIntensity_max =5500.f;
 	float CMFRIntensity_max =5500.f;

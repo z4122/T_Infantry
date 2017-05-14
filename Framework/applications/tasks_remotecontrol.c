@@ -157,6 +157,20 @@ void RemoteControlProcess(Remote *rc)
         ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
         ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
 			MINMAX(rc->ch2, 700, 1300);
+			if ((rc->ch2 < 700) || (rc->ch2 > 1300)){
+				if(ChassisSpeedRef.forward_back_ref > 300){
+				 ChassisSpeedRef.forward_back_ref =  300 +  (ChassisSpeedRef.forward_back_ref - 300) * 0.3f;
+				}
+				else if(ChassisSpeedRef.forward_back_ref < -300){
+					ChassisSpeedRef.forward_back_ref =  -300 +  (ChassisSpeedRef.forward_back_ref + 300) * 0.3f;
+				}
+				if(ChassisSpeedRef.left_right_ref > 300){
+				 ChassisSpeedRef.left_right_ref =  300 +  (ChassisSpeedRef.left_right_ref - 300) * 0.3f;
+				}
+				else if(ChassisSpeedRef.left_right_ref < -300){
+					ChassisSpeedRef.left_right_ref =  -300 +  (ChassisSpeedRef.left_right_ref + 300) * 0.3f;
+				}
+			}
 			if(GetShootMode() == MANUL){  
 			pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
       yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
