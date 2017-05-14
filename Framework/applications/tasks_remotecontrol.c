@@ -245,7 +245,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			if(GetSlabState() == CLOSE)
 			{
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,30.f);
+				pwm_server_motor_set_angle(0,0.f);
 #endif
 #ifdef Infantry_2
 				pwm_server_motor_set_angle(0,50.f);
@@ -264,7 +264,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			if(GetSlabState() == OPEN)
 			{
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,180.f);
+				pwm_server_motor_set_angle(0,110.f);
 #endif
 #ifdef Infantry_2
 				pwm_server_motor_set_angle(0,180.f);
