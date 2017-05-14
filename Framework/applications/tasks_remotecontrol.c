@@ -274,7 +274,6 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			}
 		}
 		
-		
 	
 	//step2: gimbal ref calc
  /*   if(GetWorkState() == NORMAL_STATE)
