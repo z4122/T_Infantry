@@ -20,7 +20,7 @@ void rcInit(void);
 #define RC_FRAME_LENGTH                     18u
 #define STICK_TO_CHASSIS_SPEED_REF_FACT     0.45f
 #define STICK_TO_PITCH_ANGLE_INC_FACT       0.008f
-#define STICK_TO_YAW_ANGLE_INC_FACT         0.003f
+#define STICK_TO_YAW_ANGLE_INC_FACT         0.005f
 #define FRICTION_WHEEL_MAX_DUTY             1400
 
 //mouse control parameters
@@ -28,9 +28,9 @@ void rcInit(void);
 #define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 3
 
 #define NORMAL_FORWARD_BACK_SPEED 			500
-#define NORMAL_LEFT_RIGHT_SPEED   			700
+#define NORMAL_LEFT_RIGHT_SPEED   			550
 #define HIGH_FORWARD_BACK_SPEED 			660
-#define HIGH_LEFT_RIGHT_SPEED   			800
+#define HIGH_LEFT_RIGHT_SPEED   			700
 #define LOW_FORWARD_BACK_SPEED 			100
 #define LOW_LEFT_RIGHT_SPEED   			130
 
