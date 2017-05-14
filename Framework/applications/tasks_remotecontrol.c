@@ -34,7 +34,7 @@ extern RampGen_t FBSpeedRamp  ;   //mouse前后移动斜坡
 extern RC_Ctl_t RC_CtrlData; 
 extern xSemaphoreHandle xSemaphore_rcuart;
 extern float yawAngleTarget, pitchAngleTarget;
-
+extern uint8_t GYRO_RESETED ;
 void RControlTask(void const * argument){
 	uint8_t data[18];
 	static int countwhile = 0;
@@ -55,7 +55,6 @@ void RControlTask(void const * argument){
 
 //遥控器数据处理
 				RemoteDataProcess(data);
-				
 				
 				HAL_UART_AbortReceive(&RC_UART);
 				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
@@ -124,18 +123,22 @@ void RemoteDataProcess(uint8_t *pData)
 		case REMOTE_INPUT:
 		{
 //			fw_printfln("in remote mode");
+			if(GYRO_RESETED == 2){
 			SetEmergencyFlag(NORMAL);
 			RemoteControlProcess(&(RC_CtrlData.rc));
+			}
 		}break;
 		case KEY_MOUSE_INPUT:
 		{
 			
 			//鼠标键盘控制模式
 			//暂时为自动瞄准模式
+							if(GYRO_RESETED == 2){
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
 //			SetShootMode(AUTO);
 //			RemoteShootControl(&switch1, RC_CtrlData.rc.s1);
+		  }
 		}break;
 		case STOP:
 		{
@@ -237,14 +240,18 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 		}
 	
-		if(key->v == 8192)
+		if(key->v == 8192)//c
 		{
 			if(GetSlabState() == CLOSE)
 			{
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,0.f);
+				pwm_server_motor_set_angle(0,30.f);
+#endif
+#ifdef Infantry_2
+				pwm_server_motor_set_angle(0,50.f);
 #endif
 				SetSlabState(OPEN);
+			//	fw_printfln("OPEN");	
 			}
 //			else if(GetSlabState() == OPEN)
 //			{
@@ -252,13 +259,18 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 //				SetSlabState(CLOSE);
 //			}
 		}
-		if(key->v == 8208){
+		if(key->v == 8208)//c+Shift
+			{
 			if(GetSlabState() == OPEN)
 			{
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,110.f);
+				pwm_server_motor_set_angle(0,180.f);
+#endif
+#ifdef Infantry_2
+				pwm_server_motor_set_angle(0,180.f);
 #endif
 				SetSlabState(CLOSE);
+			//fw_printfln("CLOSE");	
 			}
 		}
 		
