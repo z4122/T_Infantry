@@ -59,7 +59,7 @@ void RControlTask(void const * argument){
 				
 				HAL_UART_AbortReceive(&RC_UART);
 				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
-				if(countwhile >= 300){
+				if(countwhile >= 400){
 				countwhile = 0;
 	//			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
 	//				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
@@ -137,7 +137,7 @@ void RemoteDataProcess(uint8_t *pData)
 							if(GYRO_RESETED == 2){
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
-//			SetShootMode(AUTO);
+  		SetShootMode(AUTO);
 //			RemoteShootControl(&switch1, RC_CtrlData.rc.s1);
 		  }
 		}break;
@@ -156,19 +156,19 @@ void RemoteControlProcess(Remote *rc)
 			SetShootMode(MANUL);
         ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
         ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
-			MINMAX(rc->ch2, 700, 1300);
-			if ((rc->ch2 < 700) || (rc->ch2 > 1300)){
-				if(ChassisSpeedRef.forward_back_ref > 300){
-				 ChassisSpeedRef.forward_back_ref =  300 +  (ChassisSpeedRef.forward_back_ref - 300) * 0.3f;
+			MINMAX(rc->ch2, 480, 1520);
+			if ((rc->ch2 < 480) || (rc->ch2 > 1520)){
+				if(ChassisSpeedRef.forward_back_ref > 400){
+				 ChassisSpeedRef.forward_back_ref =  400 +  (ChassisSpeedRef.forward_back_ref - 400) * 0.15f;
 				}
-				else if(ChassisSpeedRef.forward_back_ref < -300){
-					ChassisSpeedRef.forward_back_ref =  -300 +  (ChassisSpeedRef.forward_back_ref + 300) * 0.3f;
+				else if(ChassisSpeedRef.forward_back_ref < -400){
+					ChassisSpeedRef.forward_back_ref =  -400 +  (ChassisSpeedRef.forward_back_ref + 400) * 0.15f;
 				}
-				if(ChassisSpeedRef.left_right_ref > 300){
-				 ChassisSpeedRef.left_right_ref =  300 +  (ChassisSpeedRef.left_right_ref - 300) * 0.3f;
+				if(ChassisSpeedRef.left_right_ref > 400){
+				 ChassisSpeedRef.left_right_ref =  400 +  (ChassisSpeedRef.left_right_ref - 400) * 0.15f;
 				}
-				else if(ChassisSpeedRef.left_right_ref < -300){
-					ChassisSpeedRef.left_right_ref =  -300 +  (ChassisSpeedRef.left_right_ref + 300) * 0.3f;
+				else if(ChassisSpeedRef.left_right_ref < -400){
+					ChassisSpeedRef.left_right_ref =  -400 +  (ChassisSpeedRef.left_right_ref + 400) * 0.15f;
 				}
 			}
 			if(GetShootMode() == MANUL){  
