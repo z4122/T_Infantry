@@ -11,6 +11,7 @@
 #include "peripheral_define.h"
 #include "pwm_server_motor.h"
 #include "tasks_motor.h"
+#include "utilities_minmax.h"
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
 {\
@@ -155,6 +156,7 @@ void RemoteControlProcess(Remote *rc)
 			SetShootMode(MANUL);
         ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
         ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
+			MINMAX(rc->ch2, 700, 1300);
 			if(GetShootMode() == MANUL){  
 			pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
       yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
