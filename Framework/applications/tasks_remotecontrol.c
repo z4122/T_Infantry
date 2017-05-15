@@ -12,6 +12,8 @@
 #include "pwm_server_motor.h"
 #include "tasks_motor.h"
 #include "utilities_minmax.h"
+#include "math.h"
+#include <stdlib.h>
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
 {\
@@ -59,7 +61,7 @@ void RControlTask(void const * argument){
 				
 				HAL_UART_AbortReceive(&RC_UART);
 				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
-				if(countwhile >= 400){
+				if(countwhile >= 200){
 				countwhile = 0;
 	//			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
 	//				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
@@ -156,21 +158,23 @@ void RemoteControlProcess(Remote *rc)
 			SetShootMode(MANUL);
         ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
         ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
-			MINMAX(rc->ch2, 480, 1520);
 			if ((rc->ch2 < 480) || (rc->ch2 > 1520)){
-				if(ChassisSpeedRef.forward_back_ref > 400){
-				 ChassisSpeedRef.forward_back_ref =  400 +  (ChassisSpeedRef.forward_back_ref - 400) * 0.15f;
+				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 200){
+				if(ChassisSpeedRef.forward_back_ref > 100){
+				 ChassisSpeedRef.forward_back_ref =  100 +  (ChassisSpeedRef.forward_back_ref - 100) * 0.15f;
 				}
-				else if(ChassisSpeedRef.forward_back_ref < -400){
-					ChassisSpeedRef.forward_back_ref =  -400 +  (ChassisSpeedRef.forward_back_ref + 400) * 0.15f;
+				else if(ChassisSpeedRef.forward_back_ref < -100){
+					ChassisSpeedRef.forward_back_ref =  -100 +  (ChassisSpeedRef.forward_back_ref + 100) * 0.15f;
 				}
-				if(ChassisSpeedRef.left_right_ref > 400){
-				 ChassisSpeedRef.left_right_ref =  400 +  (ChassisSpeedRef.left_right_ref - 400) * 0.15f;
+				if(ChassisSpeedRef.left_right_ref > 100){
+				 ChassisSpeedRef.left_right_ref =  100 +  (ChassisSpeedRef.left_right_ref - 100) * 0.15f;
 				}
-				else if(ChassisSpeedRef.left_right_ref < -400){
-					ChassisSpeedRef.left_right_ref =  -400 +  (ChassisSpeedRef.left_right_ref + 400) * 0.15f;
+				else if(ChassisSpeedRef.left_right_ref < -100){
+					ChassisSpeedRef.left_right_ref =  -100 +  (ChassisSpeedRef.left_right_ref + 100) * 0.15f;
 				}
 			}
+			}
+			MINMAX(rc->ch2, 480, 1520);
 			if(GetShootMode() == MANUL){  
 			pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
       yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
@@ -261,7 +265,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			if(GetSlabState() == CLOSE)
 		{
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,30.f);
+				pwm_server_motor_set_angle(0,100.f);
 #endif
 #ifdef Infantry_2
 				pwm_server_motor_set_angle(0,50.f);
