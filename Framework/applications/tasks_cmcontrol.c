@@ -134,12 +134,13 @@ void Timer_2ms_lTask(void const * argument)
 		WorkStateFSM();
 	  WorkStateSwitchProcess();
 //1s循环
-		if(countwhile >= 500){//定时 1S
-//		countwhile = 0;
+		if(countwhile >= 1000){//定时 1S
+		countwhile = 0;
 //			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
-//			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
+			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
+			fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
 //			fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
-//			fw_printfln("PitAngle= %f", pitchRealAngle);
+			fw_printfln("PitAngle= %f", pitchRealAngle);
 //				fw_printfln("GMYAWEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle );
 //			fw_printfln("in CMcontrol_task");
 //		StackResidue = uxTaskGetStackHighWaterMark( GMControlTaskHandle );
