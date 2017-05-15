@@ -100,25 +100,21 @@ void CMGMControlTask(void const * argument){
 		if(IOPool_hasNextRead(GMYAWRxIOPool, 0)){
 			uint16_t yawZeroAngle = yaw_zero;
 			float yawRealAngle = 0.0;
-			int16_t yawIntensity = 0;
-			
+			int16_t yawIntensity = 0;		
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
-//			Motor820RRxMsg_t tempData; tempData.angle = IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle;
-//			tempData.RotateSpeed = 0;
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
 			NORMALIZE_ANGLE180(yawRealAngle);
 			if(GYRO_RESETED == 2) {
 /******发送数据1  yaw角度*******/
 			
 /*底盘跟随编码器旋转PID计算*/
-//		 CANReceiveMsgProcess_820R(&tempData, &GMYawEncoder);
 		 CMRotatePID.ref = 0;
 		 CMRotatePID.fdb = yawRealAngle;
 	   CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 //				ChassisSpeedRef.rotate_ref = 0;
 //陀螺仪值获取
-		 yawRealAngle = -ZGyroModuleAngle;
+		 yawRealAngle = -ZGyroModuleAngle;//此时底盘跟随已经设定完毕，yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
 						
 		//fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 			}
@@ -141,6 +137,7 @@ void CMGMControlTask(void const * argument){
 		
 						
 //			MINMAX(yawAngleTarget, -45, 45);
+// 进行yaw轴的控制pid
 			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget,yawRealAngle,-gYroZs);
 
 //      fw_printfln("yawIntensity:%d", yawIntensity);
@@ -158,12 +155,11 @@ void CMGMControlTask(void const * argument){
 /*******发送数据2 Pitch角度******/
 //			fw_printfln("pitchRealAngle:%f",pitchRealAngle);
 //自瞄模式切换
-			if(GetShootMode() == AUTO) {
+			if(GetShootMode() == AUTO) 
+				{
 				if((GetLocateState() == Locating) && (CReceive != 0))	{
-//				yawAngleTarget = yawRealAngle - (yawAdd *0.21f);
-//					fw_printfln("pitchRealAngle:%f",pitchRealAngle );
-					fw_printfln("pitchAdd:%f",pitchAdd );
-			pitchAngleTarget = pitchRealAngle + pitchAdd ;
+			  fw_printfln("pitchAdd:%f",pitchAdd );
+			  pitchAngleTarget = pitchRealAngle + pitchAdd ;
 				CReceive --;
 				}
 //大神符
@@ -171,9 +167,9 @@ void CMGMControlTask(void const * argument){
 					if(GetRuneState() == AIMING){
 						pitchAngleTarget = Location_Number[rune - 1].pitch_position;
 						rune_flag--;
-					}
-				}
-		  }
+					  }
+				  }
+		    }
 			MINMAX(pitchAngleTarget, -25, 25);
 			pitchIntensity = PID_PROCESS_Double(pitchPositionPID,pitchSpeedPID,pitchAngleTarget,pitchRealAngle,-gYroXs);
 			//		fw_printfln("pitchIntensity:%d", pitchIntensity);
