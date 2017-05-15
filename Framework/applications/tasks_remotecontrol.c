@@ -136,7 +136,7 @@ void RemoteDataProcess(uint8_t *pData)
 			
 			//鼠标键盘控制模式
 			//暂时为自动瞄准模式
-							if(GYRO_RESETED == 2){
+			if(GYRO_RESETED == 2){
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
   		SetShootMode(AUTO);
