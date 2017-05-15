@@ -152,14 +152,14 @@ void CMGMControlTask(void const * argument){
 					}
 				}
 		  }
-		if(abs(ChassisSpeedRef.rotate_ref) < 0.5){
-		if(diff_fbspeed > 200){
-			yawAngleTarget = yawAngleTarget	+ 0.0025f * diff_fbspeed;
-		}
+//		if(abs(ChassisSpeedRef.rotate_ref) < 0.5){
+//		if(diff_fbspeed > 200){
+//			yawAngleTarget = yawAngleTarget	+ 0.0025f * diff_fbspeed;
+//		}
 //		if(diff_fbspeed < -350){
 //			yawAngleTarget = yawAngleTarget	+ 0.0035f * diff_fbspeed;
 //		}
-	}
+//	}
 		static float sum_flag;
 	  static float sum_flag1;
 		if(fb_move_flag != 0){
@@ -211,7 +211,7 @@ void CMGMControlTask(void const * argument){
 				}
 		  }
 #ifdef Infantry_2
-			MINMAX(pitchAngleTarget, -8.5f, 21);
+			MINMAX(pitchAngleTarget, -8.5f, 28);
 #endif
 #ifdef Infantry_3
 			MINMAX(pitchAngleTarget, -28.f, 26);
