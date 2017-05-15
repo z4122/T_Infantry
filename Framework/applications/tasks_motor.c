@@ -92,6 +92,8 @@ extern float ZGyroModuleAngle;
 float yawAngleTarget = 0.0;
 float pitchAngleTarget = 0.0;
 extern float diff_fbspeed;
+extern uint8_t fb_move_flag;
+extern uint8_t fb_move_flag1;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 void CMGMControlTask(void const * argument){
 	static float yawAdd;
@@ -154,12 +156,28 @@ void CMGMControlTask(void const * argument){
 		if(diff_fbspeed > 200){
 			yawAngleTarget = yawAngleTarget	+ 0.0025f * diff_fbspeed;
 		}
-		if(diff_fbspeed < -350){
-			yawAngleTarget = yawAngleTarget	+ 0.004f * diff_fbspeed;
-		}
+//		if(diff_fbspeed < -350){
+//			yawAngleTarget = yawAngleTarget	+ 0.0035f * diff_fbspeed;
+//		}
 	}
+		static float sum_flag;
+	  static float sum_flag1;
+		if(fb_move_flag != 0){
+			sum_flag = sum_flag - 0.001f;
+			fb_move_flag = fb_move_flag - 1;
+		}
+		else{
+			sum_flag = 0;
+		}
+		if(fb_move_flag1 != 0){
+			sum_flag1 = sum_flag1 + 0.001f;
+			fb_move_flag1 = fb_move_flag1 - 1;
+		}
+		else{
+			sum_flag1 = 0;
+		}
 //			MINMAX(yawAngleTarget, -45, 45);
-			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget,yawRealAngle,-gYroZs);
+			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget + sum_flag + sum_flag1,yawRealAngle,-gYroZs);
 
 //      fw_printfln("yawIntensity:%d", yawIntensity);
 			setMotor(GMYAW, yawIntensity);

@@ -202,7 +202,8 @@ void RemoteControlProcess(Remote *rc)
 
 }
 //键盘鼠标控制模式处理
-
+uint8_t fb_move_flag = 0;
+uint8_t fb_move_flag1 = 0;
 void MouseKeyControlProcess(Mouse *mouse, Key *key)
 {
 	static uint16_t forward_back_speed = 0;
@@ -239,7 +240,14 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			ChassisSpeedRef.forward_back_ref = 0;
 			FBSpeedRamp.ResetCounter(&FBSpeedRamp);
 		}
-		
+	  static int last_fb_ref = 0;
+		if((last_fb_ref > 0) && (ChassisSpeedRef.forward_back_ref == 0)){
+			fb_move_flag = 60;
+		}
+		if((last_fb_ref < 0) && (ChassisSpeedRef.forward_back_ref == 0)){
+			fb_move_flag = 60;
+		}
+		last_fb_ref = ChassisSpeedRef.forward_back_ref;
 		
 		if(key->v & 0x04)  // key: d
 		{
@@ -288,6 +296,9 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		{
 			if(GetSlabState() == CLOSE)
 		{
+#ifdef Infantry_4
+				pwm_server_motor_set_angle(0,0.f);
+#endif
 #ifdef Infantry_3
 				pwm_server_motor_set_angle(0,0.f);
 #endif
@@ -307,6 +318,9 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			{
 			if(GetSlabState() == OPEN)
 			{
+#ifdef Infantry_4
+				pwm_server_motor_set_angle(0,110.f);
+#endif
 #ifdef Infantry_3
 				pwm_server_motor_set_angle(0,110.f);
 #endif

@@ -13,7 +13,7 @@ void UserTimerInit(void)
 	HAL_TIM_PWM_Start(&FRICTION_TIM, TIM_CHANNEL_2);
 	pwm_server_motor_init(0);
 #ifdef Infantry_4
-	pwm_server_motor_set_angle(0,110.);
+	pwm_server_motor_set_angle(0,50.);
 #endif
 #ifdef Infantry_3
 	pwm_server_motor_set_angle(0,110.);
