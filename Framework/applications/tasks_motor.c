@@ -14,7 +14,8 @@
 #include "usart.h"
 #include "peripheral_define.h"
 #include "drivers_uartupper_user.h"
-
+#include "math.h"
+#include <stdlib.h>
 #include "stdint.h"
 
 //PID_INIT(Kp, Ki, Kd, KpMax, KiMax, KdMax, OutputMax)
@@ -36,9 +37,9 @@ fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10
 #endif
 #ifdef Infantry_3
 fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(4.0, 0, 2.5, 10000.0, 10000.0, 10000.0, 10000.0);
-fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(2.0, 0.5, 0.7, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
-fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 5900.0);
-fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(35.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 9800.0);
+fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
+fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
+fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
 #define yaw_zero 720
 #define pitch_zero 5003
 #endif
@@ -82,6 +83,7 @@ extern uint8_t GYRO_RESETED;
 extern float ZGyroModuleAngle;
 float yawAngleTarget = 0.0;
 float pitchAngleTarget = 0.0;
+extern float diff_fbspeed;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 void CMGMControlTask(void const * argument){
 	static float yawAdd;
@@ -116,7 +118,6 @@ void CMGMControlTask(void const * argument){
 		 CMRotatePID.fdb = yawRealAngle;
 	   CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-//				ChassisSpeedRef.rotate_ref = 0;
 //陀螺仪值获取
 		 yawRealAngle = -ZGyroModuleAngle;
 						
@@ -124,6 +125,9 @@ void CMGMControlTask(void const * argument){
 			}
 /*自瞄模式切换*/
 			if(GetShootMode() == AUTO) {
+				if((GetLocateState() == Located)){
+				ChassisSpeedRef.rotate_ref = 0;
+				}
 				if((GetLocateState() == Locating) && (CReceive != 0))	{
 				yawAngleTarget = yawRealAngle - yawAdd ;
 				fw_printfln("yawAdd:%f",yawAdd );
@@ -138,8 +142,14 @@ void CMGMControlTask(void const * argument){
 					}
 				}
 		  }
-		
-						
+		if(abs(ChassisSpeedRef.rotate_ref) < 0.5){
+		if(diff_fbspeed > 200){
+			yawAngleTarget = yawAngleTarget	+ 0.0025f * diff_fbspeed;
+		}
+		if(diff_fbspeed < -350){
+			yawAngleTarget = yawAngleTarget	+ 0.004f * diff_fbspeed;
+		}
+	}
 //			MINMAX(yawAngleTarget, -45, 45);
 			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget,yawRealAngle,-gYroZs);
 
@@ -174,7 +184,13 @@ void CMGMControlTask(void const * argument){
 					}
 				}
 		  }
-			MINMAX(pitchAngleTarget, -12.0f, 21);
+#ifdef Infantry_2
+			MINMAX(pitchAngleTarget, -8.5f, 21);
+#endif
+#ifdef Infantry_3
+			MINMAX(pitchAngleTarget, -28.f, 26);
+#endif
+//			MINMAX(pitchAngleTarget, -28.f, 26);
 			pitchIntensity = PID_PROCESS_Double(pitchPositionPID,pitchSpeedPID,pitchAngleTarget,pitchRealAngle,-gYroXs);
 			//		fw_printfln("pitchIntensity:%d", pitchIntensity);
 			setMotor(GMPITCH, pitchIntensity);

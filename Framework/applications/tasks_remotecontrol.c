@@ -178,10 +178,10 @@ void RemoteControlProcess(Remote *rc)
 			if(GetShootMode() == MANUL){  
 			pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
       yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
-#ifdef Infantry_3
-			pitchAngleTarget += 0.5f*(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
-      yawAngleTarget   -= 0.5f*(rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
-#endif
+//#ifdef Infantry_3
+//			pitchAngleTarget += 0.5f*(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+//      yawAngleTarget   -= 0.5f*(rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
+//#endif
 			}
 			}
 
@@ -216,11 +216,6 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
         yawAngleTarget    -= mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
 		//speed mode: normal speed/high speed 
 		if(key->v & 0x10)
-		{
-			forward_back_speed =  HIGH_FORWARD_BACK_SPEED;
-			left_right_speed = HIGH_LEFT_RIGHT_SPEED;
-		}
-		else if(key->v & 0x20)
 		{
 			forward_back_speed =  LOW_FORWARD_BACK_SPEED;
 			left_right_speed = LOW_LEFT_RIGHT_SPEED;
@@ -259,13 +254,42 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			ChassisSpeedRef.left_right_ref = 0;
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 		}
-	
+	  if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500){
+				if(ChassisSpeedRef.forward_back_ref > 200){
+				 ChassisSpeedRef.forward_back_ref =  200 +  (ChassisSpeedRef.forward_back_ref - 200) * 0.15f;
+				}
+				else if(ChassisSpeedRef.forward_back_ref < -200){
+					ChassisSpeedRef.forward_back_ref =  -200 +  (ChassisSpeedRef.forward_back_ref + 200) * 0.15f;
+				}
+				if(ChassisSpeedRef.left_right_ref > 200){
+				 ChassisSpeedRef.left_right_ref =  200 +  (ChassisSpeedRef.left_right_ref - 200) * 0.15f;
+				}
+				else if(ChassisSpeedRef.left_right_ref < -200){
+					ChassisSpeedRef.left_right_ref =  -200 +  (ChassisSpeedRef.left_right_ref + 200) * 0.15f;
+				}
+			}
+				if ((mouse->x < -2.6) || (mouse->x > 2.6)){
+				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 200){
+				if(ChassisSpeedRef.forward_back_ref > 100){
+				 ChassisSpeedRef.forward_back_ref =  100 +  (ChassisSpeedRef.forward_back_ref - 100) * 0.15f;
+				}
+				else if(ChassisSpeedRef.forward_back_ref < -100){
+					ChassisSpeedRef.forward_back_ref =  -100 +  (ChassisSpeedRef.forward_back_ref + 100) * 0.15f;
+				}
+				if(ChassisSpeedRef.left_right_ref > 100){
+				 ChassisSpeedRef.left_right_ref =  100 +  (ChassisSpeedRef.left_right_ref - 100) * 0.15f;
+				}
+				else if(ChassisSpeedRef.left_right_ref < -100){
+					ChassisSpeedRef.left_right_ref =  -100 +  (ChassisSpeedRef.left_right_ref + 100) * 0.15f;
+				}
+			}
+			}
 		if(key->v == 8192)//c
 		{
 			if(GetSlabState() == CLOSE)
 		{
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,100.f);
+				pwm_server_motor_set_angle(0,0.f);
 #endif
 #ifdef Infantry_2
 				pwm_server_motor_set_angle(0,50.f);
@@ -284,7 +308,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			if(GetSlabState() == OPEN)
 			{
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,180.f);
+				pwm_server_motor_set_angle(0,110.f);
 #endif
 #ifdef Infantry_2
 				pwm_server_motor_set_angle(0,180.f);

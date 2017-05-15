@@ -116,6 +116,9 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float z
 
 //*********debug by ZY*********
 extern int EncoderCnt;
+float this_fbspeed = 0;
+float last_fbspeed = 0;
+float diff_fbspeed = 0;
 void Timer_2ms_lTask(void const * argument)
 {
 	portTickType xLastWakeTime;
@@ -154,8 +157,12 @@ void Timer_2ms_lTask(void const * argument)
 		}
 		else{countwhile1++;}
 //10ms循环
-		if(countwhile2 >= 5){//定时 10MS
+		if(countwhile2 >= 10){//定时 20MS
 		countwhile2 = 0;
+		this_fbspeed = (IOPool_pGetReadData(CMFLRxIOPool, 0)->RotateSpeed + IOPool_pGetReadData(CMFRRxIOPool, 0)->RotateSpeed 
+			             + IOPool_pGetReadData(CMBLRxIOPool, 0)->RotateSpeed + IOPool_pGetReadData(CMBRRxIOPool, 0)->RotateSpeed)/4.f;
+    diff_fbspeed = this_fbspeed - last_fbspeed;
+		last_fbspeed = this_fbspeed;
 //		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);//发送数据到上位机看波形
 			//printf("pitch:%f *** yaw:%f",pitchRealAngle,ZGyroModuleAngle);
 //		HAL_UART_Transmit(&DEBUG_UART,txbuf,strlen((char *)txbuf),1000);
