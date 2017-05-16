@@ -152,25 +152,29 @@ void CMGMControlTask(void const * argument){
 					}
 				}
 		  }
-//		if(abs(ChassisSpeedRef.rotate_ref) < 0.5){
-//		if(diff_fbspeed > 200){
-//			yawAngleTarget = yawAngleTarget	+ 0.0025f * diff_fbspeed;
-//		}
-//		if(diff_fbspeed < -350){
-//			yawAngleTarget = yawAngleTarget	+ 0.0035f * diff_fbspeed;
-//		}
-//	}
-		static float sum_flag;
+	  static float sum_flag;
 	  static float sum_flag1;
 		if(fb_move_flag != 0){
-			sum_flag = sum_flag - 0.001f;
+//			sum_flag = sum_flag - 0.001f;
+			if(diff_fbspeed > 200){
+				sum_flag = sum_flag	+ 0.0025f * diff_fbspeed;
+			}
+			if(diff_fbspeed < -350){
+				sum_flag = sum_flag	+ 0.0035f * diff_fbspeed;
+			}
 			fb_move_flag = fb_move_flag - 1;
 		}
 		else{
 			sum_flag = 0;
 		}
 		if(fb_move_flag1 != 0){
-			sum_flag1 = sum_flag1 + 0.001f;
+//			sum_flag1 = sum_flag1 + 0.001f;
+			if(diff_fbspeed > 200){
+				sum_flag1 = sum_flag1	+ 0.0025f * diff_fbspeed;
+			}
+			if(diff_fbspeed < -350){
+				sum_flag1 = sum_flag1	+ 0.0035f * diff_fbspeed;
+			}
 			fb_move_flag1 = fb_move_flag1 - 1;
 		}
 		else{

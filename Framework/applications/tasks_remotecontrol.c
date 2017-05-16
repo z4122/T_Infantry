@@ -227,6 +227,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			left_right_speed = NORMAL_LEFT_RIGHT_SPEED;
 		}
 		//movement process
+		static int last_fb_ref = 0;
 		if(key->v & 0x01)  // key: w
 		{
 			ChassisSpeedRef.forward_back_ref = forward_back_speed* FBSpeedRamp.Calc(&FBSpeedRamp);
@@ -239,15 +240,15 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		{
 			ChassisSpeedRef.forward_back_ref = 0;
 			FBSpeedRamp.ResetCounter(&FBSpeedRamp);
+			
+				if((last_fb_ref > 0) && (ChassisSpeedRef.forward_back_ref == 0)){
+				fb_move_flag = 200;
+			}
+				if((last_fb_ref < 0) && (ChassisSpeedRef.forward_back_ref == 0)){
+				fb_move_flag = 200;
+			}
 		}
-	  static int last_fb_ref = 0;
-		if((last_fb_ref > 0) && (ChassisSpeedRef.forward_back_ref == 0)){
-			fb_move_flag = 60;
-		}
-		if((last_fb_ref < 0) && (ChassisSpeedRef.forward_back_ref == 0)){
-			fb_move_flag = 60;
-		}
-		last_fb_ref = ChassisSpeedRef.forward_back_ref;
+	 	last_fb_ref = ChassisSpeedRef.forward_back_ref;
 		
 		if(key->v & 0x04)  // key: d
 		{
