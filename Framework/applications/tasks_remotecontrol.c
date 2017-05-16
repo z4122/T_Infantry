@@ -36,9 +36,6 @@ extern RC_Ctl_t RC_CtrlData;
 extern xSemaphoreHandle xSemaphore_rcuart;
 extern float yawAngleTarget, pitchAngleTarget;
 extern uint8_t GYRO_RESETED ;
-extern int twist_state ;
-
-
 void RControlTask(void const * argument){
 	uint8_t data[18];
 	static int countwhile = 0;
@@ -233,12 +230,10 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		if(key->v & 0x01)  // key: w
 		{
 			ChassisSpeedRef.forward_back_ref = forward_back_speed* FBSpeedRamp.Calc(&FBSpeedRamp);
-			twist_state = 0;
 		}
 		else if(key->v & 0x02) //key: s
 		{
 			ChassisSpeedRef.forward_back_ref = -forward_back_speed* FBSpeedRamp.Calc(&FBSpeedRamp);
-			twist_state = 0;
 		}
 		else
 		{
@@ -250,12 +245,10 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		if(key->v & 0x04)  // key: d
 		{
 			ChassisSpeedRef.left_right_ref = -left_right_speed* LRSpeedRamp.Calc(&LRSpeedRamp);
-			twist_state = 0;
 		}
 		else if(key->v & 0x08) //key: a
 		{
 			ChassisSpeedRef.left_right_ref = left_right_speed* LRSpeedRamp.Calc(&LRSpeedRamp);
-			twist_state = 0;
 		}
 		else
 		{
@@ -295,15 +288,6 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 				SetSlabState(CLOSE);
 			//fw_printfln("CLOSE");	
 			}
-		}
-			//进行扭腰与关闭扭腰
-		if(key->v == 256)  // key: r
-		{
-			twist_state = 1;
-		}
-		if(key->v == 272)  // key: r+Shift
-		{
-			twist_state = 0;
 		}
 
 		
