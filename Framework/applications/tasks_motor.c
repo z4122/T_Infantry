@@ -83,6 +83,9 @@ extern float ZGyroModuleAngle;
 float yawAngleTarget = 0.0;
 float pitchAngleTarget = 0.0;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
+int twist_state = 0;
+uint16_t twist_target = 0;
+
 void CMGMControlTask(void const * argument){
 	static float yawAdd;
 	static float pitchAdd;
@@ -109,7 +112,27 @@ void CMGMControlTask(void const * argument){
 			NORMALIZE_ANGLE180(yawRealAngle);
 			if(GYRO_RESETED == 2) {
 /******发送数据1  yaw角度*******/
-			
+				
+			 
+				//扭腰
+			if (twist_state == 1){
+				CMRotatePID.ref = 0; //进入扭腰状态以后初值为0
+					twist_target = 60;
+					if (CMRotatePID.ref <= twist_target){
+						twist_target = 60;
+			      CMRotatePID.ref = CMRotatePID.ref + 5 ;   //
+		        CMRotatePID.fdb = yawRealAngle;
+						fw_printfln("CMRotatePID.ref:%f",CMRotatePID.ref);
+					}
+			  	else{
+					  twist_target = -60;
+			      CMRotatePID.ref = CMRotatePID.ref - 5 ;   //
+		        CMRotatePID.fdb = yawRealAngle;
+				  }
+	         CMRotatePID.Calc(&CMRotatePID);   
+		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+			}				
+			else {				
 /*底盘跟随编码器旋转PID计算*/
 //		 CANReceiveMsgProcess_820R(&tempData, &GMYawEncoder);
 		 CMRotatePID.ref = 0;
@@ -118,8 +141,7 @@ void CMGMControlTask(void const * argument){
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 //				ChassisSpeedRef.rotate_ref = 0;
 //陀螺仪值获取
-		 yawRealAngle = -ZGyroModuleAngle;
-						
+		 yawRealAngle = -ZGyroModuleAngle;			
 		//fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 			}
 /*自瞄模式切换*/
@@ -249,4 +271,8 @@ void CMGMControlTask(void const * argument){
 		}
 	}
 }
+}
+
+
+
 
