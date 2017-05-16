@@ -122,7 +122,7 @@ void CMGMControlTask(void const * argument){
 			if(GetShootMode() == AUTO) {
 				if((GetLocateState() == Locating) && (CReceive != 0))	{
 				yawAngleTarget = yawRealAngle - yawAdd ;
-				fw_printfln("yawAdd:%f",yawAdd );
+				//fw_printfln("yawAdd:%f",yawAdd );
 				CReceive--;
 				}
 //´óÉñ·û
