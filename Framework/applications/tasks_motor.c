@@ -84,7 +84,10 @@ float yawAngleTarget = 0.0;
 float pitchAngleTarget = 0.0;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 int twist_state = 0;
-uint16_t twist_target = 0;
+int twist_count = 0;
+int mm =0;
+
+int16_t twist_target = 0;
 void CMGMControlTask(void const * argument){
 	static float yawAdd;
 	static float pitchAdd;
@@ -102,43 +105,79 @@ void CMGMControlTask(void const * argument){
 		if(IOPool_hasNextRead(GMYAWRxIOPool, 0)){
 			uint16_t yawZeroAngle = yaw_zero;
 			float yawRealAngle = 0.0;
+			float gap_angle = 0.0;
 			int16_t yawIntensity = 0;		
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
+			gap_angle  = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
+			
+			
+			
 			NORMALIZE_ANGLE180(yawRealAngle);
+			NORMALIZE_ANGLE180(gap_angle);	
 		if(GYRO_RESETED == 2) {
 				/*扭腰*/
+			//试图用PID
 				if (twist_state == 1){
-				CMRotatePID.ref = 0; //一定角度之间进行扭腰
-					twist_target = 60;
-					if (CMRotatePID.ref <= twist_target){
-						twist_target = 60;
-			      CMRotatePID.ref = CMRotatePID.ref + 5 ;   //
-		        CMRotatePID.fdb = yawRealAngle;
-						fw_printfln("CMRotatePID.ref:%f",CMRotatePID.ref);
+//				CMRotatePID.ref = 0; //一定角度之间进行扭腰
+//					twist_target = 30;
+//					if (CMRotatePID.ref < twist_target){
+//						twist_target = 30;
+//			      CMRotatePID.ref = CMRotatePID.ref + 0.001f ;   //
+//		        CMRotatePID.fdb = gap_angle;
+//						fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
+//					}
+//			  	else{
+//					  twist_target = -30;
+//			      CMRotatePID.ref = CMRotatePID.ref - 0.001f ;   //
+//		        CMRotatePID.fdb = gap_angle;
+//				  }
+//	         CMRotatePID.Calc(&CMRotatePID);   
+//		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+//					fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
+					
+//					CMRotatePID.output = 0; //一定角度之间进行扭腰
+//					twist_target = 20;
+//					if (CMRotatePID.output < twist_target){
+//						twist_target = 20;
+//						CMRotatePID.output = CMRotatePID.output + 4;
+//					}
+//			  	else{
+//					  twist_target = -20;
+//						CMRotatePID.output = CMRotatePID.output - 4;
+//				  }
+//		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+					//fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
+					
+					CMRotatePID.output = 0; //一定角度之间进行扭腰
+					mm = (twist_count / 600)%2 ;
+					if (mm == 1){
+						CMRotatePID.output = -10;
+						twist_count = twist_count + 1;
 					}
-			  	else{
-					  twist_target = -60;
-			      CMRotatePID.ref = CMRotatePID.ref - 5 ;   //
-		        CMRotatePID.fdb = yawRealAngle;
+			  	if (mm == 0){
+					  CMRotatePID.output = 10;
+						twist_count = twist_count + 1;
 				  }
-	         CMRotatePID.Calc(&CMRotatePID);   
+					fw_printfln("mm:%d",mm);
 		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 			}				
 			else {
 /******发送数据1  yaw角度*******/
-			
+				
 /*底盘跟随编码器旋转PID计算*/
 		 CMRotatePID.ref = 0;
 		 CMRotatePID.fdb = yawRealAngle;
 	   CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+		//fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
 //				ChassisSpeedRef.rotate_ref = 0;
 //陀螺仪值获取
-		 yawRealAngle = -ZGyroModuleAngle;//此时底盘跟随已经设定完毕，yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
+//		 yawRealAngle = -ZGyroModuleAngle;//此时底盘跟随已经设定完毕，yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
 						
 		//fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 			}
+			yawRealAngle = -ZGyroModuleAngle;//此时底盘跟随已经设定完毕，yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
 /*自瞄模式切换*/
 			if(GetShootMode() == AUTO) {
 				if((GetLocateState() == Locating) && (CReceive != 0))	{
@@ -159,9 +198,10 @@ void CMGMControlTask(void const * argument){
 						
 //			MINMAX(yawAngleTarget, -45, 45);
 // 进行yaw轴的控制pid
+			
 			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget,yawRealAngle,-gYroZs);
 
-//      fw_printfln("yawIntensity:%d", yawIntensity);
+     //fw_printfln("yawRealAngle:%f",yawRealAngle);
 			setMotor(GMYAW, yawIntensity);
 		}
 /*云台pitch轴*/
@@ -266,4 +306,6 @@ void CMGMControlTask(void const * argument){
 		}
 	}
 }
+
 }
+

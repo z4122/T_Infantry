@@ -149,7 +149,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		pData->Data[7] = (uint8_t)CMBRIntensity;
     
 		
-		fw_printfln("CMFLIntensity:%d",CMFLIntensity);		
+//		fw_printfln("CMFLIntensity:%d",CMFLIntensity);		
 		
 		IOPool_getNextWrite(CMTxIOPool);
 		CMReady = 0;
