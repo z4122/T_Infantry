@@ -12,6 +12,8 @@
 #include "pwm_server_motor.h"
 #include "tasks_motor.h"
 #include "utilities_minmax.h"
+#include "math.h"
+#include <stdlib.h>
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
 {\
@@ -59,7 +61,7 @@ void RControlTask(void const * argument){
 				
 				HAL_UART_AbortReceive(&RC_UART);
 				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
-				if(countwhile >= 400){
+				if(countwhile >= 200){
 				countwhile = 0;
 	//			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
 	//				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
@@ -134,7 +136,7 @@ void RemoteDataProcess(uint8_t *pData)
 			
 			//鼠标键盘控制模式
 			//暂时为自动瞄准模式
-							if(GYRO_RESETED == 2){
+			if(GYRO_RESETED == 2){
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
   		SetShootMode(AUTO);
@@ -156,28 +158,30 @@ void RemoteControlProcess(Remote *rc)
 			SetShootMode(MANUL);
         ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
         ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
-			MINMAX(rc->ch2, 480, 1520);
 			if ((rc->ch2 < 480) || (rc->ch2 > 1520)){
-				if(ChassisSpeedRef.forward_back_ref > 400){
-				 ChassisSpeedRef.forward_back_ref =  400 +  (ChassisSpeedRef.forward_back_ref - 400) * 0.15f;
+				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 200){
+				if(ChassisSpeedRef.forward_back_ref > 100){
+				 ChassisSpeedRef.forward_back_ref =  100 +  (ChassisSpeedRef.forward_back_ref - 100) * 0.15f;
 				}
-				else if(ChassisSpeedRef.forward_back_ref < -400){
-					ChassisSpeedRef.forward_back_ref =  -400 +  (ChassisSpeedRef.forward_back_ref + 400) * 0.15f;
+				else if(ChassisSpeedRef.forward_back_ref < -100){
+					ChassisSpeedRef.forward_back_ref =  -100 +  (ChassisSpeedRef.forward_back_ref + 100) * 0.15f;
 				}
-				if(ChassisSpeedRef.left_right_ref > 400){
-				 ChassisSpeedRef.left_right_ref =  400 +  (ChassisSpeedRef.left_right_ref - 400) * 0.15f;
+				if(ChassisSpeedRef.left_right_ref > 100){
+				 ChassisSpeedRef.left_right_ref =  100 +  (ChassisSpeedRef.left_right_ref - 100) * 0.15f;
 				}
-				else if(ChassisSpeedRef.left_right_ref < -400){
-					ChassisSpeedRef.left_right_ref =  -400 +  (ChassisSpeedRef.left_right_ref + 400) * 0.15f;
+				else if(ChassisSpeedRef.left_right_ref < -100){
+					ChassisSpeedRef.left_right_ref =  -100 +  (ChassisSpeedRef.left_right_ref + 100) * 0.15f;
 				}
 			}
+			}
+			MINMAX(rc->ch2, 480, 1520);
 			if(GetShootMode() == MANUL){  
 			pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
       yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
-#ifdef Infantry_3
-			pitchAngleTarget += 0.5f*(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
-      yawAngleTarget   -= 0.5f*(rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
-#endif
+//#ifdef Infantry_3
+//			pitchAngleTarget += 0.5f*(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
+//      yawAngleTarget   -= 0.5f*(rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
+//#endif
 			}
 			}
 
@@ -198,7 +202,8 @@ void RemoteControlProcess(Remote *rc)
 
 }
 //键盘鼠标控制模式处理
-
+uint8_t fb_move_flag = 0;
+uint8_t fb_move_flag1 = 0;
 void MouseKeyControlProcess(Mouse *mouse, Key *key)
 {
 	static uint16_t forward_back_speed = 0;
@@ -213,13 +218,13 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		//speed mode: normal speed/high speed 
 		if(key->v & 0x10)
 		{
-			forward_back_speed =  HIGH_FORWARD_BACK_SPEED;
-			left_right_speed = HIGH_LEFT_RIGHT_SPEED;
+			forward_back_speed =  LOW_FORWARD_BACK_SPEED;
+			left_right_speed = LOW_LEFT_RIGHT_SPEED;
 		}
 		else if(key->v & 0x20)
 		{
-			forward_back_speed =  LOW_FORWARD_BACK_SPEED;
-			left_right_speed = LOW_LEFT_RIGHT_SPEED;
+			forward_back_speed =  MIDDLE_FORWARD_BACK_SPEED;
+			left_right_speed = MIDDLE_LEFT_RIGHT_SPEED;
 		}
 		else
 		{
@@ -227,6 +232,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			left_right_speed = NORMAL_LEFT_RIGHT_SPEED;
 		}
 		//movement process
+		static int last_fb_ref = 0;
 		if(key->v & 0x01)  // key: w
 		{
 			ChassisSpeedRef.forward_back_ref = forward_back_speed* FBSpeedRamp.Calc(&FBSpeedRamp);
@@ -239,8 +245,15 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		{
 			ChassisSpeedRef.forward_back_ref = 0;
 			FBSpeedRamp.ResetCounter(&FBSpeedRamp);
+			
+				if((last_fb_ref > 0) && (ChassisSpeedRef.forward_back_ref == 0)){
+				fb_move_flag = 200;
+			}
+				if((last_fb_ref < 0) && (ChassisSpeedRef.forward_back_ref == 0)){
+				fb_move_flag = 200;
+			}
 		}
-		
+	 	last_fb_ref = ChassisSpeedRef.forward_back_ref;
 		
 		if(key->v & 0x04)  // key: d
 		{
@@ -255,13 +268,45 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			ChassisSpeedRef.left_right_ref = 0;
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 		}
-	
+	  if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500){
+				if(ChassisSpeedRef.forward_back_ref > 200){
+				 ChassisSpeedRef.forward_back_ref =  200 +  (ChassisSpeedRef.forward_back_ref - 200) * 0.15f;
+				}
+				else if(ChassisSpeedRef.forward_back_ref < -200){
+					ChassisSpeedRef.forward_back_ref =  -200 +  (ChassisSpeedRef.forward_back_ref + 200) * 0.15f;
+				}
+				if(ChassisSpeedRef.left_right_ref > 200){
+				 ChassisSpeedRef.left_right_ref =  200 +  (ChassisSpeedRef.left_right_ref - 200) * 0.15f;
+				}
+				else if(ChassisSpeedRef.left_right_ref < -200){
+					ChassisSpeedRef.left_right_ref =  -200 +  (ChassisSpeedRef.left_right_ref + 200) * 0.15f;
+				}
+			}
+				if ((mouse->x < -2.6) || (mouse->x > 2.6)){
+				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 200){
+				if(ChassisSpeedRef.forward_back_ref > 100){
+				 ChassisSpeedRef.forward_back_ref =  100 +  (ChassisSpeedRef.forward_back_ref - 100) * 0.15f;
+				}
+				else if(ChassisSpeedRef.forward_back_ref < -100){
+					ChassisSpeedRef.forward_back_ref =  -100 +  (ChassisSpeedRef.forward_back_ref + 100) * 0.15f;
+				}
+				if(ChassisSpeedRef.left_right_ref > 100){
+				 ChassisSpeedRef.left_right_ref =  100 +  (ChassisSpeedRef.left_right_ref - 100) * 0.15f;
+				}
+				else if(ChassisSpeedRef.left_right_ref < -100){
+					ChassisSpeedRef.left_right_ref =  -100 +  (ChassisSpeedRef.left_right_ref + 100) * 0.15f;
+				}
+			}
+			}
 		if(key->v == 8192)//c
 		{
 			if(GetSlabState() == CLOSE)
 		{
+#ifdef Infantry_4
+				pwm_server_motor_set_angle(0,0.f);
+#endif
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,30.f);
+				pwm_server_motor_set_angle(0,0.f);
 #endif
 #ifdef Infantry_2
 				pwm_server_motor_set_angle(0,50.f);
@@ -279,8 +324,11 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			{
 			if(GetSlabState() == OPEN)
 			{
+#ifdef Infantry_4
+				pwm_server_motor_set_angle(0,104.f);
+#endif
 #ifdef Infantry_3
-				pwm_server_motor_set_angle(0,180.f);
+				pwm_server_motor_set_angle(0,110.f);
 #endif
 #ifdef Infantry_2
 				pwm_server_motor_set_angle(0,180.f);

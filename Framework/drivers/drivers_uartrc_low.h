@@ -2,7 +2,6 @@
 #define DRIVERS_UARTRC_LOW_H
 
 #include "stdint.h"
-
 void rcUartRxCpltCallback(void);
 
 void rcInit(void);
@@ -21,18 +20,19 @@ void rcInit(void);
 #define STICK_TO_CHASSIS_SPEED_REF_FACT     0.45f
 #define STICK_TO_PITCH_ANGLE_INC_FACT       0.008f
 #define STICK_TO_YAW_ANGLE_INC_FACT         0.005f
-#define FRICTION_WHEEL_MAX_DUTY             1400
-
+#define FRICTION_WHEEL_MAX_DUTY             1300
 //mouse control parameters
 #define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 3
 #define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 3
 
 #define NORMAL_FORWARD_BACK_SPEED 			500
-#define NORMAL_LEFT_RIGHT_SPEED   			550
+#define NORMAL_LEFT_RIGHT_SPEED   			650
 #define HIGH_FORWARD_BACK_SPEED 			660
 #define HIGH_LEFT_RIGHT_SPEED   			700
 #define LOW_FORWARD_BACK_SPEED 			100
 #define LOW_LEFT_RIGHT_SPEED   			130
+#define MIDDLE_FORWARD_BACK_SPEED 			250
+#define MIDDLE_LEFT_RIGHT_SPEED   			280
 
 #define FRICTION_RAMP_TICK_COUNT			100
 #define MOUSE_LR_RAMP_TICK_COUNT			50
