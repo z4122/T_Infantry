@@ -11,9 +11,11 @@
 #include "peripheral_define.h"
 #include "pwm_server_motor.h"
 #include "tasks_motor.h"
+
 #include "utilities_minmax.h"
 #include "math.h"
 #include <stdlib.h>
+
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
 {\
@@ -28,16 +30,17 @@ else if(val>=max)\
 extern ChassisSpeed_Ref_t ChassisSpeedRef;
 extern Gimbal_Ref_t GimbalRef;
 extern FrictionWheelState_e friction_wheel_state ;
-static RemoteSwitch_t switch1;   //遥控器左侧拨杆
+static RemoteSwitch_t switch1;   //ң������ದ��
 
-extern RampGen_t frictionRamp ;  //摩擦轮斜坡
-extern RampGen_t LRSpeedRamp ;   //mouse左右移动斜坡
-extern RampGen_t FBSpeedRamp  ;   //mouse前后移动斜坡
+extern RampGen_t frictionRamp ;  //Ħ����б��
+extern RampGen_t LRSpeedRamp ;   //mouse�����ƶ�б��
+extern RampGen_t FBSpeedRamp  ;   //mouseǰ���ƶ�б��
 
 extern RC_Ctl_t RC_CtrlData; 
 extern xSemaphoreHandle xSemaphore_rcuart;
 extern float yawAngleTarget, pitchAngleTarget;
 extern uint8_t GYRO_RESETED ;
+extern int twist_state ;
 void RControlTask(void const * argument){
 	uint8_t data[18];
 	static int countwhile = 0;
@@ -56,12 +59,14 @@ void RControlTask(void const * argument){
 					data[i] = pData[i];
 				}
 
-//遥控器数据处理
+//ң������ݴ���
 				RemoteDataProcess(data);
 				
 				HAL_UART_AbortReceive(&RC_UART);
 				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
-				if(countwhile >= 200){
+
+				if(countwhile >= 300){
+
 				countwhile = 0;
 	//			fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
 	//				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
@@ -134,23 +139,24 @@ void RemoteDataProcess(uint8_t *pData)
 		case KEY_MOUSE_INPUT:
 		{
 			
+
 			//鼠标键盘控制模式
 			//暂时为自动瞄准模式
 			if(GYRO_RESETED == 2){
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
-  		SetShootMode(AUTO);
+//			SetShootMode(AUTO);
 //			RemoteShootControl(&switch1, RC_CtrlData.rc.s1);
 		  }
 		}break;
 		case STOP:
 		{
 			SetEmergencyFlag(EMERGENCY);
-			//紧急停车
+			//��ͣ��
 		}break;
 	}
 }
-//遥控器控制模式处理
+//ң�������ģʽ����
 void RemoteControlProcess(Remote *rc)
 {
     if(GetWorkState()!=PREPARE_STATE)
@@ -194,16 +200,18 @@ void RemoteControlProcess(Remote *rc)
 		}
 	
 	/* not used to control, just as a flag */ 
-    GimbalRef.pitch_speed_ref = rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET;    //speed_ref仅做输入量判断用
+    GimbalRef.pitch_speed_ref = rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET;    //speed_ref����������ж���
     GimbalRef.yaw_speed_ref   = (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET);
-	//射击-摩擦轮，拨盘电机状态
+	//���-Ħ���֣����̵��״̬
 	RemoteShootControl(&switch1, rc->s1);
 		
 
 }
+
 //键盘鼠标控制模式处理
 uint8_t fb_move_flag = 0;
 uint8_t fb_move_flag1 = 0;
+
 void MouseKeyControlProcess(Mouse *mouse, Key *key)
 {
 	static uint16_t forward_back_speed = 0;
@@ -236,10 +244,12 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		if(key->v & 0x01)  // key: w
 		{
 			ChassisSpeedRef.forward_back_ref = forward_back_speed* FBSpeedRamp.Calc(&FBSpeedRamp);
+			twist_state = 0;
 		}
 		else if(key->v & 0x02) //key: s
 		{
 			ChassisSpeedRef.forward_back_ref = -forward_back_speed* FBSpeedRamp.Calc(&FBSpeedRamp);
+			twist_state = 0;
 		}
 		else
 		{
@@ -258,10 +268,12 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		if(key->v & 0x04)  // key: d
 		{
 			ChassisSpeedRef.left_right_ref = -left_right_speed* LRSpeedRamp.Calc(&LRSpeedRamp);
+			twist_state = 0;
 		}
 		else if(key->v & 0x08) //key: a
 		{
 			ChassisSpeedRef.left_right_ref = left_right_speed* LRSpeedRamp.Calc(&LRSpeedRamp);
+			twist_state = 0;
 		}
 		else
 		{
@@ -337,7 +349,16 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			//fw_printfln("CLOSE");	
 			}
 		}
-
+			//����Ť����ر�Ť��
+		if(key->v == 256)  // key: r
+		{
+			twist_state = 1;
+		}
+		if(key->v == 272)  // key: r+Shift
+		{
+			twist_state = 0;
+		}
+		
 		
 	
 	//step2: gimbal ref calc
@@ -352,7 +373,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 	}
 	*/
 	/* not used to control, just as a flag */ 
-    GimbalRef.pitch_speed_ref = mouse->y;    //speed_ref仅做输入量判断用
+    GimbalRef.pitch_speed_ref = mouse->y;    //speed_ref����������ж���
     GimbalRef.yaw_speed_ref   = mouse->x;
 	  MouseShootControl(mouse);
 	}

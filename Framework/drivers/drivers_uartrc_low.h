@@ -13,12 +13,13 @@ void rcInit(void);
 ****************************************************************************
 */
 #define PITCH_MAX 19.0f
-#define YAW_MAX 720.0f//720.0				//cyq:云台角度的范围
+#define YAW_MAX 720.0f//720.0				//cyq:��̨�Ƕȵķ�Χ
 //remote control parameters
 #define REMOTE_CONTROLLER_STICK_OFFSET      1024u   
 #define RC_FRAME_LENGTH                     18u
 #define STICK_TO_CHASSIS_SPEED_REF_FACT     0.45f
 #define STICK_TO_PITCH_ANGLE_INC_FACT       0.008f
+
 #define STICK_TO_YAW_ANGLE_INC_FACT         0.005f
 #define FRICTION_WHEEL_MAX_DUTY             1300
 //mouse control parameters
@@ -27,8 +28,9 @@ void rcInit(void);
 
 #define NORMAL_FORWARD_BACK_SPEED 			500
 #define NORMAL_LEFT_RIGHT_SPEED   			650
+
 #define HIGH_FORWARD_BACK_SPEED 			660
-#define HIGH_LEFT_RIGHT_SPEED   			700
+#define HIGH_LEFT_RIGHT_SPEED   			800
 #define LOW_FORWARD_BACK_SPEED 			100
 #define LOW_LEFT_RIGHT_SPEED   			130
 #define MIDDLE_FORWARD_BACK_SPEED 			280
@@ -101,7 +103,7 @@ typedef enum
 
 
 
-//输入模式:遥控器/键盘鼠标/停止运行
+//����ģʽ:ң����/�������/ֹͣ����
 typedef enum
 {
 	REMOTE_INPUT = 1,
@@ -109,7 +111,7 @@ typedef enum
 	STOP = 2,
 }InputMode_e;
 
-//摩擦轮状态枚举
+//Ħ����״̬ö��
 typedef enum
 {
 	FRICTION_WHEEL_OFF = 0,
@@ -117,7 +119,7 @@ typedef enum
 	FRICTION_WHEEL_ON = 2,
 }FrictionWheelState_e;
 
-//拨杆动作枚举
+//���˶���ö��
 typedef enum
 {
 	FROM1TO2,
