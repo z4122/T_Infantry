@@ -14,13 +14,14 @@
 #include "usart.h"
 #include "peripheral_define.h"
 #include "drivers_uartupper_user.h"
-
+#include "math.h"
+#include <stdlib.h>
 #include "stdint.h"
 
 //PID_INIT(Kp, Ki, Kd, KpMax, KiMax, KdMax, OutputMax)
 #ifdef Infantry_1_Aim
 fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(15.0, 2.0, 1.0, 10000.0, 10000.0, 10000.0, 10000.0);
-fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//µÈ·ùÕñµ´P37.3 I11.9 D3.75  Ô­26.1 8.0 1.1
+fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//ç­‰å¹…æŒ¯è¡P37.3 I11.9 D3.75  åŸ26.1 8.0 1.1
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
 #define yaw_zero 1075
@@ -28,7 +29,7 @@ fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10
 #endif
 #ifdef Infantry_2
 fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(15.0, 2.0, 1.0, 10000.0, 10000.0, 10000.0, 10000.0);
-fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//µÈ·ùÕñµ´P37.3 I11.9 D3.75  Ô­26.1 8.0 1.1
+fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//ç­‰å¹…æŒ¯è¡P37.3 I11.9 D3.75  åŸ26.1 8.0 1.1
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
 #define yaw_zero 614
@@ -36,11 +37,19 @@ fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10
 #endif
 #ifdef Infantry_3
 fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(4.0, 0, 2.5, 10000.0, 10000.0, 10000.0, 10000.0);
-fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(2.0, 0.5, 0.7, 10000.0, 10000.0, 10000.0, 10000.0);//µÈ·ùÕñµ´P37.3 I11.9 D3.75  Ô­26.1 8.0 1.1
-fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 5900.0);
-fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(35.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 9800.0);
+fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//ç­‰å¹…æŒ¯è¡P37.3 I11.9 D3.75  åŸ26.1 8.0 1.1
+fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
+fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
 #define yaw_zero 720
 #define pitch_zero 5003
+#endif
+#ifdef Infantry_4
+fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(15.0, 0.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);
+fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 1.5, 10000.0, 10000.0, 10000.0, 10000.0);//ç­‰å¹…æŒ¯è¡P37.3 I11.9 D3.75  åŸ26.1 8.0 1.1
+fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(35.0, 0.0, 2.0, 10000.0, 10000.0, 10000.0, 3500.0);
+fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
+#define yaw_zero 1040
+#define pitch_zero 6050
 #endif
 #ifdef Infantry_1_Aim
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT_old; 
@@ -82,6 +91,9 @@ extern uint8_t GYRO_RESETED;
 extern float ZGyroModuleAngle;
 float yawAngleTarget = 0.0;
 float pitchAngleTarget = 0.0;
+extern float diff_fbspeed;
+extern uint8_t fb_move_flag;
+extern uint8_t fb_move_flag1;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 int twist_state = 0;
 int twist_count = 0;
@@ -101,7 +113,7 @@ void CMGMControlTask(void const * argument){
 		pitchAdd = IOPool_pGetReadData(upperIOPool, 0)->pitchAdd;
 		rune = IOPool_pGetReadData(upperIOPool, 0)->rune;
 		}
-/*ÔÆÌ¨yawÖá*/
+/*äº‘å°yawè½´*/
 		if(IOPool_hasNextRead(GMYAWRxIOPool, 0)){
 			uint16_t yawZeroAngle = yaw_zero;
 			float yawRealAngle = 0.0;
@@ -116,10 +128,10 @@ void CMGMControlTask(void const * argument){
 			NORMALIZE_ANGLE180(yawRealAngle);
 			NORMALIZE_ANGLE180(gap_angle);	
 		if(GYRO_RESETED == 2) {
-				/*Å¤Ñü*/
-			//ÊÔÍ¼ÓÃPID
+				/*æ‰­è…°*/
+			//è¯•å›¾ç”¨PID
 				if (twist_state == 1){
-//				CMRotatePID.ref = 0; //Ò»¶¨½Ç¶ÈÖ®¼ä½øĞĞÅ¤Ñü
+//				CMRotatePID.ref = 0; //ä¸€å®šè§’åº¦ä¹‹é—´è¿›è¡Œæ‰­è…°
 //					twist_target = 30;
 //					if (CMRotatePID.ref < twist_target){
 //						twist_target = 30;
@@ -136,7 +148,7 @@ void CMGMControlTask(void const * argument){
 //		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 //					fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
 					
-//					CMRotatePID.output = 0; //Ò»¶¨½Ç¶ÈÖ®¼ä½øĞĞÅ¤Ñü
+//					CMRotatePID.output = 0; //ä¸€å®šè§’åº¦ä¹‹é—´è¿›è¡Œæ‰­è…°
 //					twist_target = 20;
 //					if (CMRotatePID.output < twist_target){
 //						twist_target = 20;
@@ -149,7 +161,7 @@ void CMGMControlTask(void const * argument){
 //		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 					//fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
 					
-					CMRotatePID.output = 0; //Ò»¶¨½Ç¶ÈÖ®¼ä½øĞĞÅ¤Ñü
+					CMRotatePID.output = 0; //ä¸€å®šè§’åº¦ä¹‹é—´è¿›è¡Œæ‰­è…°
 					mm = (twist_count / 600)%2 ;
 					if (mm == 1){
 						CMRotatePID.output = -10;
@@ -163,29 +175,34 @@ void CMGMControlTask(void const * argument){
 		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 			}				
 			else {
-/******·¢ËÍÊı¾İ1  yaw½Ç¶È*******/
+/******å‘é€æ•°æ®1  yawè§’åº¦*******/
 				
-/*µ×ÅÌ¸úËæ±àÂëÆ÷Ğı×ªPID¼ÆËã*/
+/*åº•ç›˜è·Ÿéšç¼–ç å™¨æ—‹è½¬PIDè®¡ç®—*/
 		 CMRotatePID.ref = 0;
 		 CMRotatePID.fdb = yawRealAngle;
 	   CMRotatePID.Calc(&CMRotatePID);   
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+
 		//fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
 //				ChassisSpeedRef.rotate_ref = 0;
-//ÍÓÂİÒÇÖµ»ñÈ¡
-//		 yawRealAngle = -ZGyroModuleAngle;//´ËÊ±µ×ÅÌ¸úËæÒÑ¾­Éè¶¨Íê±Ï£¬yawrealangleµÄÖµ¸ÄÎª¸´Î»ºóÍÓÂİÒÇµÄ¾ø¶ÔÖµ£¬½øĞĞyawÖáÔË¶¯Éè¶¨
+
+//é™€èºä»ªå€¼è·å–
+//		 yawRealAngle = -ZGyroModuleAngle;//æ­¤æ—¶åº•ç›˜è·Ÿéšå·²ç»è®¾å®šå®Œæ¯•ï¼Œyawrealangleçš„å€¼æ”¹ä¸ºå¤ä½åé™€èºä»ªçš„ç»å¯¹å€¼ï¼Œè¿›è¡Œyawè½´è¿åŠ¨è®¾å®š
 						
 		//fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 			}
-			yawRealAngle = -ZGyroModuleAngle;//´ËÊ±µ×ÅÌ¸úËæÒÑ¾­Éè¶¨Íê±Ï£¬yawrealangleµÄÖµ¸ÄÎª¸´Î»ºóÍÓÂİÒÇµÄ¾ø¶ÔÖµ£¬½øĞĞyawÖáÔË¶¯Éè¶¨
-/*×ÔÃéÄ£Ê½ÇĞ»»*/
+			yawRealAngle = -ZGyroModuleAngle;//æ­¤æ—¶åº•ç›˜è·Ÿéšå·²ç»è®¾å®šå®Œæ¯•ï¼Œyawrealangleçš„å€¼æ”¹ä¸ºå¤ä½åé™€èºä»ªçš„ç»å¯¹å€¼ï¼Œè¿›è¡Œyawè½´è¿åŠ¨è®¾å®š
+/*è‡ªç„æ¨¡å¼åˆ‡æ¢*/
 			if(GetShootMode() == AUTO) {
+				if((GetLocateState() == Located)){
+				ChassisSpeedRef.rotate_ref = 0;
+				}
 				if((GetLocateState() == Locating) && (CReceive != 0))	{
 				yawAngleTarget = yawRealAngle - yawAdd ;
 				//fw_printfln("yawAdd:%f",yawAdd );
 				CReceive--;
 				}
-//´óÉñ·û
+//å¤§ç¥ç¬¦
 				else if((GetLocateState() == Located) && (rune_flag != 0)){
 					if(GetRuneState() == AIMING){
 						fw_printfln("rune:%d", rune);
@@ -194,17 +211,43 @@ void CMGMControlTask(void const * argument){
 					}
 				}
 		  }
-		
-						
+	  static float sum_flag;
+	  static float sum_flag1;
+		if(fb_move_flag != 0){
+//			sum_flag = sum_flag - 0.001f;
+			if(diff_fbspeed > 200){
+				sum_flag = sum_flag	+ 0.0025f * diff_fbspeed;
+			}
+			if(diff_fbspeed < -350){
+				sum_flag = sum_flag	+ 0.0035f * diff_fbspeed;
+			}
+			fb_move_flag = fb_move_flag - 1;
+		}
+		else{
+			sum_flag = 0;
+		}
+		if(fb_move_flag1 != 0){
+//			sum_flag1 = sum_flag1 + 0.001f;
+			if(diff_fbspeed > 200){
+				sum_flag1 = sum_flag1	+ 0.0025f * diff_fbspeed;
+			}
+			if(diff_fbspeed < -350){
+				sum_flag1 = sum_flag1	+ 0.0035f * diff_fbspeed;
+			}
+			fb_move_flag1 = fb_move_flag1 - 1;
+		}
+		else{
+			sum_flag1 = 0;
+		}
 //			MINMAX(yawAngleTarget, -45, 45);
-// ½øĞĞyawÖáµÄ¿ØÖÆpid
-			
-			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget,yawRealAngle,-gYroZs);
+
+			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,yawAngleTarget + sum_flag + sum_flag1,yawRealAngle,-gYroZs);
+
 
      //fw_printfln("yawRealAngle:%f",yawRealAngle);
 			setMotor(GMYAW, yawIntensity);
 		}
-/*ÔÆÌ¨pitchÖá*/
+/*äº‘å°pitchè½´*/
 		if(IOPool_hasNextRead(GMPITCHRxIOPool, 0)){
 			
 			uint16_t pitchZeroAngle = pitch_zero;
@@ -213,9 +256,9 @@ void CMGMControlTask(void const * argument){
 			IOPool_getNextRead(GMPITCHRxIOPool, 0);
 			pitchRealAngle = -(IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - pitchZeroAngle) * 360 / 8192.0;
 			NORMALIZE_ANGLE180(pitchRealAngle);
-/*******·¢ËÍÊı¾İ2 Pitch½Ç¶È******/
+/*******å‘é€æ•°æ®2 Pitchè§’åº¦******/
 //			fw_printfln("pitchRealAngle:%f",pitchRealAngle);
-//×ÔÃéÄ£Ê½ÇĞ»»
+//è‡ªç„æ¨¡å¼åˆ‡æ¢
 			if(GetShootMode() == AUTO) 
 				{
 				if((GetLocateState() == Locating) && (CReceive != 0))	{
@@ -223,21 +266,33 @@ void CMGMControlTask(void const * argument){
 			  pitchAngleTarget = pitchRealAngle + pitchAdd ;
 				CReceive --;
 				}
-//´óÉñ·û
+//å¤§ç¥ç¬¦
 				else if((GetLocateState() == Located) && (rune_flag != 0)){
 					if(GetRuneState() == AIMING){
 						pitchAngleTarget = Location_Number[rune - 1].pitch_position;
 						rune_flag--;
-					  }
-				  }
-		    }
-			MINMAX(pitchAngleTarget, -25, 25);
+
+=======
+					}
+				}
+		  }
+#ifdef Infantry_2
+			MINMAX(pitchAngleTarget, -8.5f, 28);
+#endif
+#ifdef Infantry_3
+			MINMAX(pitchAngleTarget, -28.f, 26);
+#endif
+#ifdef Infantry_4
+			MINMAX(pitchAngleTarget, -37.f, 29);
+#endif
+//			MINMAX(pitchAngleTarget, -28.f, 26);
+
 			pitchIntensity = PID_PROCESS_Double(pitchPositionPID,pitchSpeedPID,pitchAngleTarget,pitchRealAngle,-gYroXs);
 			//		fw_printfln("pitchIntensity:%d", pitchIntensity);
 			setMotor(GMPITCH, pitchIntensity);
 		}
-//µ×ÅÌµç»ú 1 2 3 4	
-//		ChassisSpeedRef.rotate_ref = 0;//È¡Ïûµ×ÅÌ¸úËæ
+//åº•ç›˜ç”µæœº 1 2 3 4	
+//		ChassisSpeedRef.rotate_ref = 0;//å–æ¶ˆåº•ç›˜è·Ÿéš
 
 		if(IOPool_hasNextRead(CMFLRxIOPool, 0)){
 			IOPool_getNextRead(CMFLRxIOPool, 0);

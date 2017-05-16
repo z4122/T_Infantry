@@ -3,6 +3,9 @@
 
 #include "drivers_uartupper_user.h"
 
+void judgeUartRxCpltCallback(void);
+void judgeUartInit(void);
+
 void ctrlUartRxCpltCallback(void);
 
 void ctrlUartInit(void);

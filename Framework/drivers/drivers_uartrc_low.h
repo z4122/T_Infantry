@@ -2,7 +2,6 @@
 #define DRIVERS_UARTRC_LOW_H
 
 #include "stdint.h"
-
 void rcUartRxCpltCallback(void);
 
 void rcInit(void);
@@ -14,25 +13,28 @@ void rcInit(void);
 ****************************************************************************
 */
 #define PITCH_MAX 19.0f
-#define YAW_MAX 720.0f//720.0				//cyq:ÔÆÌ¨½Ç¶ÈµÄ·¶Î§
+#define YAW_MAX 720.0f//720.0				//cyq:ï¿½ï¿½Ì¨ï¿½Ç¶ÈµÄ·ï¿½Î§
 //remote control parameters
 #define REMOTE_CONTROLLER_STICK_OFFSET      1024u   
 #define RC_FRAME_LENGTH                     18u
 #define STICK_TO_CHASSIS_SPEED_REF_FACT     0.45f
 #define STICK_TO_PITCH_ANGLE_INC_FACT       0.008f
-#define STICK_TO_YAW_ANGLE_INC_FACT         0.008f
-#define FRICTION_WHEEL_MAX_DUTY             1400
 
+#define STICK_TO_YAW_ANGLE_INC_FACT         0.005f
+#define FRICTION_WHEEL_MAX_DUTY             1300
 //mouse control parameters
 #define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 3
 #define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 3
 
 #define NORMAL_FORWARD_BACK_SPEED 			500
-#define NORMAL_LEFT_RIGHT_SPEED   			700
+#define NORMAL_LEFT_RIGHT_SPEED   			650
+
 #define HIGH_FORWARD_BACK_SPEED 			660
 #define HIGH_LEFT_RIGHT_SPEED   			800
 #define LOW_FORWARD_BACK_SPEED 			100
 #define LOW_LEFT_RIGHT_SPEED   			130
+#define MIDDLE_FORWARD_BACK_SPEED 			250
+#define MIDDLE_LEFT_RIGHT_SPEED   			280
 
 #define FRICTION_RAMP_TICK_COUNT			100
 #define MOUSE_LR_RAMP_TICK_COUNT			50
@@ -101,7 +103,7 @@ typedef enum
 
 
 
-//ÊäÈëÄ£Ê½:Ò£¿ØÆ÷/¼üÅÌÊó±ê/Í£Ö¹ÔËÐÐ
+//ï¿½ï¿½ï¿½ï¿½Ä£Ê½:Ò£ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/Í£Ö¹ï¿½ï¿½ï¿½ï¿½
 typedef enum
 {
 	REMOTE_INPUT = 1,
@@ -109,7 +111,7 @@ typedef enum
 	STOP = 2,
 }InputMode_e;
 
-//Ä¦²ÁÂÖ×´Ì¬Ã¶¾Ù
+//Ä¦ï¿½ï¿½ï¿½ï¿½×´Ì¬Ã¶ï¿½ï¿½
 typedef enum
 {
 	FRICTION_WHEEL_OFF = 0,
@@ -117,7 +119,7 @@ typedef enum
 	FRICTION_WHEEL_ON = 2,
 }FrictionWheelState_e;
 
-//²¦¸Ë¶¯×÷Ã¶¾Ù
+//ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½
 typedef enum
 {
 	FROM1TO2,

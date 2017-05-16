@@ -44,7 +44,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 			fw_Error_Handler();
 	}
 	
-	//	µçÁ÷¹¦ÂÊÏÞÖÆ
+	//	ÂµÃ§ÃÃ·Â¹Â¦Ã‚ÃŠÃÃžÃ–Ã†
 //	uint16_t CM_current_max = 24000;
 //	
 //	uint16_t CMFLIntensity_max =6000;
@@ -71,13 +71,12 @@ void setMotor(MotorId motorId, int16_t Intensity){
 //	}
 	
 	
-		float CM_current_max = 18000.f;
-	
-	float CMFLIntensity_max =5500.f;
-	float CMFRIntensity_max =5500.f;
-	float CMBLIntensity_max =5500.f;
-	float CMBRIntensity_max =5500.f;
-	float sum = (fabs(CMFLIntensity) + fabs(CMFRIntensity) + fabs(CMBLIntensity) + fabs(CMBRIntensity));
+		float CM_current_max = 14000.f;
+		float CMFLIntensity_max =4000.f;
+	float CMFRIntensity_max =4000.f;
+	float CMBLIntensity_max =4000.f;
+	float CMBRIntensity_max =4000.f;
+	float sum = (abs(CMFLIntensity) + abs(CMFRIntensity) + abs(CMBLIntensity) + abs(CMBRIntensity))
 	
 	if ((CMFLIntensity > CMFLIntensity_max))
 	{
@@ -117,7 +116,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		CMBLIntensity = (CM_current_max/sum)*CMBLIntensity;
 		CMBRIntensity = (CM_current_max/sum)*CMBRIntensity;
 	}
-//	//µ×ÅÌµ÷ÊÔ
+//	//ÂµÃ—Ã…ÃŒÂµÃ·ÃŠÃ”
 //	    CMFLIntensity = 7500;
 //			CMFRIntensity = 7500;
 //			CMBLIntensity = 7500;
@@ -133,6 +132,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 			GMYAWIntensity = 0;
 			GMPITCHIntensity = 0;
 		}
+
 	if(CMReady == 0xF){
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(CMTxIOPool);
 		pData->StdId = CM_TXID;

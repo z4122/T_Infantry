@@ -10,6 +10,7 @@
 #define RC_UART huart1
 #define DEBUG_UART huart3//huart2
 #define CTRL_UART huart3
+#define JUDGE_UART huart6
 
 #define CMGMMOTOR_CAN hcan1
 #define ZGYRO_CAN hcan2

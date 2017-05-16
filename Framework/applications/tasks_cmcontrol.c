@@ -40,7 +40,7 @@ WorkState_e GetWorkState()
 {
 	return workState;
 }
-/*2ms¶¨Ê±ÈÎÎñ*/
+/*2mså®šæ—¶ä»»åŠ¡*/
 
 extern float ZGyroModuleAngle;
 float ZGyroModuleAngleMAX;
@@ -118,6 +118,9 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float z
 
 //*********debug by ZY*********
 extern int EncoderCnt;
+float this_fbspeed = 0;
+float last_fbspeed = 0;
+float diff_fbspeed = 0;
 void Timer_2ms_lTask(void const * argument)
 {
 	portTickType xLastWakeTime;
@@ -126,17 +129,18 @@ void Timer_2ms_lTask(void const * argument)
 	static int countwhile1 = 0;
 	static int countwhile2 = 0;
 	static int countwhile3 = 0;
-//	unsigned portBASE_TYPE StackResidue; //Õ»Ê£Óà
+//	unsigned portBASE_TYPE StackResidue; //æ ˆå‰©ä½™
 	while(1)  {       //motor control frequency 2ms
-//¼à¿ØÈÎÎñ
+//ç›‘æ§ä»»åŠ¡
 //		SuperviseTask();    
 		WorkStateFSM();
 	  WorkStateSwitchProcess();
-//1sÑ­»·
-		if(countwhile >= 500){//¶¨Ê± 1S
-//		countwhile = 0;
+//1så¾ªç¯
+		if(countwhile >= 1000){//å®šæ—¶ 1S
+		countwhile = 0;
 //			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
 //			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
+//			fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
 //			fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
 //			fw_printfln("PitAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
 //				fw_printfln("GMYAWEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle );
@@ -146,21 +150,24 @@ void Timer_2ms_lTask(void const * argument)
 		}else{
 			countwhile++;
 		}
-//ÍÓÂİÒÇ¸´Î»¼ÆÊ±
+//é™€èºä»ªå¤ä½è®¡æ—¶
     if(countwhile1 > 2500){
-			if(GYRO_RESETED == 0)GYRO_RST();//¸øµ¥ÖáÍÓÂİÒÇ½«µ±Ç°Î»ÖÃĞ´Áã
+			if(GYRO_RESETED == 0)GYRO_RST();//ç»™å•è½´é™€èºä»ªå°†å½“å‰ä½ç½®å†™é›¶
 		}
 		else{countwhile1++;}
 		if(countwhile1 > 4000){
-			GYRO_RESETED = 2;//Õı³£Ò£¿ØÆ÷»òÕß¼üÅÌ¿ØÖÆÄ£Ê½£¬µ×ÅÌ¸úËæÄ£Ê½
+			GYRO_RESETED = 2;//æ­£å¸¸é¥æ§å™¨æˆ–è€…é”®ç›˜æ§åˆ¶æ¨¡å¼ï¼Œåº•ç›˜è·Ÿéšæ¨¡å¼
 		}
 		else{countwhile1++;}
-//10msÑ­»·
-		if(countwhile2 >= 50){//¶¨Ê± 100MS
+//10mså¾ªç¯
+		if(countwhile2 >= 10){//å®šæ—¶ 20MS
 		countwhile2 = 0;
-		//fw_printfln("yawRealAngle:%f",yawRealAngle);	
-			
-//		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);//·¢ËÍÊı¾İµ½ÉÏÎ»»ú¿´²¨ĞÎ
+		this_fbspeed = (IOPool_pGetReadData(CMFLRxIOPool, 0)->RotateSpeed + IOPool_pGetReadData(CMFRRxIOPool, 0)->RotateSpeed 
+			             + IOPool_pGetReadData(CMBLRxIOPool, 0)->RotateSpeed + IOPool_pGetReadData(CMBRRxIOPool, 0)->RotateSpeed)/4.f;
+    diff_fbspeed = this_fbspeed - last_fbspeed;
+		last_fbspeed = this_fbspeed;
+
+//		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);//å‘é€æ•°æ®åˆ°ä¸Šä½æœºçœ‹æ³¢å½¢
 			//printf("pitch:%f *** yaw:%f",pitchRealAngle,ZGyroModuleAngle);
 //		HAL_UART_Transmit(&DEBUG_UART,txbuf,strlen((char *)txbuf),1000);
 		}else{
@@ -168,11 +175,11 @@ void Timer_2ms_lTask(void const * argument)
 		}
 		if(countwhile3 >=25 && GetShootState() == SHOOTING){
 			countwhile3 = 0;
-			//ÏÈ¼ì²âÊÇ·ñ¿¨µ¯£¬¶øºó¸ù¾İÇé¿ö¸üĞÂ²¦ÅÌµç»úPID	
-			if(EncoderCnt<3){		//²úÉú¿¨µ¯
-				//Çå¿Õ¼ÆÊıÆ÷
+			//å…ˆæ£€æµ‹æ˜¯å¦å¡å¼¹ï¼Œè€Œåæ ¹æ®æƒ…å†µæ›´æ–°æ‹¨ç›˜ç”µæœºPID	
+			if(EncoderCnt<3){		//äº§ç”Ÿå¡å¼¹
+				//æ¸…ç©ºè®¡æ•°å™¨
 				//EncoderCnt = 0;			
-				//¿¨µ¯Ö®ºóÖ±½Ó·´×ª
+				//å¡å¼¹ä¹‹åç›´æ¥åè½¬
 				HAL_GPIO_TogglePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin);
 				HAL_GPIO_TogglePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin);
 				ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
@@ -183,7 +190,7 @@ void Timer_2ms_lTask(void const * argument)
 				//ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
 				ShootMotorSpeedPID.output = 1*(ShootMotorSpeedPID.ref-ShootMotorSpeedPID.fdb);
 			}
-			else{	//Èç¹ûÃ»ÓĞ¿¨µ¯,¸üĞÂPID
+			else{	//å¦‚æœæ²¡æœ‰å¡å¼¹,æ›´æ–°PID
 				ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
 				fw_printfln("ref = %d",PID_SHOOT_MOTOR_SPEED);
 				ShootMotorSpeedPID.fdb = EncoderCnt;
@@ -196,7 +203,7 @@ void Timer_2ms_lTask(void const * argument)
 		}
 		else countwhile3++;
 		
-		ShooterMControlLoop();       //·¢Éä»ú¹¹¿ØÖÆÈÎÎñ
+		ShooterMControlLoop();       //å‘å°„æœºæ„æ§åˆ¶ä»»åŠ¡
 		
 		vTaskDelayUntil( &xLastWakeTime, ( 2 / portTICK_RATE_MS ) );
 	}
@@ -206,9 +213,9 @@ void Timer_2ms_lTask(void const * argument)
 	static uint32_t time_tick_2ms = 0;
 void CMControtLoopTaskInit(void)
 {
-	//¼ÆÊı³õÊ¼»¯
-	time_tick_2ms = 0;   //ÖĞ¶ÏÖĞµÄ¼ÆÊıÇåÁã
-  //¼à¿ØÈÎÎñ³õÊ¼»¯
+	//è®¡æ•°åˆå§‹åŒ–
+	time_tick_2ms = 0;   //ä¸­æ–­ä¸­çš„è®¡æ•°æ¸…é›¶
+  //ç›‘æ§ä»»åŠ¡åˆå§‹åŒ–
 	/*
     LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_RC));
     LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_IMU));
@@ -230,7 +237,7 @@ void CMControtLoopTaskInit(void)
 	CM4SpeedPID.Reset(&CM4SpeedPID);
 }
 /**********************************************************
-*¹¤×÷×´Ì¬ÇĞ»»×´Ì¬»ú
+*å·¥ä½œçŠ¶æ€åˆ‡æ¢çŠ¶æ€æœº
 **********************************************************/
 
 void WorkStateFSM(void)
@@ -258,7 +265,7 @@ void WorkStateFSM(void)
 			}
 			else if(!IsRemoteBeingAction()  && GetShootState() != SHOOTING) //||(Get_Lost_Error(LOST_ERROR_RC) == LOST_ERROR_RC
 			{
-				fw_printfln("½øÈëSTANDBY");
+				fw_printfln("è¿›å…¥STANDBY");
 				workState = STANDBY_STATE;      
 			}			
 		}break;
@@ -288,25 +295,25 @@ void WorkStateFSM(void)
 }
 void WorkStateSwitchProcess(void)
 {
-	//Èç¹û´ÓÆäËûÄ£Ê½ÇĞ»»µ½prapareÄ£Ê½£¬Òª½«Ò»ÏµÁĞ²ÎÊı³õÊ¼»¯
+	//å¦‚æœä»å…¶ä»–æ¨¡å¼åˆ‡æ¢åˆ°prapareæ¨¡å¼ï¼Œè¦å°†ä¸€ç³»åˆ—å‚æ•°åˆå§‹åŒ–
 	if((lastWorkState != workState) && (workState == PREPARE_STATE))  
 	{
 		CMControtLoopTaskInit();
 		RemoteTaskInit();
 	}
 }
-//µ×ÅÌ¿ØÖÆÈÎÎñ
+//åº•ç›˜æ§åˆ¶ä»»åŠ¡
 extern int16_t yawZeroAngle;
 void CMControlLoop(void)
 {  
-	//µ×ÅÌĞı×ªÁ¿¼ÆËã
-	if(GetWorkState()==PREPARE_STATE) //Æô¶¯½×¶Î£¬µ×ÅÌ²»Ğı×ª
+	//åº•ç›˜æ—‹è½¬é‡è®¡ç®—
+	if(GetWorkState()==PREPARE_STATE) //å¯åŠ¨é˜¶æ®µï¼Œåº•ç›˜ä¸æ—‹è½¬
 	{
 		ChassisSpeedRef.rotate_ref = 0;	 
 	}
 	else
 	{
-		 //µ×ÅÌ¸úËæ±àÂëÆ÷Ğı×ªPID¼ÆËã
+		 //åº•ç›˜è·Ÿéšç¼–ç å™¨æ—‹è½¬PIDè®¡ç®—
 		 CMRotatePID.ref = 48;
 		 CMRotatePID.fdb = GMYawEncoder.ecd_angle;
 //		fw_printfln("%f",GMYawEncoder.ecd_angle );
@@ -314,7 +321,7 @@ void CMControlLoop(void)
 		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 		 ChassisSpeedRef.rotate_ref = 0;
 	}
-/*	if(Is_Lost_Error_Set(LOST_ERROR_RC))      //Èç¹ûÒ£¿ØÆ÷¶ªÊ§£¬Ç¿ÖÆ½«ËÙ¶ÈÉè¶¨Öµreset
+/*	if(Is_Lost_Error_Set(LOST_ERROR_RC))      //å¦‚æœé¥æ§å™¨ä¸¢å¤±ï¼Œå¼ºåˆ¶å°†é€Ÿåº¦è®¾å®šå€¼reset
 	{
 		ChassisSpeedRef.forward_back_ref = 0;
 		ChassisSpeedRef.left_right_ref = 0;
@@ -368,7 +375,7 @@ void CMControlLoop(void)
 
 CM4SpeedPID.Calc(&CM4SpeedPID);
 	
-	 if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY)   //||Is_Serious_Error()|| dead_lock_flag == 1½ô¼±Í£³µ£¬±àÂëÆ÷Ğ£×¼£¬ÎŞ¿ØÖÆÊäÈëÊ±¶¼»áÊ¹µ×ÅÌ¿ØÖÆÍ£Ö¹
+	 if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY)   //||Is_Serious_Error()|| dead_lock_flag == 1ç´§æ€¥åœè½¦ï¼Œç¼–ç å™¨æ ¡å‡†ï¼Œæ— æ§åˆ¶è¾“å…¥æ—¶éƒ½ä¼šä½¿åº•ç›˜æ§åˆ¶åœæ­¢
 	 {
 		 Set_CM_Speed(0,0,0,0);
 	 }
@@ -396,7 +403,7 @@ int32_t GetQuadEncoderDiff(void)
 	}
 }
 
-//·¢Éä»ú¹¹Éä»÷µç»úÈÎÎñ
+//å‘å°„æœºæ„å°„å‡»ç”µæœºä»»åŠ¡
 int16_t pwm_ccr = 0;
 //extern TIM_HandleTypeDef htim9;
 uint16_t x = 0;
