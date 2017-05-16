@@ -83,6 +83,8 @@ extern float ZGyroModuleAngle;
 float yawAngleTarget = 0.0;
 float pitchAngleTarget = 0.0;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
+int twist_state = 0;
+uint16_t twist_target = 0;
 void CMGMControlTask(void const * argument){
 	static float yawAdd;
 	static float pitchAdd;
@@ -104,7 +106,26 @@ void CMGMControlTask(void const * argument){
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
 			NORMALIZE_ANGLE180(yawRealAngle);
-			if(GYRO_RESETED == 2) {
+		if(GYRO_RESETED == 2) {
+				/*扭腰*/
+				if (twist_state == 1){
+				CMRotatePID.ref = 0; //一定角度之间进行扭腰
+					twist_target = 60;
+					if (CMRotatePID.ref <= twist_target){
+						twist_target = 60;
+			      CMRotatePID.ref = CMRotatePID.ref + 5 ;   //
+		        CMRotatePID.fdb = yawRealAngle;
+						fw_printfln("CMRotatePID.ref:%f",CMRotatePID.ref);
+					}
+			  	else{
+					  twist_target = -60;
+			      CMRotatePID.ref = CMRotatePID.ref - 5 ;   //
+		        CMRotatePID.fdb = yawRealAngle;
+				  }
+	         CMRotatePID.Calc(&CMRotatePID);   
+		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+			}				
+			else {
 /******发送数据1  yaw角度*******/
 			
 /*底盘跟随编码器旋转PID计算*/
