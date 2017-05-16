@@ -158,7 +158,7 @@ void CMGMControlTask(void const * argument){
 			if(GetShootMode() == AUTO) 
 				{
 				if((GetLocateState() == Locating) && (CReceive != 0))	{
-			  fw_printfln("pitchAdd:%f",pitchAdd );
+			  //fw_printfln("pitchAdd:%f",pitchAdd );
 			  pitchAngleTarget = pitchRealAngle + pitchAdd ;
 				CReceive --;
 				}
