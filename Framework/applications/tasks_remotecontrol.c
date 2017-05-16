@@ -221,6 +221,11 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			forward_back_speed =  LOW_FORWARD_BACK_SPEED;
 			left_right_speed = LOW_LEFT_RIGHT_SPEED;
 		}
+		else if(key->v & 0x20)
+		{
+			forward_back_speed =  MIDDLE_FORWARD_BACK_SPEED;
+			left_right_speed = MIDDLE_LEFT_RIGHT_SPEED;
+		}
 		else
 		{
 			forward_back_speed =  NORMAL_FORWARD_BACK_SPEED;
