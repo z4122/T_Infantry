@@ -257,10 +257,10 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			FBSpeedRamp.ResetCounter(&FBSpeedRamp);
 			
 				if((last_fb_ref > 0) && (ChassisSpeedRef.forward_back_ref == 0)){
-				fb_move_flag = 80;
+				fb_move_flag = 200;
 			}
 				if((last_fb_ref < 0) && (ChassisSpeedRef.forward_back_ref == 0)){
-				fb_move_flag = 80;
+				fb_move_flag = 200;
 			}
 		}
 	 	last_fb_ref = ChassisSpeedRef.forward_back_ref;
@@ -295,18 +295,18 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 				}
 			}
 				if ((mouse->x < -2.6) || (mouse->x > 2.6)){
-				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500){
-				if(ChassisSpeedRef.forward_back_ref > 300){
-				 ChassisSpeedRef.forward_back_ref =  300 +  (ChassisSpeedRef.forward_back_ref - 300) * 0.15f;
+				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 200){
+				if(ChassisSpeedRef.forward_back_ref > 100){
+				 ChassisSpeedRef.forward_back_ref =  100 +  (ChassisSpeedRef.forward_back_ref - 100) * 0.15f;
 				}
-				else if(ChassisSpeedRef.forward_back_ref < -300){
-					ChassisSpeedRef.forward_back_ref =  -300 +  (ChassisSpeedRef.forward_back_ref + 300) * 0.15f;
+				else if(ChassisSpeedRef.forward_back_ref < -100){
+					ChassisSpeedRef.forward_back_ref =  -100 +  (ChassisSpeedRef.forward_back_ref + 100) * 0.15f;
 				}
-				if(ChassisSpeedRef.left_right_ref > 300){
-				 ChassisSpeedRef.left_right_ref =  300 +  (ChassisSpeedRef.left_right_ref - 300) * 0.15f;
+				if(ChassisSpeedRef.left_right_ref > 100){
+				 ChassisSpeedRef.left_right_ref =  100 +  (ChassisSpeedRef.left_right_ref - 100) * 0.15f;
 				}
-				else if(ChassisSpeedRef.left_right_ref < -300){
-					ChassisSpeedRef.left_right_ref =  -300 +  (ChassisSpeedRef.left_right_ref + 300) * 0.15f;
+				else if(ChassisSpeedRef.left_right_ref < -100){
+					ChassisSpeedRef.left_right_ref =  -100 +  (ChassisSpeedRef.left_right_ref + 100) * 0.15f;
 				}
 			}
 			}
