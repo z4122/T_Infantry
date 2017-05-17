@@ -295,18 +295,18 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 				}
 			}
 				if ((mouse->x < -2.6) || (mouse->x > 2.6)){
-				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500){
-				if(ChassisSpeedRef.forward_back_ref > 300){
-				 ChassisSpeedRef.forward_back_ref =  300 +  (ChassisSpeedRef.forward_back_ref - 300) * 0.15f;
+				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 400){
+				if(ChassisSpeedRef.forward_back_ref > 250){
+				 ChassisSpeedRef.forward_back_ref =  250 +  (ChassisSpeedRef.forward_back_ref - 250) * 0.15f;
 				}
-				else if(ChassisSpeedRef.forward_back_ref < -300){
-					ChassisSpeedRef.forward_back_ref =  -300 +  (ChassisSpeedRef.forward_back_ref + 300) * 0.15f;
+				else if(ChassisSpeedRef.forward_back_ref < -250){
+					ChassisSpeedRef.forward_back_ref =  -250 +  (ChassisSpeedRef.forward_back_ref + 250) * 0.15f;
 				}
-				if(ChassisSpeedRef.left_right_ref > 300){
-				 ChassisSpeedRef.left_right_ref =  300 +  (ChassisSpeedRef.left_right_ref - 300) * 0.15f;
+				if(ChassisSpeedRef.left_right_ref > 250){
+				 ChassisSpeedRef.left_right_ref =  250 +  (ChassisSpeedRef.left_right_ref - 250) * 0.15f;
 				}
-				else if(ChassisSpeedRef.left_right_ref < -300){
-					ChassisSpeedRef.left_right_ref =  -300 +  (ChassisSpeedRef.left_right_ref + 300) * 0.15f;
+				else if(ChassisSpeedRef.left_right_ref < -250){
+					ChassisSpeedRef.left_right_ref =  -250 +  (ChassisSpeedRef.left_right_ref + 250) * 0.15f;
 				}
 			}
 			}

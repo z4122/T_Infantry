@@ -74,18 +74,18 @@ void setMotor(MotorId motorId, int16_t Intensity){
 //	}
 	
 	
-		float CM_current_max = 13500.f;
+		float CM_current_max = 13000.f;
 	
 	float CMFLIntensity_max =4000.f;
 	float CMFRIntensity_max =4000.f;
 	float CMBLIntensity_max =4000.f;
 	float CMBRIntensity_max =4000.f;
 #ifdef Infantry_4
-		CM_current_max = 16000.f;
-		CMFLIntensity_max =5500.f;
-		CMFRIntensity_max =5500.f;
-		CMBLIntensity_max =5500.f;
-		CMBRIntensity_max =5500.f;
+		CM_current_max = 15000.f;
+		CMFLIntensity_max =4500.f;
+		CMFRIntensity_max =4500.f;
+		CMBLIntensity_max =4500.f;
+		CMBRIntensity_max =4500.f;
 #endif
 	float sum = (abs(CMFLIntensity) + abs(CMFRIntensity) + abs(CMBLIntensity) + abs(CMBRIntensity));
 	
