@@ -417,7 +417,7 @@ void ShooterMControlLoop(void)
 		fw_printfln("temp: %d",temp);
 		ShootMotorSpeedPID.output = 0;
 		
-		if(temp>950) temp = 950;//700
+		if(temp>800) temp = 800;//950
 		else if(temp<-1) temp = 0;
 		TIM4->CCR1 = temp;//500500
 		
