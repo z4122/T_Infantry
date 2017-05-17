@@ -321,7 +321,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 				pwm_server_motor_set_angle(0,0.f);
 #endif
 #ifdef Infantry_2
-				pwm_server_motor_set_angle(0,170.f);
+				pwm_server_motor_set_angle(0,0.f);
 #endif
 				SetSlabState(OPEN);
 			//	fw_printfln("OPEN");	

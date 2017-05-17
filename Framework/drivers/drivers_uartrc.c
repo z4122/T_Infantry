@@ -160,7 +160,7 @@ InputMode_e GetInputMode()
 input: RemoteSwitch_t *sw, include the switch info
 */
 #ifdef Infantry_4
-#define FRICTION_WHEEL_MAX_DUTY             1450
+#define FRICTION_WHEEL_MAX_DUTY             1500
 #endif
 void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val) 
 {
