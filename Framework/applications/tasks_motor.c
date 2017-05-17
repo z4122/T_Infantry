@@ -97,7 +97,7 @@ extern uint8_t fb_move_flag1;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 int twist_state = 0;
 int twist_count = 0;
-int mm =0;
+int twist =0;
 
 int16_t twist_target = 0;
 void CMGMControlTask(void const * argument){
@@ -164,16 +164,16 @@ void CMGMControlTask(void const * argument){
 					//fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
 					
 					CMRotatePID.output = 0; //一定角度之间进行扭腰
-					mm = (twist_count / 600)%2 ;
-					if (mm == 1){
+					twist = (twist_count / 600)%2 ;
+					if (twist == 1){
 						CMRotatePID.output = -10;
 						twist_count = twist_count + 1;
 					}
-			  	if (mm == 0){
+			  	if (twist == 0){
 					  CMRotatePID.output = 10;
 						twist_count = twist_count + 1;
 				  }
-					fw_printfln("mm:%d",mm);
+					fw_printfln("twist:%d",twist);
 		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 			  }				
 			else {
