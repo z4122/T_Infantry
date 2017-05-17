@@ -9,6 +9,7 @@
 #include "math.h"
 #include <math.h>
 #include <stdlib.h>
+#include "tasks_motor.h"
 //typedef struct{
 //	CAN_HandleTypeDef  *canNum;
 //	uint32_t id;
@@ -79,6 +80,13 @@ void setMotor(MotorId motorId, int16_t Intensity){
 	float CMFRIntensity_max =4000.f;
 	float CMBLIntensity_max =4000.f;
 	float CMBRIntensity_max =4000.f;
+#ifdef Infantry_4
+		CM_current_max = 16000.f;
+		CMFLIntensity_max =5500.f;
+		CMFRIntensity_max =5500.f;
+		CMBLIntensity_max =5500.f;
+		CMBRIntensity_max =5500.f;
+#endif
 	float sum = (abs(CMFLIntensity) + abs(CMFRIntensity) + abs(CMBLIntensity) + abs(CMBRIntensity));
 	
 	if ((CMFLIntensity > CMFLIntensity_max))
