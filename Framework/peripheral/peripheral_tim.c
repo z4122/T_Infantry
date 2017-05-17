@@ -19,7 +19,7 @@ void UserTimerInit(void)
 	pwm_server_motor_set_angle(0,110.);
 #endif
 #ifdef Infantry_2
-	pwm_server_motor_set_angle(0,180.);
+	pwm_server_motor_set_angle(0,100.);
 #endif
   SetSlabState(CLOSE);
 }
