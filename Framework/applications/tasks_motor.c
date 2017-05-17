@@ -306,6 +306,9 @@ void CMGMControlTask(void const * argument){
 			CM2SpeedPID.ref = 160 * CM2SpeedPID.ref;
 			CM2SpeedPID.fdb = pData->RotateSpeed;
 #endif
+#ifdef Infantry_4
+			CM2SpeedPID.ref = 1.2f * CM2SpeedPID.ref;
+#endif
 		  CM2SpeedPID.Calc(&CM2SpeedPID);
 		  setMotor(CMFR, CHASSIS_SPEED_ATTENUATION * CM2SpeedPID.output);
 			
@@ -324,6 +327,9 @@ void CMGMControlTask(void const * argument){
 			CM1SpeedPID.ref = 160 * CM1SpeedPID.ref;
 			CM1SpeedPID.fdb = pData->RotateSpeed;
 #endif
+#ifdef Infantry_4
+			CM1SpeedPID.ref = 1.2f * CM1SpeedPID.ref;
+#endif
 //		 fw_printfln("CM1SpeedPID.ref:%f",CM1SpeedPID.ref);
 //		 fw_printfln("CM1Encoder.filter_rate:%d",CM1Encoder.filter_rate);
 		  CM1SpeedPID.Calc(&CM1SpeedPID);
@@ -341,6 +347,9 @@ void CMGMControlTask(void const * argument){
 			CM3SpeedPID.ref = 160 * CM3SpeedPID.ref;
 			CM3SpeedPID.fdb = pData->RotateSpeed;
 #endif
+#ifdef Infantry_4
+			CM3SpeedPID.ref = 1.2f * CM3SpeedPID.ref;
+#endif
 		  CM3SpeedPID.Calc(&CM3SpeedPID);
 		  setMotor(CMBL, CHASSIS_SPEED_ATTENUATION * CM3SpeedPID.output);
 		}
@@ -356,6 +365,9 @@ void CMGMControlTask(void const * argument){
 		  CM4SpeedPID.ref = 160 * CM4SpeedPID.ref;
 #endif
 			CM4SpeedPID.fdb = pData->RotateSpeed;
+#ifdef Infantry_4
+			CM4SpeedPID.ref = 1.2f * CM4SpeedPID.ref;
+#endif
 		  CM4SpeedPID.Calc(&CM4SpeedPID);
 		  setMotor(CMBR, CHASSIS_SPEED_ATTENUATION * CM4SpeedPID.output);
 		}

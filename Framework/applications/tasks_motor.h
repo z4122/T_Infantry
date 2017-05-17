@@ -3,8 +3,8 @@
 
 //#define MOTOR_ARMED
 //#define Infantry_1_Aim
-#define Infantry_2//蓝车
-//#define Infantry_3//R标
+//#define Infantry_2//蓝车
+#define Infantry_3//R标
 //#define Infantry_4//红车
 void CMGMControlTask(void const * argument);
 
