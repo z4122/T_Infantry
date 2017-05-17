@@ -17,6 +17,9 @@
 #include "math.h"
 #include <stdlib.h>
 #include "stdint.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 //PID_INIT(Kp, Ki, Kd, KpMax, KiMax, KdMax, OutputMax)
 #ifdef Infantry_1_Aim
@@ -98,6 +101,8 @@ int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 int twist_state = 0;
 int twist_count = 0;
 int twist =0;
+float mm =0;
+float nn =0;
 
 int16_t twist_target = 0;
 void CMGMControlTask(void const * argument){
@@ -163,23 +168,32 @@ void CMGMControlTask(void const * argument){
 //		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 					//fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
 					
+					
+					
+					
 					CMRotatePID.output = 0; //一定角度之间进行扭腰
-					twist = (twist_count / 600)%2 ;
-					if (twist == 1){
+					twist = (twist_count / 600)%2 ;	
+					if (twist == nn){
 						CMRotatePID.output = -10;
 						twist_count = twist_count + 1;
 					}
-			  	if (twist == 0){
+			  	if (twist == (1-nn)){
 					  CMRotatePID.output = 10;
 						twist_count = twist_count + 1;
 				  }
-					fw_printfln("twist:%d",twist);
 		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 			  }				
 			else {
 /******发送数据1  yaw角度*******/
 				
-/*底盘跟随编码器旋转PID计算*/
+				
+			  /*产生扭腰随机数*/  
+		srand(xTaskGetTickCount());
+		mm = (1.0*rand()/RAND_MAX);//产生随机方向
+		nn = floor(2.0*mm);
+				
+	/*底盘跟随编码器旋转PID计算*/		
+				
 		 CMRotatePID.ref = 0;
 		 CMRotatePID.fdb = yawRealAngle;
 	   CMRotatePID.Calc(&CMRotatePID);   
