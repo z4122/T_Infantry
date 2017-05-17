@@ -7,6 +7,9 @@
 #include "utilities_debug.h"
 #include "tasks_cmcontrol.h"
 #include "math.h"
+#include <math.h>
+#include <stdlib.h>
+#include "tasks_motor.h"
 //typedef struct{
 //	CAN_HandleTypeDef  *canNum;
 //	uint32_t id;
@@ -44,7 +47,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 			fw_Error_Handler();
 	}
 	
-	//	碌莽脕梅鹿娄脗脢脧脼脰脝
+	//	电流功率限制
 //	uint16_t CM_current_max = 24000;
 //	
 //	uint16_t CMFLIntensity_max =6000;
@@ -71,12 +74,20 @@ void setMotor(MotorId motorId, int16_t Intensity){
 //	}
 	
 	
-		float CM_current_max = 14000.f;
-		float CMFLIntensity_max =4000.f;
+		float CM_current_max = 13000.f;
+	
+	float CMFLIntensity_max =4000.f;
 	float CMFRIntensity_max =4000.f;
 	float CMBLIntensity_max =4000.f;
 	float CMBRIntensity_max =4000.f;
-	float sum = (abs(CMFLIntensity) + abs(CMFRIntensity) + abs(CMBLIntensity) + abs(CMBRIntensity))
+#ifdef Infantry_4
+		CM_current_max = 15000.f;
+		CMFLIntensity_max =4500.f;
+		CMFRIntensity_max =4500.f;
+		CMBLIntensity_max =4500.f;
+		CMBRIntensity_max =4500.f;
+#endif
+	float sum = (abs(CMFLIntensity) + abs(CMFRIntensity) + abs(CMBLIntensity) + abs(CMBRIntensity));
 	
 	if ((CMFLIntensity > CMFLIntensity_max))
 	{
@@ -116,7 +127,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		CMBLIntensity = (CM_current_max/sum)*CMBLIntensity;
 		CMBRIntensity = (CM_current_max/sum)*CMBRIntensity;
 	}
-//	//碌脳脜脤碌梅脢脭
+//	//底盘调试
 //	    CMFLIntensity = 7500;
 //			CMFRIntensity = 7500;
 //			CMBLIntensity = 7500;

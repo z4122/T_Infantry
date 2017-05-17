@@ -104,6 +104,8 @@ void CMGMControlTask(void const * argument){
 	static float yawAdd;
 	static float pitchAdd;
 	static uint8_t rune;
+	static float sum_flag  = 0;
+	static float sum_flag1 = 0;
 	while(1){
 //  osSemaphoreWait(imurefreshGimbalSemaphoreHandle, osWaitForever);
 		osSemaphoreWait(CMGMCanRefreshSemaphoreHandle, osWaitForever);
@@ -173,7 +175,7 @@ void CMGMControlTask(void const * argument){
 				  }
 					fw_printfln("mm:%d",mm);
 		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-			}				
+			  }				
 			else {
 /******发送数据1  yaw角度*******/
 				
@@ -211,33 +213,32 @@ void CMGMControlTask(void const * argument){
 					}
 				}
 		  }
-	  static float sum_flag;
-	  static float sum_flag1;
-		if(fb_move_flag != 0){
-//			sum_flag = sum_flag - 0.001f;
-			if(diff_fbspeed > 200){
-				sum_flag = sum_flag	+ 0.0025f * diff_fbspeed;
-			}
-			if(diff_fbspeed < -350){
-				sum_flag = sum_flag	+ 0.0035f * diff_fbspeed;
-			}
-			fb_move_flag = fb_move_flag - 1;
-		}
-		else{
-			sum_flag = 0;
-		}
-		if(fb_move_flag1 != 0){
-//			sum_flag1 = sum_flag1 + 0.001f;
-			if(diff_fbspeed > 200){
-				sum_flag1 = sum_flag1	+ 0.0025f * diff_fbspeed;
-			}
-			if(diff_fbspeed < -350){
-				sum_flag1 = sum_flag1	+ 0.0035f * diff_fbspeed;
-			}
-			fb_move_flag1 = fb_move_flag1 - 1;
-		}
-		else{
-			sum_flag1 = 0;
+				if(fb_move_flag != 0){
+		//			sum_flag = sum_flag - 0.001f;
+					if(diff_fbspeed > 200){
+						sum_flag = sum_flag	+ 0.0025f * diff_fbspeed;
+					}
+					if(diff_fbspeed < -350){
+						sum_flag = sum_flag	+ 0.0035f * diff_fbspeed;
+					}
+					fb_move_flag = fb_move_flag - 1;
+				}
+				else{
+					sum_flag = 0;
+				}
+				if(fb_move_flag1 != 0){
+		//			sum_flag1 = sum_flag1 + 0.001f;
+					if(diff_fbspeed > 200){
+						sum_flag1 = sum_flag1	+ 0.0025f * diff_fbspeed;
+					}
+					if(diff_fbspeed < -350){
+						sum_flag1 = sum_flag1	+ 0.0035f * diff_fbspeed;
+					}
+					fb_move_flag1 = fb_move_flag1 - 1;
+				}
+				else{
+					sum_flag1 = 0;
+				}
 		}
 //			MINMAX(yawAngleTarget, -45, 45);
 
@@ -272,12 +273,11 @@ void CMGMControlTask(void const * argument){
 						pitchAngleTarget = Location_Number[rune - 1].pitch_position;
 						rune_flag--;
 
-=======
 					}
 				}
 		  }
 #ifdef Infantry_2
-			MINMAX(pitchAngleTarget, -8.5f, 28);
+			MINMAX(pitchAngleTarget, -8.5f, 32);
 #endif
 #ifdef Infantry_3
 			MINMAX(pitchAngleTarget, -28.f, 26);
@@ -306,6 +306,9 @@ void CMGMControlTask(void const * argument){
 			CM2SpeedPID.ref = 160 * CM2SpeedPID.ref;
 			CM2SpeedPID.fdb = pData->RotateSpeed;
 #endif
+#ifdef Infantry_4
+			CM2SpeedPID.ref = 1.2f * CM2SpeedPID.ref;
+#endif
 		  CM2SpeedPID.Calc(&CM2SpeedPID);
 		  setMotor(CMFR, CHASSIS_SPEED_ATTENUATION * CM2SpeedPID.output);
 			
@@ -324,6 +327,9 @@ void CMGMControlTask(void const * argument){
 			CM1SpeedPID.ref = 160 * CM1SpeedPID.ref;
 			CM1SpeedPID.fdb = pData->RotateSpeed;
 #endif
+#ifdef Infantry_4
+			CM1SpeedPID.ref = 1.2f * CM1SpeedPID.ref;
+#endif
 //		 fw_printfln("CM1SpeedPID.ref:%f",CM1SpeedPID.ref);
 //		 fw_printfln("CM1Encoder.filter_rate:%d",CM1Encoder.filter_rate);
 		  CM1SpeedPID.Calc(&CM1SpeedPID);
@@ -341,6 +347,9 @@ void CMGMControlTask(void const * argument){
 			CM3SpeedPID.ref = 160 * CM3SpeedPID.ref;
 			CM3SpeedPID.fdb = pData->RotateSpeed;
 #endif
+#ifdef Infantry_4
+			CM3SpeedPID.ref = 1.2f * CM3SpeedPID.ref;
+#endif
 		  CM3SpeedPID.Calc(&CM3SpeedPID);
 		  setMotor(CMBL, CHASSIS_SPEED_ATTENUATION * CM3SpeedPID.output);
 		}
@@ -356,11 +365,13 @@ void CMGMControlTask(void const * argument){
 		  CM4SpeedPID.ref = 160 * CM4SpeedPID.ref;
 #endif
 			CM4SpeedPID.fdb = pData->RotateSpeed;
+#ifdef Infantry_4
+			CM4SpeedPID.ref = 1.2f * CM4SpeedPID.ref;
+#endif
 		  CM4SpeedPID.Calc(&CM4SpeedPID);
 		  setMotor(CMBR, CHASSIS_SPEED_ATTENUATION * CM4SpeedPID.output);
 		}
 	}
 }
 
-}
 

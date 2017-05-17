@@ -145,7 +145,7 @@ void RemoteDataProcess(uint8_t *pData)
 			if(GYRO_RESETED == 2){
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
-//			SetShootMode(AUTO);
+			SetShootMode(AUTO);
 //			RemoteShootControl(&switch1, RC_CtrlData.rc.s1);
 		  }
 		}break;
@@ -257,10 +257,10 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			FBSpeedRamp.ResetCounter(&FBSpeedRamp);
 			
 				if((last_fb_ref > 0) && (ChassisSpeedRef.forward_back_ref == 0)){
-				fb_move_flag = 200;
+				fb_move_flag = 80;
 			}
 				if((last_fb_ref < 0) && (ChassisSpeedRef.forward_back_ref == 0)){
-				fb_move_flag = 200;
+				fb_move_flag = 80;
 			}
 		}
 	 	last_fb_ref = ChassisSpeedRef.forward_back_ref;
@@ -295,18 +295,18 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 				}
 			}
 				if ((mouse->x < -2.6) || (mouse->x > 2.6)){
-				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 200){
-				if(ChassisSpeedRef.forward_back_ref > 100){
-				 ChassisSpeedRef.forward_back_ref =  100 +  (ChassisSpeedRef.forward_back_ref - 100) * 0.15f;
+				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 400){
+				if(ChassisSpeedRef.forward_back_ref > 250){
+				 ChassisSpeedRef.forward_back_ref =  250 +  (ChassisSpeedRef.forward_back_ref - 250) * 0.15f;
 				}
-				else if(ChassisSpeedRef.forward_back_ref < -100){
-					ChassisSpeedRef.forward_back_ref =  -100 +  (ChassisSpeedRef.forward_back_ref + 100) * 0.15f;
+				else if(ChassisSpeedRef.forward_back_ref < -250){
+					ChassisSpeedRef.forward_back_ref =  -250 +  (ChassisSpeedRef.forward_back_ref + 250) * 0.15f;
 				}
-				if(ChassisSpeedRef.left_right_ref > 100){
-				 ChassisSpeedRef.left_right_ref =  100 +  (ChassisSpeedRef.left_right_ref - 100) * 0.15f;
+				if(ChassisSpeedRef.left_right_ref > 250){
+				 ChassisSpeedRef.left_right_ref =  250 +  (ChassisSpeedRef.left_right_ref - 250) * 0.15f;
 				}
-				else if(ChassisSpeedRef.left_right_ref < -100){
-					ChassisSpeedRef.left_right_ref =  -100 +  (ChassisSpeedRef.left_right_ref + 100) * 0.15f;
+				else if(ChassisSpeedRef.left_right_ref < -250){
+					ChassisSpeedRef.left_right_ref =  -250 +  (ChassisSpeedRef.left_right_ref + 250) * 0.15f;
 				}
 			}
 			}
