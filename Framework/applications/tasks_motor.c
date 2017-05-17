@@ -17,6 +17,9 @@
 #include "math.h"
 #include <stdlib.h>
 #include "stdint.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 //PID_INIT(Kp, Ki, Kd, KpMax, KiMax, KdMax, OutputMax)
 #ifdef Infantry_1_Aim
@@ -40,7 +43,7 @@ fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(4.0, 0, 2.5, 10000.0, 10000.0,
 fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
-#define yaw_zero 720
+#define yaw_zero 705//720
 #define pitch_zero 5003
 #endif
 #ifdef Infantry_4
@@ -49,7 +52,7 @@ fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 1.5, 10000.0, 10000.0
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(35.0, 0.0, 2.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
 #define yaw_zero 1040
-#define pitch_zero 6050
+#define pitch_zero 6400//6050
 #endif
 #ifdef Infantry_1_Aim
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT_old; 
@@ -97,7 +100,9 @@ extern uint8_t fb_move_flag1;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 int twist_state = 0;
 int twist_count = 0;
-int mm =0;
+int twist =0;
+float mm =0;
+float nn =0;
 
 int16_t twist_target = 0;
 void CMGMControlTask(void const * argument){
@@ -163,23 +168,32 @@ void CMGMControlTask(void const * argument){
 //		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 					//fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
 					
+					
+					
+					
 					CMRotatePID.output = 0; //一定角度之间进行扭腰
-					mm = (twist_count / 600)%2 ;
-					if (mm == 1){
+					twist = (twist_count / 600)%2 ;	
+					if (twist == nn){
 						CMRotatePID.output = -10;
 						twist_count = twist_count + 1;
 					}
-			  	if (mm == 0){
+			  	if (twist == (1-nn)){
 					  CMRotatePID.output = 10;
 						twist_count = twist_count + 1;
 				  }
-					fw_printfln("mm:%d",mm);
 		       ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 			  }				
 			else {
 /******发送数据1  yaw角度*******/
 				
-/*底盘跟随编码器旋转PID计算*/
+				
+			  /*产生扭腰随机数*/  
+		srand(xTaskGetTickCount());
+		mm = (1.0f*rand()/RAND_MAX);//产生随机方向
+		nn = floor(2.0f*mm);
+				
+	/*底盘跟随编码器旋转PID计算*/		
+				
 		 CMRotatePID.ref = 0;
 		 CMRotatePID.fdb = yawRealAngle;
 	   CMRotatePID.Calc(&CMRotatePID);   
@@ -283,7 +297,7 @@ void CMGMControlTask(void const * argument){
 			MINMAX(pitchAngleTarget, -28.f, 26);
 #endif
 #ifdef Infantry_4
-			MINMAX(pitchAngleTarget, -37.f, 29);
+			MINMAX(pitchAngleTarget, -21.f, 18);
 #endif
 //			MINMAX(pitchAngleTarget, -28.f, 26);
 

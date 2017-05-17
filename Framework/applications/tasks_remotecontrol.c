@@ -254,7 +254,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		else
 		{
 			ChassisSpeedRef.forward_back_ref = 0;
-			FBSpeedRamp.ResetCounter(&FBSpeedRamp);
+			FBSpeedRamp.ResetCounter(&FBSpeedRamp);//µ÷½Ú¼±Í£»¬¶¯
 			
 				if((last_fb_ref > 0) && (ChassisSpeedRef.forward_back_ref == 0)){
 				fb_move_flag = 80;
@@ -321,7 +321,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 				pwm_server_motor_set_angle(0,0.f);
 #endif
 #ifdef Infantry_2
-				pwm_server_motor_set_angle(0,50.f);
+				pwm_server_motor_set_angle(0,0.f);
 #endif
 				SetSlabState(OPEN);
 			//	fw_printfln("OPEN");	
@@ -343,7 +343,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 				pwm_server_motor_set_angle(0,110.f);
 #endif
 #ifdef Infantry_2
-				pwm_server_motor_set_angle(0,180.f);
+				pwm_server_motor_set_angle(0,100.f);
 #endif
 				SetSlabState(CLOSE);
 			//fw_printfln("CLOSE");	
