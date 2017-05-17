@@ -74,7 +74,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 //	}
 	
 	
-		float CM_current_max = 12000.f;
+		float CM_current_max = 13500.f;
 	
 	float CMFLIntensity_max =4000.f;
 	float CMFRIntensity_max =4000.f;
