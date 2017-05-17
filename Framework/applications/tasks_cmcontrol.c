@@ -151,11 +151,11 @@ void Timer_2ms_lTask(void const * argument)
 			countwhile++;
 		}
 //陀螺仪复位计时
-    if(countwhile1 > 3000){
+    if(countwhile1 > 2500){
 			if(GYRO_RESETED == 0)GYRO_RST();//给单轴陀螺仪将当前位置写零
 		}
 		else{countwhile1++;}
-		if(countwhile1 > 5500){
+		if(countwhile1 > 4000){
 			GYRO_RESETED = 2;//正常遥控器或者键盘控制模式，底盘跟随模式
 		}
 		else{countwhile1++;}

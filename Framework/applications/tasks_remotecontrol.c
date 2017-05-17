@@ -145,7 +145,7 @@ void RemoteDataProcess(uint8_t *pData)
 			if(GYRO_RESETED == 2){
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
-			SetShootMode(AUTO);
+//			SetShootMode(AUTO);
 //			RemoteShootControl(&switch1, RC_CtrlData.rc.s1);
 		  }
 		}break;
