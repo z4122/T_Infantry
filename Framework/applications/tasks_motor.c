@@ -297,7 +297,7 @@ void CMGMControlTask(void const * argument){
 			MINMAX(pitchAngleTarget, -28.f, 26);
 #endif
 #ifdef Infantry_4
-			MINMAX(pitchAngleTarget, -21.f, 18);
+			MINMAX(pitchAngleTarget, -16.f, 18);
 #endif
 //			MINMAX(pitchAngleTarget, -28.f, 26);
 

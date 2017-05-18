@@ -81,7 +81,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 	float CMBLIntensity_max =4000.f;
 	float CMBRIntensity_max =4000.f;
 #ifdef Infantry_4
-		CM_current_max = 15000.f;
+		CM_current_max = 14000.f;
 		CMFLIntensity_max =4500.f;
 		CMFRIntensity_max =4500.f;
 		CMBLIntensity_max =4500.f;
