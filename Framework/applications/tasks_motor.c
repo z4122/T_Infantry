@@ -43,7 +43,7 @@ fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(4.0, 0, 2.5, 10000.0, 10000.0,
 fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
-#define yaw_zero 705//720
+#define yaw_zero 650//720
 #define pitch_zero 5003
 #endif
 #ifdef Infantry_4
@@ -291,13 +291,13 @@ void CMGMControlTask(void const * argument){
 				}
 		  }
 #ifdef Infantry_2
-			MINMAX(pitchAngleTarget, -8.5f, 32);
+			MINMAX(pitchAngleTarget, -22.5f, 24);
 #endif
 #ifdef Infantry_3
-			MINMAX(pitchAngleTarget, -28.f, 26);
+			MINMAX(pitchAngleTarget, -26.5f, 26);
 #endif
 #ifdef Infantry_4
-			MINMAX(pitchAngleTarget, -16.f, 18);
+			MINMAX(pitchAngleTarget, -22.5f, 33);
 #endif
 //			MINMAX(pitchAngleTarget, -28.f, 26);
 

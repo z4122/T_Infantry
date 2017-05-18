@@ -280,12 +280,12 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			ChassisSpeedRef.left_right_ref = 0;
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 		}
-	  if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 550){
-				if(ChassisSpeedRef.forward_back_ref > 350){
-				 ChassisSpeedRef.forward_back_ref =  350 +  (ChassisSpeedRef.forward_back_ref - 350) * 0.15f;
+	  if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500){
+				if(ChassisSpeedRef.forward_back_ref > 325){
+				 ChassisSpeedRef.forward_back_ref =  325 +  (ChassisSpeedRef.forward_back_ref - 325) * 0.15f;
 				}
-				else if(ChassisSpeedRef.forward_back_ref < -350){
-					ChassisSpeedRef.forward_back_ref =  -350 +  (ChassisSpeedRef.forward_back_ref + 350) * 0.15f;
+				else if(ChassisSpeedRef.forward_back_ref < -325){
+					ChassisSpeedRef.forward_back_ref =  -325 +  (ChassisSpeedRef.forward_back_ref + 325) * 0.15f;
 				}
 				if(ChassisSpeedRef.left_right_ref > 300){
 				 ChassisSpeedRef.left_right_ref =  300 +  (ChassisSpeedRef.left_right_ref - 300) * 0.15f;
@@ -294,8 +294,6 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 					ChassisSpeedRef.left_right_ref =  -300 +  (ChassisSpeedRef.left_right_ref + 300) * 0.15f;
 				}
 			}
-		
-			
 				if ((mouse->x < -2.6) || (mouse->x > 2.6)){
 				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 400){
 				if(ChassisSpeedRef.forward_back_ref > 250){
@@ -312,11 +310,11 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 				}
 			}
 			}
-			if ((mouse->x < -2)){
-				mouse->x = -2;
+			if ((mouse->x < -1.8)){
+				mouse->x = -1.8f;
 			}
-			if ((mouse->x > 2)){
-				mouse->x = 2;
+			if ((mouse->x > 1.8)){
+				mouse->x = 1.8f;
 			}
 		if(key->v == 8192)//c
 		{
