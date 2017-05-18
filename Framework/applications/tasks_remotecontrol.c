@@ -294,6 +294,8 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 					ChassisSpeedRef.left_right_ref =  -300 +  (ChassisSpeedRef.left_right_ref + 300) * 0.15f;
 				}
 			}
+		
+			
 				if ((mouse->x < -2.6) || (mouse->x > 2.6)){
 				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 400){
 				if(ChassisSpeedRef.forward_back_ref > 250){
@@ -309,6 +311,12 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 					ChassisSpeedRef.left_right_ref =  -250 +  (ChassisSpeedRef.left_right_ref + 250) * 0.15f;
 				}
 			}
+			}
+			if ((mouse->x < -2)){
+				mouse->x = -2;
+			}
+			if ((mouse->x > 2)){
+				mouse->x = 2;
 			}
 		if(key->v == 8192)//c
 		{
