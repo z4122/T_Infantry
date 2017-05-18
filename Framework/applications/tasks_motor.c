@@ -52,7 +52,7 @@ fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 1.5, 10000.0, 10000.0
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(35.0, 0.0, 2.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
 #define yaw_zero 1040
-#define pitch_zero 6050
+#define pitch_zero 6400//原来6050
 #endif
 #ifdef Infantry_1_Aim
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT_old; 
