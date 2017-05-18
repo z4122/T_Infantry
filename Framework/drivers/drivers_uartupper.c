@@ -14,10 +14,6 @@ NaiveIOPoolDefine(ctrlUartIOPool, {0});
 
 xdata_ctrlUart ctrlData; //ÃîËã½ÓÊÕ±äÁ¿
 
-void judgeUartRxCpltCallback(void){
-	
-}
-
 void ctrlUartRxCpltCallback(){
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
