@@ -280,7 +280,8 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			ChassisSpeedRef.left_right_ref = 0;
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 		}
-	  if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500){
+	 //前后和左右的和限制
+		if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500){
 				if(ChassisSpeedRef.forward_back_ref > 200){
 				 ChassisSpeedRef.forward_back_ref =  200 +  (ChassisSpeedRef.forward_back_ref - 200) * 0.15f;
 				}
@@ -294,6 +295,8 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 					ChassisSpeedRef.left_right_ref =  -200 +  (ChassisSpeedRef.left_right_ref + 200) * 0.15f;
 				}
 			}
+		
+			//转动的限制
 				if ((mouse->x < -2.6) || (mouse->x > 2.6)){
 				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 400){
 				if(ChassisSpeedRef.forward_back_ref > 250){
