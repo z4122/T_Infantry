@@ -16,7 +16,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 	}else if(UartHandle == &CTRL_UART){
 		ctrlUartRxCpltCallback();
 	}
-//	else if(UartHandle == &JUDGE_UART){
-//		judgeUartRxCpltCallback();
-//	}
+	else if(UartHandle == &JUDGE_UART){
+		judgeUartRxCpltCallback();
+	}
 }   

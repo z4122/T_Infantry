@@ -1,6 +1,6 @@
 #include "drivers_uartjudge_low.h"
 #include "drivers_uartjudge_user.h"
-
+#include "utilities_debug.h"
 #include "usart.h"
 #include "stm32f4xx_hal_uart.h"
 #include "peripheral_define.h"
@@ -110,14 +110,79 @@ uint32_t myVerify_CRC16_Check_Sum(uint8_t *pchMessage, uint32_t dwLength)
 }
 
 NaiveIOPoolDefine(judgePowerUartIOPool, {0});
-
+uint8_t tmp_judge;
 void judgeUartInit(void){
-	if(HAL_UART_Receive_DMA(&JUDGE_UART, (uint8_t*)IOPool_pGetWriteData(judgePowerUartIOPool), 60) != HAL_OK){
+	if(HAL_UART_Receive_DMA(&JUDGE_UART, &tmp_judge, 1) != HAL_OK){
 			Error_Handler();
 	}
-	__HAL_UART_ENABLE_IT(&JUDGE_UART, UART_IT_IDLE);
 }
+uint8_t receiving = 0;
+uint8_t received = 0;
+uint8_t buffer[44] = {0}; 
+uint8_t buffercnt = 0;
 
 void judgeUartRxCpltCallback(void){
+//	fw_printfln("judge receive");
+			if(receiving) 
+		{
+			buffer[buffercnt] = tmp_judge;
+			buffercnt++;
+			
+			if(buffercnt == 5)
+			{
+				if (myVerify_CRC8_Check_Sum(buffer, 5)==0) {receiving = 0;buffercnt = 0;}
+			}
+			
+			if(buffercnt == 44)
+			{
+				if (myVerify_CRC16_Check_Sum(buffer, 44)) Judge_Refresh();
+				receiving = 0;
+				buffercnt = 0;
+			}
+		}
+		else 
+		{
+			if(tmp_judge == 0xA5)
+			{
+				receiving = 1;
+				buffercnt = 0;
+				buffer[0] = tmp_judge;
+				buffercnt++;
+			}
+		}
+		if(HAL_UART_Receive_DMA(&JUDGE_UART, &tmp_judge, 1) != HAL_OK){
+			Error_Handler();
+	}
+}
+
+tGameInfo mytGameInfo;
+
+void Judge_Refresh(void)
+{
+	printf("verify OK\r\n");
 	
+  mytGameInfo.remainTime = (0x00000000 | buffer[7]) | (buffer[8]<<8) | (buffer[9]<<16) | (buffer[10]<<24);
+	
+  mytGameInfo.remainLifeValue = (0x0000 | buffer[11]) | (buffer[12]<<8);
+	
+  unsigned char * b = (unsigned char*)&mytGameInfo.realChassisOutV;
+  char c[4] = {buffer[13],buffer[14],buffer[15],buffer[16]};
+  for(int i = 0; i<4; i++){
+      b[i] = (unsigned char)c[i];
+  }
+  fw_printf("COutV: %f \r\n",mytGameInfo.realChassisOutV);
+	
+	b = (unsigned char*)&mytGameInfo.realChassisOutA;
+  c[0] = buffer[17];c[1] = buffer[18];c[2] = buffer[19];c[3] = buffer[20];
+  for(int i = 0; i<4; i++){
+      b[i] = (unsigned char)c[i];
+  }
+  fw_printf("COutA: %f \r\n",mytGameInfo.realChassisOutA);
+
+	b = (unsigned char*)&mytGameInfo.remainPower;
+  c[0] = buffer[38];c[1] = buffer[39];c[2] = buffer[40];c[3] = buffer[41];
+  for(int i = 0; i<4; i++){
+      b[i] = (unsigned char)c[i];
+  }
+  fw_printf("remainPower: %f \r\n",mytGameInfo.remainPower);
 }
