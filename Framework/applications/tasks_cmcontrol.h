@@ -30,7 +30,7 @@ WorkState_e GetWorkState(void);
 	0,\
 	0,\
 	{0,0},\
-	1.1f,\
+	1.4f,\
 	0.0f,\
 	0.0f,\
 	0,\
