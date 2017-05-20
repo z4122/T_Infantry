@@ -969,6 +969,21 @@
               <FileType>5</FileType>
               <FilePath>..\Framework\drivers\pwm_server_motor.h</FilePath>
             </File>
+            <File>
+              <FileName>drivers_uartjudge.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\drivers\drivers_uartjudge.c</FilePath>
+            </File>
+            <File>
+              <FileName>drivers_uartjudge_low.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\drivers\drivers_uartjudge_low.h</FilePath>
+            </File>
+            <File>
+              <FileName>drivers_uartjudge_user.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\drivers\drivers_uartjudge_user.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

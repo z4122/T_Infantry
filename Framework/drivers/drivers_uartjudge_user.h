@@ -4,9 +4,9 @@
 #include "utilities_iopool.h"
 
 typedef struct{
-	uint16_t voltage;
-	uint16_t electricity;
-	uint16_t remainPower;
+	float voltage;
+	float electricity;
+	float remainPower;
 }JudgePower_t;
 IOPoolDeclare(judgePowerUartIOPool, JudgePower_t);
 
