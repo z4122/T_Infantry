@@ -18,6 +18,9 @@ extern tGameInfo mytGameInfo;
 //	uint32_t id;
 //}MotorCanNumId;
 int16_t CMFLIntensity = 0, CMFRIntensity = 0, CMBLIntensity = 0, CMBRIntensity = 0;
+
+extern uint8_t JUDGE_State;
+
 void setMotor(MotorId motorId, int16_t Intensity){
 //	static int16_t CMFLIntensity = 0, CMFRIntensity = 0, CMBLIntensity = 0, CMBRIntensity = 0;
 	static int8_t CMReady = 0;
@@ -115,7 +118,7 @@ if (mytGameInfo.remainPower < 7 ){
 	 CMBRIntensity_max = 0;
 }
 
-if (mytGameInfo.remainPower == 0 ){
+if (JUDGE_State == 1){
 		
 	 CM_current_max = 13000;
 	 CMFLIntensity_max = 4500;

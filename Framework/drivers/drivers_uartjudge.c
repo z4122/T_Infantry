@@ -154,6 +154,8 @@ void judgeUartRxCpltCallback(void){
 }
 
 tGameInfo mytGameInfo;
+uint8_t JUDGE_Received = 0;
+uint8_t JUDGE_State = 1;
 
 void Judge_Refresh(void)
 {
@@ -182,5 +184,8 @@ void Judge_Refresh(void)
   for(int i = 0; i<4; i++){
       b[i] = (unsigned char)c[i];
   }
-//  fw_printf("remainPower: %f \r\n",mytGameInfo.remainPower);
+  fw_printf("remainPower: %f \r\n",mytGameInfo.remainPower);
+	
+	
+	JUDGE_Received = 1;
 }
