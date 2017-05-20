@@ -1,4 +1,5 @@
 #include "drivers_uartjudge_low.h"
+#include "drivers_uartjudge_user.h"
 #include "utilities_debug.h"
 #include "usart.h"
 #include "stm32f4xx_hal_uart.h"
@@ -108,6 +109,7 @@ uint32_t myVerify_CRC16_Check_Sum(uint8_t *pchMessage, uint32_t dwLength)
     pchMessage[dwLength - 1]);
 }
 
+NaiveIOPoolDefine(judgePowerUartIOPool, {0});
 uint8_t tmp_judge;
 void judgeUartInit(void){
 	if(HAL_UART_Receive_DMA(&JUDGE_UART, &tmp_judge, 1) != HAL_OK){
@@ -157,7 +159,7 @@ tGameInfo mytGameInfo;
 
 void Judge_Refresh(void)
 {
-	//printf("verify OK\r\n");
+	printf("verify OK\r\n");
 	
   mytGameInfo.remainTime = (0x00000000 | buffer[7]) | (buffer[8]<<8) | (buffer[9]<<16) | (buffer[10]<<24);
 	
@@ -168,19 +170,19 @@ void Judge_Refresh(void)
   for(int i = 0; i<4; i++){
       b[i] = (unsigned char)c[i];
   }
-//  fw_printf("COutV: %f \r\n",mytGameInfo.realChassisOutV);
+  fw_printf("COutV: %f \r\n",mytGameInfo.realChassisOutV);
 	
 	b = (unsigned char*)&mytGameInfo.realChassisOutA;
   c[0] = buffer[17];c[1] = buffer[18];c[2] = buffer[19];c[3] = buffer[20];
   for(int i = 0; i<4; i++){
       b[i] = (unsigned char)c[i];
   }
-//  fw_printf("COutA: %f \r\n",mytGameInfo.realChassisOutA);
+  fw_printf("COutA: %f \r\n",mytGameInfo.realChassisOutA);
 
 	b = (unsigned char*)&mytGameInfo.remainPower;
   c[0] = buffer[38];c[1] = buffer[39];c[2] = buffer[40];c[3] = buffer[41];
   for(int i = 0; i<4; i++){
       b[i] = (unsigned char)c[i];
   }
-//  fw_printf("remainPower: %f \r\n",mytGameInfo.remainPower);
+  fw_printf("remainPower: %f \r\n",mytGameInfo.remainPower);
 }
