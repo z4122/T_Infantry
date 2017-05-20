@@ -97,6 +97,7 @@ float pitchAngleTarget = 0.0;
 extern float diff_fbspeed;
 extern uint8_t fb_move_flag;
 extern uint8_t fb_move_flag1;
+float gap_angle = 0.0;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 int twist_state = 0;
 int twist_count = 0;
@@ -124,7 +125,6 @@ void CMGMControlTask(void const * argument){
 		if(IOPool_hasNextRead(GMYAWRxIOPool, 0)){
 			uint16_t yawZeroAngle = yaw_zero;
 			float yawRealAngle = 0.0;
-			float gap_angle = 0.0;
 			int16_t yawIntensity = 0;		
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
@@ -297,7 +297,15 @@ void CMGMControlTask(void const * argument){
 			MINMAX(pitchAngleTarget, -26.5f, 26);
 #endif
 #ifdef Infantry_4
-			MINMAX(pitchAngleTarget, -22.5f, 33);
+			MINMAX(pitchAngleTarget, -11.0f, 27);
+			//原本想避免弹道卡住装甲板
+//float Pitch_add = 0;			
+//if(fabs(gap_angle) > 20){
+//	Pitch_add = 5.0f;
+//}
+//else{
+//	Pitch_add = 0;
+//}
 #endif
 //			MINMAX(pitchAngleTarget, -28.f, 26);
 
