@@ -297,7 +297,7 @@ void CMGMControlTask(void const * argument){
 			MINMAX(pitchAngleTarget, -26.5f, 26);
 #endif
 #ifdef Infantry_4
-			MINMAX(pitchAngleTarget, -11.0f, 27);
+			MINMAX(pitchAngleTarget, -9.0f, 32);
 			//原本想避免弹道卡住装甲板
 //float Pitch_add = 0;			
 //if(fabs(gap_angle) > 20){

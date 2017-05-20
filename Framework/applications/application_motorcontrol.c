@@ -97,7 +97,7 @@ if (mytGameInfo.remainPower > 10 & mytGameInfo.remainPower < 40){
 	 CMBRIntensity_max = CMBRIntensity_lower;
 }
 //0-10极限限制
-if (mytGameInfo.remainPower < 10 ){
+if (mytGameInfo.remainPower < 15 ){
 		
 	 CM_current_max = CM_current_bottom;
 	 CMFLIntensity_max = CMFLIntensity_bottom;
@@ -106,7 +106,7 @@ if (mytGameInfo.remainPower < 10 ){
 	 CMBRIntensity_max = CMBRIntensity_bottom;
 }
 //绝对不超
-if (mytGameInfo.remainPower < 10 ){
+if (mytGameInfo.remainPower < 7 ){
 		
 	 CM_current_max = 0;
 	 CMFLIntensity_max = 0;
@@ -115,6 +115,14 @@ if (mytGameInfo.remainPower < 10 ){
 	 CMBRIntensity_max = 0;
 }
 
+if (mytGameInfo.remainPower == 0 ){
+		
+	 CM_current_max = 13000;
+	 CMFLIntensity_max = 4500;
+	 CMFRIntensity_max = 4500;
+	 CMBLIntensity_max = 4500;
+	 CMBRIntensity_max = 4500;
+}
 
 	float sum = (abs(CMFLIntensity) + abs(CMFRIntensity) + abs(CMBLIntensity) + abs(CMBRIntensity));
 	
