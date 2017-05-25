@@ -210,12 +210,13 @@ void CMGMControlTask(void const * argument){
 			yawRealAngle = -ZGyroModuleAngle;//此时底盘跟随已经设定完毕，yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
 /*自瞄模式切换*/
 			if(GetShootMode() == AUTO) {
+				ChassisSpeedRef.rotate_ref = 0;
 				if((GetLocateState() == Located)){
 				ChassisSpeedRef.rotate_ref = 0;
 				}
 				if((GetLocateState() == Locating) && (CReceive != 0))	{
 				yawAngleTarget = yawRealAngle - yawAdd ;
-				//fw_printfln("yawAdd:%f",yawAdd );
+				fw_printfln("yawAdd-in control:%f",yawAdd );
 				CReceive--;
 				}
 //大神符

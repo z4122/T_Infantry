@@ -183,7 +183,10 @@ if (JUDGE_State == 1){
 			GMYAWIntensity = 0;
 			GMPITCHIntensity = 0;
 		}
-
+CMFLIntensity = 0;
+			CMFRIntensity = 0;
+			CMBLIntensity = 0;
+			CMBRIntensity = 0;
 	if(CMReady == 0xF){
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(CMTxIOPool);
 		pData->StdId = CM_TXID;
