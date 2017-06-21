@@ -54,6 +54,7 @@ void getCtrlUartTask(void const * argument){
 				if(ctrlData.rune_locate != 0){
 					SetLocateState(Locating);
 				}
+				/////
 				else if((ctrlData.rune_locate == 0) && (last_rune_locate != 0)){
 					SetLocateState(Located);
 					fw_printfln("Located");
