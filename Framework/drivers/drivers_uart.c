@@ -1,6 +1,7 @@
 #include "drivers_uart.h"
 #include "drivers_uartrc_low.h"
 #include "drivers_uartupper_low.h"
+#include "drivers_uartjudge_low.h"
 
 #include "peripheral_define.h"
 #include "utilities_debug.h"
@@ -14,7 +15,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 		
 	}else if(UartHandle == &CTRL_UART){
 		ctrlUartRxCpltCallback();
-	}else if(UartHandle == &JUDGE_UART){
+	}
+	else if(UartHandle == &JUDGE_UART){
 		judgeUartRxCpltCallback();
 	}
 }   

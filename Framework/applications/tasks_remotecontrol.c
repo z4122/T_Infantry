@@ -11,7 +11,7 @@
 #include "peripheral_define.h"
 #include "pwm_server_motor.h"
 #include "tasks_motor.h"
-
+//**//
 #include "utilities_minmax.h"
 #include "math.h"
 #include <stdlib.h>
@@ -212,6 +212,16 @@ void RemoteControlProcess(Remote *rc)
 uint8_t fb_move_flag = 0;
 uint8_t fb_move_flag1 = 0;
 
+extern uint8_t JUDGE_State;
+
+#ifndef Infantry_4
+  #define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 2
+  #define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 2
+#else
+  #define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 3
+  #define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 3
+#endif
+
 void MouseKeyControlProcess(Mouse *mouse, Key *key)
 {
 	static uint16_t forward_back_speed = 0;
@@ -220,7 +230,8 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
     {
 		VAL_LIMIT(mouse->x, -150, 150); 
 		VAL_LIMIT(mouse->y, -150, 150); 
-		
+
+			
         pitchAngleTarget -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  //(rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
         yawAngleTarget    -= mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
 		//speed mode: normal speed/high speed 
@@ -280,20 +291,24 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			ChassisSpeedRef.left_right_ref = 0;
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 		}
+		
+		
+	if(JUDGE_State==1){
 	  if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500){
-				if(ChassisSpeedRef.forward_back_ref > 200){
-				 ChassisSpeedRef.forward_back_ref =  200 +  (ChassisSpeedRef.forward_back_ref - 200) * 0.15f;
+				if(ChassisSpeedRef.forward_back_ref > 325){
+				 ChassisSpeedRef.forward_back_ref =  325 +  (ChassisSpeedRef.forward_back_ref - 325) * 0.15f;
 				}
-				else if(ChassisSpeedRef.forward_back_ref < -200){
-					ChassisSpeedRef.forward_back_ref =  -200 +  (ChassisSpeedRef.forward_back_ref + 200) * 0.15f;
+				else if(ChassisSpeedRef.forward_back_ref < -325){
+					ChassisSpeedRef.forward_back_ref =  -325 +  (ChassisSpeedRef.forward_back_ref + 325) * 0.15f;
 				}
-				if(ChassisSpeedRef.left_right_ref > 200){
-				 ChassisSpeedRef.left_right_ref =  200 +  (ChassisSpeedRef.left_right_ref - 200) * 0.15f;
+				if(ChassisSpeedRef.left_right_ref > 300){
+				 ChassisSpeedRef.left_right_ref =  300 +  (ChassisSpeedRef.left_right_ref - 300) * 0.15f;
 				}
-				else if(ChassisSpeedRef.left_right_ref < -200){
-					ChassisSpeedRef.left_right_ref =  -200 +  (ChassisSpeedRef.left_right_ref + 200) * 0.15f;
+				else if(ChassisSpeedRef.left_right_ref < -300){
+					ChassisSpeedRef.left_right_ref =  -300 +  (ChassisSpeedRef.left_right_ref + 300) * 0.15f;
 				}
 			}
+//限制组合键超功率
 				if ((mouse->x < -2.6) || (mouse->x > 2.6)){
 				if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 400){
 				if(ChassisSpeedRef.forward_back_ref > 250){
@@ -310,6 +325,13 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 				}
 			}
 			}
+		}
+//			if ((mouse->x < -1.8)){
+//				mouse->x = -1.8f;
+//			}
+//			if ((mouse->x > 1.8)){
+//				mouse->x = 1.8f;
+//			}
 		if(key->v == 8192)//c
 		{
 			if(GetSlabState() == CLOSE)

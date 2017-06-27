@@ -43,7 +43,7 @@ fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(4.0, 0, 2.5, 10000.0, 10000.0,
 fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
-#define yaw_zero 705//720
+#define yaw_zero 720//720
 #define pitch_zero 5003
 #endif
 #ifdef Infantry_4
@@ -97,6 +97,7 @@ float pitchAngleTarget = 0.0;
 extern float diff_fbspeed;
 extern uint8_t fb_move_flag;
 extern uint8_t fb_move_flag1;
+float gap_angle = 0.0;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
 int twist_state = 0;
 int twist_count = 0;
@@ -124,7 +125,6 @@ void CMGMControlTask(void const * argument){
 		if(IOPool_hasNextRead(GMYAWRxIOPool, 0)){
 			uint16_t yawZeroAngle = yaw_zero;
 			float yawRealAngle = 0.0;
-			float gap_angle = 0.0;
 			int16_t yawIntensity = 0;		
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
@@ -210,12 +210,13 @@ void CMGMControlTask(void const * argument){
 			yawRealAngle = -ZGyroModuleAngle;//此时底盘跟随已经设定完毕，yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
 /*自瞄模式切换*/
 			if(GetShootMode() == AUTO) {
+				ChassisSpeedRef.rotate_ref = 0;
 				if((GetLocateState() == Located)){
 				ChassisSpeedRef.rotate_ref = 0;
 				}
 				if((GetLocateState() == Locating) && (CReceive != 0))	{
 				yawAngleTarget = yawRealAngle - yawAdd ;
-				//fw_printfln("yawAdd:%f",yawAdd );
+				fw_printfln("yawAdd-in control:%f",yawAdd );
 				CReceive--;
 				}
 //大神符
@@ -291,13 +292,21 @@ void CMGMControlTask(void const * argument){
 				}
 		  }
 #ifdef Infantry_2
-			MINMAX(pitchAngleTarget, -8.5f, 32);
+			MINMAX(pitchAngleTarget, -10.0f, 26.3f);
 #endif
 #ifdef Infantry_3
-			MINMAX(pitchAngleTarget, -28.f, 26);
+			MINMAX(pitchAngleTarget, -18.f, 30);
 #endif
 #ifdef Infantry_4
-			MINMAX(pitchAngleTarget, -21.f, 18);
+			MINMAX(pitchAngleTarget, -9.0f, 32);
+			//原本想避免弹道卡住装甲板
+//float Pitch_add = 0;			
+//if(fabs(gap_angle) > 20){
+//	Pitch_add = 5.0f;
+//}
+//else{
+//	Pitch_add = 0;
+//}
 #endif
 //			MINMAX(pitchAngleTarget, -28.f, 26);
 

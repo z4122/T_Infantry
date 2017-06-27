@@ -10,11 +10,17 @@
 #include <math.h>
 #include <stdlib.h>
 #include "tasks_motor.h"
+#include "drivers_uartjudge_low.h"
+
+extern tGameInfo mytGameInfo;
 //typedef struct{
 //	CAN_HandleTypeDef  *canNum;
 //	uint32_t id;
 //}MotorCanNumId;
 int16_t CMFLIntensity = 0, CMFRIntensity = 0, CMBLIntensity = 0, CMBRIntensity = 0;
+
+extern uint8_t JUDGE_State;
+
 void setMotor(MotorId motorId, int16_t Intensity){
 //	static int16_t CMFLIntensity = 0, CMFRIntensity = 0, CMBLIntensity = 0, CMBRIntensity = 0;
 	static int8_t CMReady = 0;
@@ -74,19 +80,53 @@ void setMotor(MotorId motorId, int16_t Intensity){
 //	}
 	
 	
-		float CM_current_max = 13000.f;
 	
-	float CMFLIntensity_max =4000.f;
-	float CMFRIntensity_max =4000.f;
-	float CMBLIntensity_max =4000.f;
-	float CMBRIntensity_max =4000.f;
-#ifdef Infantry_4
-		CM_current_max = 15000.f;
-		CMFLIntensity_max =4500.f;
-		CMFRIntensity_max =4500.f;
-		CMBLIntensity_max =4500.f;
-		CMBRIntensity_max =4500.f;
-#endif
+	
+//读出功率进行电流限制
+//默认不限
+float CM_current_max = CM_current_MAX;
+float CMFLIntensity_max = CMFLIntensity_MAX;
+float CMFRIntensity_max = CMFRIntensity_MAX;
+float CMBLIntensity_max = CMBLIntensity_MAX;
+float CMBRIntensity_max = CMBRIntensity_MAX;
+
+//10-40初步限制
+if (mytGameInfo.remainPower > 10 & mytGameInfo.remainPower < 40){
+		
+	 CM_current_max = CM_current_lower;
+	 CMFLIntensity_max = CMFLIntensity_lower;
+	 CMFRIntensity_max = CMFRIntensity_lower;
+	 CMBLIntensity_max = CMBLIntensity_lower;
+	 CMBRIntensity_max = CMBRIntensity_lower;
+}
+//0-10极限限制
+if (mytGameInfo.remainPower < 15 ){
+		
+	 CM_current_max = CM_current_bottom;
+	 CMFLIntensity_max = CMFLIntensity_bottom;
+	 CMFRIntensity_max = CMFRIntensity_bottom;
+	 CMBLIntensity_max = CMBLIntensity_bottom;
+	 CMBRIntensity_max = CMBRIntensity_bottom;
+}
+//绝对不超
+if (mytGameInfo.remainPower < 7 ){
+		
+	 CM_current_max = 0;
+	 CMFLIntensity_max = 0;
+	 CMFRIntensity_max = 0;
+	 CMBLIntensity_max = 0;
+	 CMBRIntensity_max = 0;
+}
+
+if (JUDGE_State == 1){
+		
+	 CM_current_max = 13000;
+	 CMFLIntensity_max = 4500;
+	 CMFRIntensity_max = 4500;
+	 CMBLIntensity_max = 4500;
+	 CMBRIntensity_max = 4500;
+}
+
 	float sum = (abs(CMFLIntensity) + abs(CMFRIntensity) + abs(CMBLIntensity) + abs(CMBRIntensity));
 	
 	if ((CMFLIntensity > CMFLIntensity_max))
@@ -143,7 +183,10 @@ void setMotor(MotorId motorId, int16_t Intensity){
 			GMYAWIntensity = 0;
 			GMPITCHIntensity = 0;
 		}
-
+CMFLIntensity = 0;
+			CMFRIntensity = 0;
+			CMBLIntensity = 0;
+			CMBRIntensity = 0;
 	if(CMReady == 0xF){
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(CMTxIOPool);
 		pData->StdId = CM_TXID;

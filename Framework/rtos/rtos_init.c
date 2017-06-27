@@ -13,7 +13,7 @@
 #include "tim.h"
 
 #include "drivers_buzzer_low.h"
-
+#include "drivers_uartjudge_low.h"
 extern void PMInit(void);
 uint8_t isInited = 0;
 void rtos_init(){
@@ -34,6 +34,7 @@ void rtos_init(){
 	rcInit();
 	motorInit();
 	PMInit();
+	judgeUartInit();
 //	mpu6050Init();
 //	Init_Quaternion();
 	fw_printfln("init success");
