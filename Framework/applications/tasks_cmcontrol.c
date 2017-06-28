@@ -18,10 +18,8 @@
 #include "task.h"
 #include "usart.h"
 #include "peripheral_define.h"
+#include "drivers_platemotor.h"
 
-#define bool char
-#define true 1
-#define false 0
 
 extern PID_Regulator_t CMRotatePID ; 
 extern PID_Regulator_t CM1SpeedPID;
@@ -134,7 +132,7 @@ float this_fbspeed = 0;
 float last_fbspeed = 0;
 float diff_fbspeed = 0;
 
-bool stuck = false;	//卡弹标志位，未卡弹为false，卡弹为true
+int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 
 extern uint8_t JUDGE_Received;
 extern uint8_t JUDGE_State;
@@ -240,19 +238,11 @@ void Timer_2ms_lTask(void const * argument)
 				//清空计数器
 				//EncoderCnt = 0;			
 				//卡弹之后直接反转
-				stuck = true;
-//				HAL_GPIO_TogglePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin);
-//				HAL_GPIO_TogglePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin);
-//				ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
-//				fw_printfln("ref = %d",PID_SHOOT_MOTOR_SPEED);
-//				ShootMotorSpeedPID.fdb = EncoderCnt;
-//				fw_printfln("fdb = %d",EncoderCnt);
-//				EncoderCnt = 0;
-//				//ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
-//				ShootMotorSpeedPID.output = 1*(ShootMotorSpeedPID.ref-ShootMotorSpeedPID.fdb);
+				stuck = 1;
+
 			}
 			else{	
-				stuck = false;
+				stuck = 0;
 			}
 			//更新PID
 			//stuckConditionUpdate(bool stuck);
@@ -267,85 +257,7 @@ void Timer_2ms_lTask(void const * argument)
 		}
 		else countwhile3++;	
 		
-/*		last_shoot_state = this_shoot_state;//2ms更新一次
-		this_shoot_state = GetShootState();
-		if(last_shoot_state == NOSHOOTING && this_shoot_state == SHOOTING){	//一定只出现一次,检测鼠标单击动作
-			mouse_click_left = 1;//如果检测到单击，mouse_click_left置1，直至运行300ms或者出现卡弹时置0
-			fw_printfln("mouse_click_left==1");
-		}
-		//300ms计时
-		if(mouse_click_left == 1 && shootwhile>150){
-			//flag==1时，停止shooting
-			flag = 1;
-			shootwhile = 0;
-		}
-		else if(mouse_click_left == 1 && shootwhile<=150)
-			++shootwhile;
-		
-		
-		if(countwhile3>25 && mouse_click_left==1){
-			countwhile3 = 0;
-			if(EncoderCnt<3){		//产生卡弹
-				//清空计数器
-				//EncoderCnt = 0;			
-				//卡弹之后直接停转，等待下次单击，旋转方向会改变
-				HAL_GPIO_TogglePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin);
-				HAL_GPIO_TogglePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin);
 
-				EncoderCnt = 0;
-				mouse_click_left = 0;
-				shootwhile = 0;
-				flag = 0;
-				//ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
-				ShootMotorSpeedPID.output = 0;
-			}
-			else{	//如果没有卡弹,更新PID
-				if(flag==0){
-					ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
-					fw_printfln("ref = %d",PID_SHOOT_MOTOR_SPEED);
-					ShootMotorSpeedPID.fdb = EncoderCnt;
-					fw_printfln("fdb = %d",EncoderCnt);
-					EncoderCnt = 0;
-					//ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
-					ShootMotorSpeedPID.output = 1*(ShootMotorSpeedPID.ref-ShootMotorSpeedPID.fdb);
-					//ShootMotorSpeedPID.Calc(&ShootMotorSpeedPID);	
-				}
-				else{
-					EncoderCnt = 0;
-					mouse_click_left = 0;
-					shootwhile = 0;
-					flag = 0;
-					//ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
-					ShootMotorSpeedPID.output = 0;
-				}
-			}
-		}
-		else countwhile3++;
-				*/
-		
-		//如果检测到卡弹，转动方向改变，且拨盘停止转动，等待下次鼠标单击
-	/*	if(countwhile3>5){		//10ms任务，检测卡弹，更新拨盘电机位置、速度PID，检测鼠标左键状态
-			//更新（检测）发射状态与编码器
-			Shoot_State_e last_shoot_state = this_shoot_state;
-			Shoot_State_e this_shoot_state = GetShootState();
-			last_Encoder = this_Encoder;
-			this_Encoder = EncoderCnt;
-			
-			//根据发射状态设置位置目标值
-			if(last_shoot_state == NOSHOOTING &this_shoot_state == SHOOTING){	//如果单击鼠标左键，进入发射状态，设置位置PID
-				ShootMotorPositionPID.ref = 183;
-			}
-//		else if(last_shoot_state == SHOOTING && this_shoot_state == SHOOTING){}
-//		else if(last_shoot_state == SHOOTING && this_shoot_state == NOSHOOTING){}
-//			else{
-//				ShootMotorPositionPID.ref = 0;
-//			}
-			ShootMotorPositionPID.fdb = EncoderCnt;
-			ShootMotorPositionPID.Calc(&ShootMotorPositionPID);
-			ShootMotorSpeedPID.ref = ShootMotorPositionPID.output;
-			
-		}
-		else countwhile3++;*/
 		
 		ShooterMControlLoop();       //发射机构控制任务
 		
@@ -496,70 +408,75 @@ void CMControlLoop(void)
 	 } 
 	 
 }
-static char Encoder_Dir = 1;
   
 int32_t GetQuadEncoderDiff(void)
 {
   int32_t cnt = 0;    
-	cnt = 0x7fff - __HAL_TIM_GET_COUNTER(&htim3);
-//	fw_printfln("%x",cnt);
-	 __HAL_TIM_SET_COUNTER(&htim3, 0x7fff);
-    if(Encoder_Dir == 1)
-	{
-		return cnt;	
-	}
-	else
-	{
-		return -cnt;            
-	}
+	cnt = __HAL_TIM_GET_COUNTER(&htim5) - 0x7fff;
+	fw_printfln("%x",cnt);
+	 __HAL_TIM_SET_COUNTER(&htim5, 0x7fff);
+	return cnt;
 }
 
-//发射机构射击电机任务
-int16_t pwm_ccr = 0;
-//extern TIM_HandleTypeDef htim9;
-uint16_t x = 0;
 
-int temp = 800;
-uint32_t inShooting = 0;
 void ShooterMControlLoop(void)	
 {				      
-	//if(mouse_click_left == 1)
+	
 	if(GetShootState() == SHOOTING)
 	{
-		if(inShooting == 0){
-			HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_SET);
-			HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_RESET);
-			++inShooting;
-		}
-		
-		if(stuck==1){
-			HAL_GPIO_TogglePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin);
-			HAL_GPIO_TogglePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin);
-			stuck = 0;
-		}
-		
-		temp = (temp + ShootMotorSpeedPID.output);//
-		//fw_printfln("PID_Output = %f",ShootMotorSpeedPID.output);
-		fw_printfln("temp: %d",temp);
-		ShootMotorSpeedPID.output = 0;
-		
-		if(temp>800) temp = 800;//700
-		else if(temp<0) temp = 0;
-		TIM4->CCR1 = temp;//500100
-		
+		ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;//打一发弹编码器输出脉冲数*4
+//		if(ShootMotorPositionPID.ref>32000)
+//		{
+//			ShootMotorPositionPID.ref = OneShoot;
+//			__HAL_TIM_SET_COUNTER(&htim5, 0x7fff);
+//		}
 	}
-	else
-	{	
-		inShooting = 0;
-		ShootMotorSpeedPID.ref = 0;		
-		TIM4->CCR1 = 0;
-		//fw_printfln("NoShooting");
-	}
-	
-//	ShootMotorSpeedPID.fdb = GetQuadEncoderDiff();   
-//	ShootMotorSpeedPID.Calc(&ShootMotorSpeedPID);
-//	fw_printfln("%d",(uint32_t)ShootMotorSpeedPID.output);
-//	__HAL_TIM_SET_COMPARE(&htim9, TIM_CHANNEL_1, ShootMotorSpeedPID.output);
+/*
+//		if(inShooting == 0){
+//			HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_SET);
+//			HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_RESET);
+//			++inShooting;
+//		}
+//		
+//		if(stuck==1){
+//			HAL_GPIO_TogglePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin);
+//			HAL_GPIO_TogglePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin);
+//			stuck = 0;
+//		}
+//		
+//		temp = (temp + ShootMotorSpeedPID.output);//
+//		//fw_printfln("PID_Output = %f",ShootMotorSpeedPID.output);
+//		fw_printfln("temp: %d",temp);
+//		ShootMotorSpeedPID.output = 0;
+//		
+//		if(temp>800) temp = 800;//700
+//		else if(temp<0) temp = 0;
+//		TIM4->CCR1 = temp;//500100
+//		
+//	}
+//	else
+//	{	
+//		inShooting = 0;
+//		ShootMotorSpeedPID.ref = 0;		
+//		TIM4->CCR1 = 0;
+//		//fw_printfln("NoShooting");
+//	}
+*/		
+		if(GetFrictionState()==FRICTION_WHEEL_ON)
+		{
+			ShootMotorPositionPID.fdb = GetQuadEncoderDiff(); 
+			if(ShootMotorPositionPID.ref>100 && ShootMotorPositionPID.fdb<30)//卡弹
+			{
+				setPlateMotorDir(REVERSE);
+			}
+			else
+			{
+				ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - ShootMotorPositionPID.fdb;
+				ShootMotorPositionPID.Calc(&ShootMotorPositionPID);
+				fw_printfln("%d",(uint32_t)ShootMotorPositionPID.output);
+				__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, ShootMotorPositionPID.output);
+			}
+		}
 }
 
 
