@@ -17,10 +17,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		case IST_INT:
 			//osSemaphoreRelease(refreshMPU6050SemaphoreHandle);
 			break;
-		case PM_Encoder_Pin:
-			EncoderCnt++;
-			//fw_printf("EncoderCnt=%d\r\n",EncoderCnt);
-		break;
 		default:
 			fw_Warning();
 	}

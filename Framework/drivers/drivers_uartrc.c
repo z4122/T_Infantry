@@ -283,7 +283,7 @@ void MouseShootControl(Mouse *mouse)
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetShootState(NOSHOOTING);
 			}			
-			else if(mouse->press_l== 1)  //°´ÏÂ×ó¼ü£¬Éä»÷
+			else if(mouse->last_press_l == 0 && mouse->press_l== 1)  //检测鼠标左键单击动作
 			{
 				SetShootState(SHOOTING);				
 			}
@@ -294,6 +294,7 @@ void MouseShootControl(Mouse *mouse)
 		} break;				
 	}	
 	mouse->last_press_r = mouse->press_r;
+	mouse->last_press_l = mouse->press_l;
 }
 
 
