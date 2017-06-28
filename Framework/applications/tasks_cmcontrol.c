@@ -446,7 +446,7 @@ void WorkStateSwitchProcess(void)
 		RemoteTaskInit();
 	}
 }
-//底盘控制任务
+//底盘控制任务 没用到
 extern int16_t yawZeroAngle;
 void CMControlLoop(void)
 {  
@@ -484,40 +484,7 @@ void CMControlLoop(void)
 	CM1SpeedPID.Calc(&CM1SpeedPID);
 	CM2SpeedPID.Calc(&CM2SpeedPID);
 	CM3SpeedPID.Calc(&CM3SpeedPID);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-CM4SpeedPID.Calc(&CM4SpeedPID);
+	CM4SpeedPID.Calc(&CM4SpeedPID);
 	
 	 if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY)   //||Is_Serious_Error()|| dead_lock_flag == 1紧急停车，编码器校准，无控制输入时都会使底盘控制停止
 	 {

@@ -59,8 +59,8 @@ void RControlTask(void const * argument){
 					data[i] = pData[i];
 				}
 
-//ң������ݴ���
-				RemoteDataProcess(data);
+
+				RemoteDataProcess(data);	//process raw data then execute new order
 				
 				HAL_UART_AbortReceive(&RC_UART);
 				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
@@ -122,7 +122,7 @@ void RemoteDataProcess(uint8_t *pData)
     RC_CtrlData.mouse.press_l = pData[12];
     RC_CtrlData.mouse.press_r = pData[13];
  
-    RC_CtrlData.key.v = ((int16_t)pData[14]) | ((int16_t)pData[15] << 8);
+    RC_CtrlData.key.v = ((int16_t)pData[14]) | ((int16_t)pData[15] << 8);//16 bits correspond to 16 keys
 		
 		SetInputMode(&RC_CtrlData.rc);
 	
@@ -130,18 +130,13 @@ void RemoteDataProcess(uint8_t *pData)
 	{
 		case REMOTE_INPUT:
 		{
-//			fw_printfln("in remote mode");
-			if(GYRO_RESETED == 2){
+			if(GYRO_RESETED == 2){ //if gyro has been reseted
 			SetEmergencyFlag(NORMAL);
-			RemoteControlProcess(&(RC_CtrlData.rc));
+			RemoteControlProcess(&(RC_CtrlData.rc));//execute new order
 			}
 		}break;
 		case KEY_MOUSE_INPUT:
 		{
-			
-
-			//鼠标键盘控制模式
-			//暂时为自动瞄准模式
 			if(GYRO_RESETED == 2){
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
@@ -152,11 +147,11 @@ void RemoteDataProcess(uint8_t *pData)
 		case STOP:
 		{
 			SetEmergencyFlag(EMERGENCY);
-			//��ͣ��
+			
 		}break;
 	}
 }
-//ң�������ģʽ����
+
 void RemoteControlProcess(Remote *rc)
 {
     if(GetWorkState()!=PREPARE_STATE)
@@ -200,15 +195,14 @@ void RemoteControlProcess(Remote *rc)
 		}
 	
 	/* not used to control, just as a flag */ 
-    GimbalRef.pitch_speed_ref = rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET;    //speed_ref����������ж���
+    GimbalRef.pitch_speed_ref = rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET;    
     GimbalRef.yaw_speed_ref   = (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET);
-	//���-Ħ���֣����̵��״̬
-	RemoteShootControl(&switch1, rc->s1);
+		RemoteShootControl(&switch1, rc->s1);
 		
 
 }
 
-//键盘鼠标控制模式处理
+
 uint8_t fb_move_flag = 0;
 uint8_t fb_move_flag1 = 0;
 
@@ -371,7 +365,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			//fw_printfln("CLOSE");	
 			}
 		}
-			//����Ť����ر�Ť��
+			
 		if(key->v == 256)  // key: r
 		{
 			twist_state = 1;
@@ -395,7 +389,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 	}
 	*/
 	/* not used to control, just as a flag */ 
-    GimbalRef.pitch_speed_ref = mouse->y;    //speed_ref����������ж���
+    GimbalRef.pitch_speed_ref = mouse->y;    
     GimbalRef.yaw_speed_ref   = mouse->x;
 	  MouseShootControl(mouse);
 	}
