@@ -17,12 +17,7 @@
 
 uint8_t isInited = 0;
 void rtos_init(){
-  //wait for devices
-//	for(int i=0; i < 3000; i++)
-//	{
-//		int a=42000; //at 168MHz 42000 is ok
-//		while(a--);
-//	}
+
 	playMusicWhenInit();
 	fw_userTimeEnable();
 	MPU6500_Init();
