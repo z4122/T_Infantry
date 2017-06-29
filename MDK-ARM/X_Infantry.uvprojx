@@ -979,6 +979,16 @@
               <FileType>5</FileType>
               <FilePath>..\Framework\drivers\drivers_uartjudge_low.h</FilePath>
             </File>
+            <File>
+              <FileName>drivers_platemotor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\drivers\drivers_platemotor.c</FilePath>
+            </File>
+            <File>
+              <FileName>drivers_platemotor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\drivers\drivers_platemotor.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

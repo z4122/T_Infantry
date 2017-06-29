@@ -126,7 +126,7 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float z
 }
 
 //*********debug by ZY*********
-extern int EncoderCnt;
+
 int mouse_click_left = 0;
 float this_fbspeed = 0;
 float last_fbspeed = 0;
@@ -136,6 +136,7 @@ int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 
 extern uint8_t JUDGE_Received;
 extern uint8_t JUDGE_State;
+static int count_reverse = 200;
 
 void Timer_2ms_lTask(void const * argument)
 {
@@ -144,7 +145,8 @@ void Timer_2ms_lTask(void const * argument)
 	static int countwhile = 0;
 	static int countwhile1 = 0;
 	static int countwhile2 = 0;
-	static int countwhile3 = 0;
+//	static int countwhile3 = 0;
+
 	static int count_judge = 0;
 	//static int shootwhile = 0;
 //	unsigned portBASE_TYPE StackResidue; //栈剩余
@@ -231,31 +233,31 @@ void Timer_2ms_lTask(void const * argument)
 			}
 		}
 		
-		if(countwhile3 >=25 && GetShootState() == SHOOTING){//50ms 30pulse->300ms 180pulse
-			countwhile3 = 0;
-			//先检测是否卡弹，而后根据情况更新拨盘电机PID	
-			if(EncoderCnt<3){		//产生卡弹
-				//清空计数器
-				//EncoderCnt = 0;			
-				//卡弹之后直接反转
-				stuck = 1;
+//		if(countwhile3 >=25 && GetShootState() == SHOOTING){//50ms 30pulse->300ms 180pulse
+//			countwhile3 = 0;
+//			//先检测是否卡弹，而后根据情况更新拨盘电机PID	
+//			if(EncoderCnt<3){		//产生卡弹
+//				//清空计数器
+//				//EncoderCnt = 0;			
+//				//卡弹之后直接反转
+//				stuck = 1;
 
-			}
-			else{	
-				stuck = 0;
-			}
-			//更新PID
-			//stuckConditionUpdate(bool stuck);
-			ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
-			fw_printfln("ref = %d",PID_SHOOT_MOTOR_SPEED);
-			ShootMotorSpeedPID.fdb = EncoderCnt;
-			fw_printfln("fdb = %d",EncoderCnt);
-			EncoderCnt = 0;
-				//ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
-			ShootMotorSpeedPID.output = 1*(ShootMotorSpeedPID.ref-ShootMotorSpeedPID.fdb);
-				//ShootMotorSpeedPID.Calc(&ShootMotorSpeedPID);
-		}
-		else countwhile3++;	
+//			}
+//			else{	
+//				stuck = 0;
+//			}
+//			//更新PID
+//			//stuckConditionUpdate(bool stuck);
+//			ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
+//			fw_printfln("ref = %d",PID_SHOOT_MOTOR_SPEED);
+//			ShootMotorSpeedPID.fdb = EncoderCnt;
+//			fw_printfln("fdb = %d",EncoderCnt);
+//			EncoderCnt = 0;
+//				//ShootMotorSpeedPID.ref = PID_SHOOT_MOTOR_SPEED;
+//			ShootMotorSpeedPID.output = 1*(ShootMotorSpeedPID.ref-ShootMotorSpeedPID.fdb);
+//				//ShootMotorSpeedPID.Calc(&ShootMotorSpeedPID);
+//		}
+//		else countwhile3++;	
 		
 
 		
@@ -418,18 +420,17 @@ int32_t GetQuadEncoderDiff(void)
 	return cnt;
 }
 
+int RotateAdd = 0;
+int refSave = 0;
+int Stuck = 0;
+int reverse_sum = 0;
 
 void ShooterMControlLoop(void)	
 {				      
-	
-	if(GetShootState() == SHOOTING)
+	//鼠标键盘输入模式下，单击一下鼠标，拨盘转动一个扇区
+	if(GetShootState() == SHOOTING && GetInputMode()==KEY_MOUSE_INPUT && Stuck==0)
 	{
 		ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;//打一发弹编码器输出脉冲数*4
-//		if(ShootMotorPositionPID.ref>32000)
-//		{
-//			ShootMotorPositionPID.ref = OneShoot;
-//			__HAL_TIM_SET_COUNTER(&htim5, 0x7fff);
-//		}
 	}
 /*
 //		if(inShooting == 0){
@@ -462,21 +463,60 @@ void ShooterMControlLoop(void)
 //		//fw_printfln("NoShooting");
 //	}
 */		
-		if(GetFrictionState()==FRICTION_WHEEL_ON)
+	//遥控器输入模式下，只要处于发射态，就一直转动
+	if(GetShootState() == SHOOTING && GetInputMode() == REMOTE_INPUT && Stuck==0)
+	{
+		RotateAdd += 5;
+		if(RotateAdd>OneShoot)
 		{
-			ShootMotorPositionPID.fdb = GetQuadEncoderDiff(); 
-			if(ShootMotorPositionPID.ref>100 && ShootMotorPositionPID.fdb<30)//卡弹
-			{
-				setPlateMotorDir(REVERSE);
+			ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
+			RotateAdd = 0;
+		}
+	}
+	else if(GetShootState() == NOSHOOTING && GetInputMode() == REMOTE_INPUT)
+	{
+		RotateAdd = 0;
+	}
+	
+	
+	
+	if(GetFrictionState()==FRICTION_WHEEL_ON)//拨盘转动前提条件：摩擦轮转动
+	{
+		ShootMotorPositionPID.fdb = GetQuadEncoderDiff(); 
+		if(ShootMotorPositionPID.ref>50 && ShootMotorPositionPID.fdb<5 && Stuck==0)//检测到卡弹，参数需要优化
+		{
+			Stuck = 1;
+			setPlateMotorDir(REVERSE);
+			ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - ShootMotorPositionPID.fdb;
+//			refSave = ShootMotorPositionPID.ref;
+		}
+		else if(Stuck == 0)//无卡弹
+		{
+			ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - ShootMotorPositionPID.fdb;
+			ShootMotorPositionPID.Calc(&ShootMotorPositionPID);
+			fw_printfln("%d",(uint32_t)ShootMotorPositionPID.output);
+			__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, ShootMotorPositionPID.output);
+		}
+		else//卡弹
+		{
+			if(count_reverse>0){
+				--count_reverse;
+				reverse_sum = reverse_sum + ShootMotorPositionPID.fdb;
+				__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 800);
 			}
 			else
 			{
-				ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - ShootMotorPositionPID.fdb;
-				ShootMotorPositionPID.Calc(&ShootMotorPositionPID);
-				fw_printfln("%d",(uint32_t)ShootMotorPositionPID.output);
-				__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, ShootMotorPositionPID.output);
+				count_reverse = 200;
+				Stuck = 0;
+				setPlateMotorDir(FORWARD);
+				ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - reverse_sum;
 			}
 		}
+	}
+	else
+	{
+		__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 0);
+	}
 }
 
 

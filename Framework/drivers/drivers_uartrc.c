@@ -245,7 +245,7 @@ void MouseShootControl(Mouse *mouse)
 			{
 				closeDelayCount = 0;
 			}
-			if(closeDelayCount>50)   //¹Ø±ÕÄ¦²ÁÂÖ
+			if(closeDelayCount>50)   
 			{
 				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  
@@ -255,7 +255,7 @@ void MouseShootControl(Mouse *mouse)
 			}
 			else
 			{
-				//Ä¦²ÁÂÖ¼ÓËÙ				
+				//				
 				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
@@ -275,7 +275,7 @@ void MouseShootControl(Mouse *mouse)
 				closeDelayCount = 0;
 			}
 			
-			if(closeDelayCount>50)   //¹Ø±ÕÄ¦²ÁÂÖ
+			if(closeDelayCount>50)   //
 			{
 				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  

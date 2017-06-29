@@ -3,6 +3,8 @@
 #include "tim.h"
 #include "drivers_platemotor.h"
 
+RotateDir_e PlateMotorDir = FORWARD;
+
 void plateMotorInit(void){
 	HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_RESET);
@@ -15,13 +17,18 @@ void setPlateMotorDir(RotateDir_e dir)
 {
 	if(dir==FORWARD)
 	{
+		PlateMotorDir = FORWARD;
 		HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_SET);
 		HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_RESET);
 	}
 	if(dir==REVERSE)
 	{
+		PlateMotorDir = REVERSE;
 		HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_SET);
 	}
 }
 
+RotateDir_e getPlateMotorDir(){
+	return PlateMotorDir;
+}
