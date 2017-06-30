@@ -137,7 +137,7 @@ int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 extern uint8_t JUDGE_Received;
 extern uint8_t JUDGE_State;
 static int count_reverse = 200;
-
+int a;
 void Timer_2ms_lTask(void const * argument)
 {
 	portTickType xLastWakeTime;
@@ -146,7 +146,8 @@ void Timer_2ms_lTask(void const * argument)
 	static int countwhile1 = 0;
 	static int countwhile2 = 0;
 //	static int countwhile3 = 0;
-
+	ShootMotorPositionPID.ref = 0x0;
+	ShootMotorPositionPID.fdb = 0x30;
 	static int count_judge = 0;
 	//static int shootwhile = 0;
 //	unsigned portBASE_TYPE StackResidue; //栈剩余
@@ -259,8 +260,8 @@ void Timer_2ms_lTask(void const * argument)
 //		}
 //		else countwhile3++;	
 		
-
-		
+		//GetQuadEncoderDiff();
+		//fw_printfln("%d",a);
 		ShooterMControlLoop();       //发射机构控制任务
 		
 		vTaskDelayUntil( &xLastWakeTime, ( 2 / portTICK_RATE_MS ) );
@@ -414,9 +415,9 @@ void CMControlLoop(void)
 int32_t GetQuadEncoderDiff(void)
 {
   int32_t cnt = 0;    
-	cnt = __HAL_TIM_GET_COUNTER(&htim5) - 0x7fff;
-	fw_printfln("%x",cnt);
-	 __HAL_TIM_SET_COUNTER(&htim5, 0x7fff);
+	cnt = __HAL_TIM_GET_COUNTER(&htim5) - 0x0;
+	//fw_printfln("%x",cnt);
+	 //__HAL_TIM_SET_COUNTER(&htim5, 0x7fff);
 	return cnt;
 }
 
@@ -424,13 +425,19 @@ int RotateAdd = 0;
 int refSave = 0;
 int Stuck = 0;
 int reverse_sum = 0;
-
+int32_t last_fdb = 0x0;
+int32_t this_fdb = 0;
 void ShooterMControlLoop(void)	
 {				      
 	//鼠标键盘输入模式下，单击一下鼠标，拨盘转动一个扇区
+//	if(GetShootState()==NOSHOOTING)
+//		fw_printfln("NOSHOOTING");
+//	else
+//		fw_printfln("SHOOTING");
+			
 	if(GetShootState() == SHOOTING && GetInputMode()==KEY_MOUSE_INPUT && Stuck==0)
 	{
-		ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;//打一发弹编码器输出脉冲数*4
+		ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;//打一发弹编码器输出脉冲数
 	}
 /*
 //		if(inShooting == 0){
@@ -466,7 +473,8 @@ void ShooterMControlLoop(void)
 	//遥控器输入模式下，只要处于发射态，就一直转动
 	if(GetShootState() == SHOOTING && GetInputMode() == REMOTE_INPUT && Stuck==0)
 	{
-		RotateAdd += 5;
+		RotateAdd += 8;
+		fw_printfln("ref = %f",ShootMotorPositionPID.ref);
 		if(RotateAdd>OneShoot)
 		{
 			ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
@@ -475,44 +483,58 @@ void ShooterMControlLoop(void)
 	}
 	else if(GetShootState() == NOSHOOTING && GetInputMode() == REMOTE_INPUT)
 	{
+		
 		RotateAdd = 0;
+		//ShootMotorPositionPID.ref = 0;
 	}
 	
 	
 	
 	if(GetFrictionState()==FRICTION_WHEEL_ON)//拨盘转动前提条件：摩擦轮转动
 	{
-		ShootMotorPositionPID.fdb = GetQuadEncoderDiff(); 
-		if(ShootMotorPositionPID.ref>50 && ShootMotorPositionPID.fdb<5 && Stuck==0)//检测到卡弹，参数需要优化
+		this_fdb = GetQuadEncoderDiff(); 
+		fw_printfln("this_fdb = %d",this_fdb);
+		if(this_fdb<last_fdb-100)
 		{
-			Stuck = 1;
-			setPlateMotorDir(REVERSE);
-			ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - ShootMotorPositionPID.fdb;
-//			refSave = ShootMotorPositionPID.ref;
+			ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb+(65535+this_fdb-last_fdb);
 		}
-		else if(Stuck == 0)//无卡弹
-		{
-			ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - ShootMotorPositionPID.fdb;
+		else
+			ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb + this_fdb-last_fdb;
+		last_fdb = this_fdb;
+		fw_printfln("fdb = %f",ShootMotorPositionPID.fdb);
+//		if(ShootMotorPositionPID.ref>50 && ShootMotorPositionPID.fdb<5 && Stuck==0)//检测到卡弹，参数需要优化
+//		{
+//			Stuck = 1;
+//			setPlateMotorDir(REVERSE);
+//			ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - ShootMotorPositionPID.fdb;
+////			refSave = ShootMotorPositionPID.ref;
+//		}
+//		else if(Stuck == 0)//无卡弹
+//		{
+			//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - ShootMotorPositionPID.fdb;
 			ShootMotorPositionPID.Calc(&ShootMotorPositionPID);
-			fw_printfln("%d",(uint32_t)ShootMotorPositionPID.output);
+		if(ShootMotorPositionPID.output<0) ShootMotorPositionPID.output = 0;
+		fw_printfln("output = %f",ShootMotorPositionPID.output);
+			//fw_printfln("%d",(uint32_t)ShootMotorPositionPID.output);
+		
 			__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, ShootMotorPositionPID.output);
 		}
-		else//卡弹
-		{
-			if(count_reverse>0){
-				--count_reverse;
-				reverse_sum = reverse_sum + ShootMotorPositionPID.fdb;
-				__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 800);
-			}
-			else
-			{
-				count_reverse = 200;
-				Stuck = 0;
-				setPlateMotorDir(FORWARD);
-				ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - reverse_sum;
-			}
-		}
-	}
+//		else//卡弹
+//		{
+//			if(count_reverse>0){
+//				--count_reverse;
+//				reverse_sum = reverse_sum + ShootMotorPositionPID.fdb;
+//				__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 800);
+//			}
+//			else
+//			{
+//				count_reverse = 200;
+//				Stuck = 0;
+//				setPlateMotorDir(FORWARD);
+//				ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - reverse_sum;
+//			}
+//		}
+	
 	else
 	{
 		__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 0);

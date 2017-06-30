@@ -7,8 +7,11 @@ RotateDir_e PlateMotorDir = FORWARD;
 
 void plateMotorInit(void){
 	HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_SET);
 	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 0);
+	HAL_TIM_Encoder_Start(&htim5,TIM_CHANNEL_ALL);
+	__HAL_TIM_SET_COUNTER(&htim5, 0x0);
 	fw_printf("PMInit Success\t\n");
 	
 }
