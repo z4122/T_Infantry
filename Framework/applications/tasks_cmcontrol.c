@@ -147,7 +147,7 @@ void Timer_2ms_lTask(void const * argument)
 	static int countwhile2 = 0;
 //	static int countwhile3 = 0;
 	ShootMotorPositionPID.ref = 0x0;
-	ShootMotorPositionPID.fdb = 0x30;
+	ShootMotorPositionPID.fdb = 0x0;
 	static int count_judge = 0;
 	//static int shootwhile = 0;
 //	unsigned portBASE_TYPE StackResidue; //栈剩余
