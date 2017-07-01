@@ -6,8 +6,7 @@
 RotateDir_e PlateMotorDir = FORWARD;
 
 void plateMotorInit(void){
-	HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_SET);
+	setPlateMotorDir(FORWARD);
 	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 0);
 	HAL_TIM_Encoder_Start(&htim5,TIM_CHANNEL_ALL);
@@ -21,14 +20,14 @@ void setPlateMotorDir(RotateDir_e dir)
 	if(dir==FORWARD)
 	{
 		PlateMotorDir = FORWARD;
-		HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_SET);
-		HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_SET);
 	}
 	if(dir==REVERSE)
 	{
 		PlateMotorDir = REVERSE;
-		HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(PM_Dir_Ctrl1_GPIO_Port,PM_Dir_Ctrl1_Pin,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(PM_Dir_Ctrl2_GPIO_Port,PM_Dir_Ctrl2_Pin,GPIO_PIN_RESET);
 	}
 }
 
