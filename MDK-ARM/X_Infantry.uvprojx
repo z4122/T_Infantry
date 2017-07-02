@@ -10,7 +10,6 @@
       <TargetName>X_Infantry</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F427IIHx</Device>
@@ -968,16 +967,6 @@
               <FileName>pwm_server_motor.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\drivers\pwm_server_motor.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_uartjudge.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\drivers\drivers_uartjudge.c</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_uartjudge_low.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_uartjudge_low.h</FilePath>
             </File>
           </Files>
         </Group>
