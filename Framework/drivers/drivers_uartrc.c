@@ -57,16 +57,16 @@ void rcUartRxCpltCallback(){
 
 
 RC_Ctl_t RC_CtrlData;   //remote control data
-ChassisSpeed_Ref_t ChassisSpeedRef; //µ×ÅÌµç»úÄ¿±êËÙ¶È
-Gimbal_Ref_t GimbalRef; //ÔÆÌ¨Ä¿±ê
-FrictionWheelState_e friction_wheel_state = FRICTION_WHEEL_OFF; //Ä¦²ÁÂÖ×´Ì¬
+ChassisSpeed_Ref_t ChassisSpeedRef; 
+Gimbal_Ref_t GimbalRef; 
+FrictionWheelState_e friction_wheel_state = FRICTION_WHEEL_OFF; 
 
-volatile Shoot_State_e shootState = NOSHOOTING; //²¦ÅÌµç»ú×´Ì¬
-InputMode_e inputmode = REMOTE_INPUT;   //ÊäÈëÄ£Ê½Éè¶¨
+volatile Shoot_State_e shootState = NOSHOOTING; 
+InputMode_e inputmode = REMOTE_INPUT;   
 
-RampGen_t frictionRamp = RAMP_GEN_DAFAULT;  //Ä¦²ÁÂÖÐ±ÆÂ
-RampGen_t LRSpeedRamp = RAMP_GEN_DAFAULT;   //mouse×óÓÒÒÆ¶¯Ð±ÆÂ
-RampGen_t FBSpeedRamp = RAMP_GEN_DAFAULT;   //mouseÇ°ºóÒÆ¶¯Ð±ÆÂ
+RampGen_t frictionRamp = RAMP_GEN_DAFAULT;  
+RampGen_t LRSpeedRamp = RAMP_GEN_DAFAULT;   
+RampGen_t FBSpeedRamp = RAMP_GEN_DAFAULT;   
 
 void RemoteTaskInit()
 {
@@ -169,7 +169,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 	{
 		case FRICTION_WHEEL_OFF:
 		{
-			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_1TO3)   //´Ó¹Ø±Õµ½start turning
+			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_1TO3)   
 			{
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);
@@ -179,7 +179,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 		}break;
 		case FRICTION_WHEEL_START_TURNNING:
 		{
-			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   //¸ÕÆô¶¯¾Í±»¹Ø±Õ
+			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   
 			{
 				LASER_OFF();
 				SetShootState(NOSHOOTING);
@@ -199,7 +199,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 		}break;
 		case FRICTION_WHEEL_ON:
 		{
-			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   //¹Ø±ÕÄ¦²ÁÂÖ
+			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   
 			{
 				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  
@@ -221,12 +221,12 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 	 
 void MouseShootControl(Mouse *mouse)
 {
-	static int16_t closeDelayCount = 0;   //ÓÒ¼ü¹Ø±ÕÄ¦²ÁÂÖ3sÑÓÊ±¼ÆÊý
+	static int16_t closeDelayCount = 0;   
 	switch(friction_wheel_state)
 	{
 		case FRICTION_WHEEL_OFF:
 		{
-			if(mouse->last_press_r == 0 && mouse->press_r == 1)   //´Ó¹Ø±Õµ½start turning
+			if(mouse->last_press_r == 0 && mouse->press_r == 1)   
 			{
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);
@@ -245,7 +245,7 @@ void MouseShootControl(Mouse *mouse)
 			{
 				closeDelayCount = 0;
 			}
-			if(closeDelayCount>50)   //¹Ø±ÕÄ¦²ÁÂÖ
+			if(closeDelayCount>50)   
 			{
 				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  
@@ -255,7 +255,7 @@ void MouseShootControl(Mouse *mouse)
 			}
 			else
 			{
-				//Ä¦²ÁÂÖ¼ÓËÙ				
+				//				
 				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
@@ -275,7 +275,7 @@ void MouseShootControl(Mouse *mouse)
 				closeDelayCount = 0;
 			}
 			
-			if(closeDelayCount>50)   //¹Ø±ÕÄ¦²ÁÂÖ
+			if(closeDelayCount>50)   //
 			{
 				LASER_OFF();
 				friction_wheel_state = FRICTION_WHEEL_OFF;				  
@@ -283,7 +283,7 @@ void MouseShootControl(Mouse *mouse)
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetShootState(NOSHOOTING);
 			}			
-			else if(mouse->press_l== 1)  //°´ÏÂ×ó¼ü£¬Éä»÷
+			else if(mouse->last_press_l == 0 && mouse->press_l== 1)  //检测鼠标左键单击动作
 			{
 				SetShootState(SHOOTING);				
 			}
@@ -294,6 +294,7 @@ void MouseShootControl(Mouse *mouse)
 		} break;				
 	}	
 	mouse->last_press_r = mouse->press_r;
+	mouse->last_press_l = mouse->press_l;
 }
 
 
