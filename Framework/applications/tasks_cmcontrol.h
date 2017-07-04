@@ -9,6 +9,7 @@ void WorkStateFSM(void);
 void WorkStateSwitchProcess(void);
 void CMControlLoop(void);
 void ShooterMControlLoop(void);
+int32_t GetQuadEncoderDiff(void);
 //initiate status: 
 typedef enum
 {
@@ -22,6 +23,7 @@ typedef enum
 
 WorkState_e GetWorkState(void);
 
+#define OneShoot (725)
 #define PID_SHOOT_MOTOR_SPEED      (30)
 #define CHASSIS_SPEED_ATTENUATION   (1.30f)
 #define PREPARE_TIME_TICK_MS 500      //prapare time in ms*2
@@ -119,8 +121,8 @@ WorkState_e GetWorkState(void);
 	0,\
 	0,\
 	{0,0},\
-	220.f,\
-	0.0f,\
+	30.f,\
+	0.5f,\
 	0.0f,\
 	0,\
 	0,\
@@ -129,7 +131,7 @@ WorkState_e GetWorkState(void);
 	3500,\
 	1500,\
 	0,\
-	4950,\
+	1000,\
 	0,\
 	0,\
 	0,\
