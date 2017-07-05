@@ -1,3 +1,15 @@
+/**
+  ******************************************************************************
+  * File Name          : pid_regulator.c
+  * Description        : PID函数
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * C语言PID函数实现
+  ******************************************************************************
+  */
 #include "pid_regulator.h"
 
 #define MINMAX(value, min, max) value = (value < min) ? min : (value > max ? max : value)

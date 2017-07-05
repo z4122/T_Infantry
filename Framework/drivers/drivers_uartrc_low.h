@@ -1,3 +1,15 @@
+/**
+  ******************************************************************************
+  * File Name          : drivers_uartrc_low.h
+  * Description        : 遥控器串口
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 遥控器底层函数
+  ******************************************************************************
+  */
 #ifndef DRIVERS_UARTRC_LOW_H
 #define DRIVERS_UARTRC_LOW_H
 

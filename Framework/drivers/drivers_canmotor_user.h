@@ -1,9 +1,21 @@
+/**
+  ******************************************************************************
+  * File Name          : drivers_canmotor_user.h
+  * Description        : 电机CAN总线驱动函数
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * CAN总线用户函数
+  ******************************************************************************
+  */
 #ifndef DRIVERS_CANMOTOR_USER_H
 #define DRIVERS_CANMOTOR_USER_H
 
+#include <can.h>
 #include "utilities_iopool.h"
 #include "drivers_canmotor_low.h"
-#include "can.h"
 
 //RxID
 #define CMFL_RXID 0x202u

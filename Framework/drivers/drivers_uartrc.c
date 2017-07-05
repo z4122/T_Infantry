@@ -1,3 +1,17 @@
+/**
+  ******************************************************************************
+  * File Name          : drivers_uartrc.c
+  * Description        : 遥控器串口
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 串口初始化
+	* 串口数据读取
+	* 数据处理函数
+  ******************************************************************************
+  */
 #include "drivers_uartrc_user.h"
 #include "drivers_uartrc_low.h"
 #include "drivers_led_user.h"
