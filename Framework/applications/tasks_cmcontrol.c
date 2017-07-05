@@ -1,3 +1,17 @@
+/**
+  ******************************************************************************
+  * File Name          : tasks_cmcontrol.c
+  * Description        : 2ms定时任务
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+	* 2ms定时
+	* 通过count可以获得500ms,1s等定时任务
+	* 状态机切换，串口定时输出，看门狗等
+  ******************************************************************************
+  */
 #include "tasks_cmcontrol.h"
 #include "pid_Regulator.h"
 #include "drivers_uartrc_low.h"

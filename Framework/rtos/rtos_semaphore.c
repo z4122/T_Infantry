@@ -1,5 +1,18 @@
-#include "rtos_semaphore.h"
-#include "rtos_init.h"
+/**
+  ******************************************************************************
+  * File Name          : rtos_semaphore.c
+  * Description        : 添加FreeRTOS信号量
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 添加信号量用于进程间同步
+
+  ******************************************************************************
+  */
+#include <rtos_semaphore.h>
+#include <rtos_init.h>
 
 osSemaphoreId CMGMCanHaveTransmitSemaphoreHandle;
 osSemaphoreId ZGYROCanHaveTransmitSemaphoreHandle;

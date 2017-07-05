@@ -1,3 +1,16 @@
+/**
+  ******************************************************************************
+  * File Name          : pdrivers_uartjudge.c
+  * Description        : 裁判系统读取
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 单字节阻塞读取
+	* 获得能量槽用于功率限制
+  ******************************************************************************
+  */
 #include "drivers_uartjudge_low.h"
 #include "utilities_debug.h"
 #include "usart.h"

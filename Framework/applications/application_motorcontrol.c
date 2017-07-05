@@ -1,3 +1,16 @@
+/**
+  ******************************************************************************
+  * File Name          : application_motorcontrol.c
+  * Description        : 电机控制驱动函数
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 设定电机电流
+	* 陀螺仪复位
+  ******************************************************************************
+  */
 #include "application_motorcontrol.h"
 #include "drivers_uartrc_user.h"
 #include "can.h"

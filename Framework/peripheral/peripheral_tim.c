@@ -1,3 +1,16 @@
+/**
+  ******************************************************************************
+  * File Name          : peripheral_tim.c
+  * Description        : 用户自定义定时器
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 用户自定义定时器初始化：
+	*	摩擦轮、舵机PWM所需定时器
+  ******************************************************************************
+  */
 #include "peripheral_tim.h"
 #include "cmsis_os.h"
 #include "tim.h"

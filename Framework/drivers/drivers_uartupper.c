@@ -1,3 +1,17 @@
+/**
+  ******************************************************************************
+  * File Name          : drivers_uartupper.c
+  * Description        : 妙算通信
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 串口初始化
+	* 接收回调函数
+	* 自定义组帧协议
+  ******************************************************************************
+  */
 #include "drivers_uartupper_low.h"
 #include "drivers_uartupper_user.h"
 #include "FreeRTOS.h"

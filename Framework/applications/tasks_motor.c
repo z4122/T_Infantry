@@ -1,3 +1,17 @@
+/**
+  ******************************************************************************
+  * File Name          : tasks_motor.c
+  * Description        : 电机控制任务
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 云台、底盘电机控制任务
+	* 处于阻塞态等待CAN接收任务释放信号量
+	* 对CAN收到的数据进行PID计算，再将电流值发送到CAN
+  ******************************************************************************
+  */
 #include "tasks_motor.h"
 #include "drivers_canmotor_user.h"
 #include "rtos_semaphore.h"

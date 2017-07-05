@@ -1,3 +1,14 @@
+/**
+  ******************************************************************************
+  * File Name          : tasks_remotecontrol.c
+  * Description        : 遥控器处理任务
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  ******************************************************************************
+  */
 #include "tasks_remotecontrol.h"
 #include "drivers_uartrc_user.h"
 #include "drivers_uartrc_low.h"

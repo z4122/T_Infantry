@@ -1,17 +1,25 @@
+/**
+  ******************************************************************************
+  * File Name          : drivers_imu.c
+  * Description        : IMU驱动函数
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * MPU6050 IST8310
+  ******************************************************************************
+  */
+#include <cmsis_os.h>
+#include <spi.h>
+#include <tim.h>
 #include "drivers_imu_low.h"
-
 #include "utilities_debug.h"
 #include "utilities_tim.h"
-
-#include "cmsis_os.h"
-
 #include "drivers_imu_mpu6500_reg.h"
 #include "drivers_imu_IST8310_reg.h"
 #include "rtos_semaphore.h"
 
-#include "spi.h"
-
-#include "tim.h"
 
 #define MPU6500_NSS_Low() HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_RESET)
 #define MPU6500_NSS_High() HAL_GPIO_WritePin(GPIOF, GPIO_PIN_6, GPIO_PIN_SET)

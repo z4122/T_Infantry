@@ -1,10 +1,21 @@
+/**
+  ******************************************************************************
+  * File Name          : drivers_canmotor.c
+  * Description        : 电机CAN总线驱动函数
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * CAN总线初始化
+	* CAN接收处理
+	* CAN发送任务
+  ******************************************************************************
+  */
+#include <cmsis_os.h>
 #include "drivers_canmotor_low.h"
 #include "drivers_canmotor_user.h"
-
-#include "cmsis_os.h"
-
 #include "peripheral_define.h"
-
 #include "utilities_debug.h"
 #include "utilities_iopool.h"
 #include "rtos_init.h"

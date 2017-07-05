@@ -1,3 +1,16 @@
+/**
+  ******************************************************************************
+  * File Name          : rtos_semaphore.h
+  * Description        : 添加FreeRTOS信号量
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 添加信号量用于任务（进程）间同步
+
+  ******************************************************************************
+  */
 #ifndef RTOS_SEMAPHORE_H
 #define RTOS_SEMAPHORE_H
 

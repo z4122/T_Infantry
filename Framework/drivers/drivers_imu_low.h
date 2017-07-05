@@ -1,3 +1,15 @@
+/**
+  ******************************************************************************
+  * File Name          : drivers_imu_low.h
+  * Description        : IMU驱动函数
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * IMU底层函数声明
+  ******************************************************************************
+  */
 #ifndef DRIVERS_IMU_LOW_H
 #define DRIVERS_IMU_LOW_H
 
