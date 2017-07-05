@@ -1,3 +1,22 @@
+/**
+  ******************************************************************************
+  * File Name          : rtos_task.c
+  * Description        : 添加FreeRTOS任务
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 添加RTOS任务；LED灯
+	*								蜂鸣器
+	*								IMU
+	*								遥控器接收机
+	*								妙算通信
+	*								CM(Chasis Motor)GM(Gimbal Motor)控制任务
+	*								定时循环任务
+	*								CAN发送任务
+  ******************************************************************************
+  */
 #include "rtos_task.h"
 #include "rtos_init.h"
 

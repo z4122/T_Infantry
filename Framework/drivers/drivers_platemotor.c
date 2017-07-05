@@ -1,6 +1,6 @@
-#include "gpio.h"
+#include <gpio.h>
+#include <tim.h>
 #include "utilities_debug.h"
-#include "tim.h"
 #include "drivers_platemotor.h"
 
 RotateDir_e PlateMotorDir = FORWARD;

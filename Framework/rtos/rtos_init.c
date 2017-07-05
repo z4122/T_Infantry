@@ -1,3 +1,18 @@
+/**
+  ******************************************************************************
+  * File Name          : rtos_init.c
+  * Description        : FreeRTOS初始化
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+  * 对于板上所有外设如定时器，串口，蜂鸣器，CAN总线，MPU6050等进行必要的初始化
+
+  ******************************************************************************
+  */
+#include <tim.h>
+#include <stdbool.h>
 #include "rtos_init.h"
 #include "drivers_platemotor.h"
 #include "application_motorcontrol.h"
@@ -10,14 +25,12 @@
 #include "tasks_cmcontrol.h"
 #include "drivers_imu_low.h"
 #include "utilities_tim.h"
-#include "tim.h"
-
 #include "drivers_buzzer_low.h"
 #include "drivers_uartjudge_low.h"
 
-uint8_t isInited = 0;
-void rtos_init(){
-
+bool isInited = 0;
+void rtos_init()
+	{
 	playMusicWhenInit();
 	fw_userTimeEnable();
 	MPU6500_Init();
