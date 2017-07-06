@@ -18,7 +18,7 @@
 #include "pwm_server_motor.h"
 #include "drivers_uartrc_user.h"
 #include "tasks_motor.h"
-void UserTimerInit(void)
+void InitUserTimer(void)
 {
 //	HAL_TIM_Encoder_Start(&PLATE_TIM, TIM_CHANNEL_ALL);
 //	HAL_TIM_PWM_Start(&PLATE_MOTOR_TIM , TIM_CHANNEL_1);//²¦ÅÌµç»ú

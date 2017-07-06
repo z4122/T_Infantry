@@ -44,7 +44,7 @@ typedef struct
 }tGameInfo;
 
 void judgeUartRxCpltCallback(void);
-void judgeUartInit(void);
+void InitJudgeUart(void);
 void Judge_Refresh(void);
 
 #endif
