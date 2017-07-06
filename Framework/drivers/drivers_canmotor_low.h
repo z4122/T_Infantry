@@ -17,7 +17,7 @@
 #include <stdint.h>
 #include <cmsis_os.h>
 
-void motorInit(void);
+void InitCanReception(void);
 
 void CMGMCanTransmitTask(void const * argument);
 void ZGYROCanTransmitTask(void const * argument);

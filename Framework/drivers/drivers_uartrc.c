@@ -35,7 +35,7 @@
 #include "stm32f4xx_hal_uart.h"
 NaiveIOPoolDefine(rcUartIOPool, {0});
 
-void rcInit(){
+void InitRemoteControl(){
 	//遥控器DMA接收开启(一次接收18个字节)
 	if(HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18) != HAL_OK){
 			Error_Handler();
