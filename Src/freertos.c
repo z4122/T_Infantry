@@ -83,7 +83,7 @@ __weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTask
 
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-  rtos_InitInfantry();//在RTOS任务调度启动之前的初始化
+  rtos_init();
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -92,7 +92,7 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
-	rtos_AddSemaphores();//RTOS信号量,用于进程间同步，以及互斥锁等
+	rtos_addSemaphores();
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
@@ -101,13 +101,13 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);//RTOS默认进程定义
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-	rtos_AddThreads();//RTOS任务定义
-	g_bInited = 1;//初始化完成 todo:使用状态机方式替代全局变量
+	rtos_addThreads();
+	isInited = 1;
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */

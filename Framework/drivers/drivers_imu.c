@@ -137,7 +137,7 @@ static void MPU_Auto_Read_IST_config(uint8_t device_address, uint8_t reg_base_ad
 }
 
 //Initialize the IST8310
-uint8_t InitIST8310(void)
+uint8_t IST8310_Init(void)
 {
 	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET);
   MPU6500_Write_Reg(MPU6500_USER_CTRL, 0x30);
@@ -198,7 +198,7 @@ uint8_t MPU6500_Set_Gyro_Fsr(uint8_t fsr)
 }
 
 //Initialize the MPU6500
-uint8_t InitMPU6500(void)
+uint8_t MPU6500_Init(void)
 {
   uint8_t index = 0;
   uint8_t MPU6500_Init_Data[10][2] = 
@@ -257,7 +257,7 @@ void IMU_Get_Data()
 }
 
 float gYroXs, gYroYs, gYroZs;
-void IMUTask(void const * argument){
+void printIMUTask(void const * argument){
 //	int16_t tmaxx, tmaxy, tmaxz;
 //	int16_t tminx, tminy, tminz;
 //	IMU_Get_Data();

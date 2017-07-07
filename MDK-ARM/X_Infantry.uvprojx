@@ -735,6 +735,11 @@
               <FilePath>..\Framework\peripheral\peripheral_usart.h</FilePath>
             </File>
             <File>
+              <FileName>peripheral_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\peripheral\peripheral_tim.c</FilePath>
+            </File>
+            <File>
               <FileName>peripheral_tim.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\peripheral\peripheral_tim.h</FilePath>
@@ -778,11 +783,6 @@
               <FileName>utilities_tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\utilities\utilities_tim.c</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_tim.c</FilePath>
             </File>
             <File>
               <FileName>utilities_tim.h</FileName>

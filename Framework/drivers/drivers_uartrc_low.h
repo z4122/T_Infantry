@@ -16,7 +16,7 @@
 #include "stdint.h"
 void rcUartRxCpltCallback(void);
 
-void InitRemoteControl(void);
+void rcInit(void);
 
 /*
 ****************************************************************************

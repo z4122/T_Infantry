@@ -72,7 +72,7 @@ uint8_t isRcanStarted_CMGM = 0, isRcanStarted_ZGYRO = 0;
 
 CanRxMsgTypeDef CMGMCanRxMsg, ZGYROCanRxMsg;
 	
-void InitCanReception(){
+void motorInit(){
 	CMGMMOTOR_CAN.pRxMsg = &CMGMCanRxMsg;
 	/*##-- Configure the CAN2 Filter ###########################################*/
 	CAN_FilterConfTypeDef  sFilterConfig;
@@ -160,7 +160,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 		}else{
 			isRcanStarted_CMGM = 1;
 		}
-		if(g_bInited == 1){
+		if(isInited == 1){
 			osSemaphoreRelease(CMGMCanRefreshSemaphoreHandle);
 		}
 	}else if(hcan == &ZGYRO_CAN){
@@ -180,7 +180,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 		}else{
 			isRcanStarted_ZGYRO = 1;
 		}
-		if(g_bInited == 1){
+		if(isInited == 1){
 			osSemaphoreRelease(ZGYROCanRefreshSemaphoreHandle);
 		}
 	}

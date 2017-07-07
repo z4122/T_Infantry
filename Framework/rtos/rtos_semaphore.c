@@ -29,40 +29,41 @@ osSemaphoreId imurefreshGimbalSemaphoreHandle;
 
 //osSemaphoreId imuSpiTxRxCpltSemaphoreHandle;
 osSemaphoreId refreshMPU6500SemaphoreHandle;
+osSemaphoreId refreshIMUSemaphoreHandle;
 
-xSemaphoreHandle xSemaphore_mfuart;
+xSemaphoreHandle xSemaphore_uart;
 xSemaphoreHandle xSemaphore_rcuart;
 xSemaphoreHandle motorCanTransmitSemaphore;
-void rtos_AddSemaphores()
-{
-	osSemaphoreDef(CMGMCanTransmitSemaphore);//电机CAN发送信号量(未用)
+void rtos_addSemaphores(){
+	osSemaphoreDef(CMGMCanTransmitSemaphore);
 	CMGMCanTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(CMGMCanTransmitSemaphore), 1);
-	osSemaphoreDef(ZGYROCanTransmitSemaphore);//外接单轴陀螺仪CAN发送信号量(未用)
+	osSemaphoreDef(ZGYROCanTransmitSemaphore);
 	ZGYROCanTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(ZGYROCanTransmitSemaphore), 1);
+	
+	osSemaphoreDef(motorCanReceiveSemaphore);
+	motorCanReceiveSemaphoreHandle = osSemaphoreCreate(osSemaphore(motorCanReceiveSemaphore), 1);
+	
+	osSemaphoreDef(CMGMCanHaveTransmitSemaphore);
+	CMGMCanHaveTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(CMGMCanHaveTransmitSemaphore), 1);
+	osSemaphoreDef(ZGYROCanHaveTransmitSemaphore);
+	ZGYROCanHaveTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(ZGYROCanHaveTransmitSemaphore), 1);
 
-	osSemaphoreDef(CMGMCanRefreshSemaphore);//电机CAN接收信号量
+	osSemaphoreDef(CMGMCanRefreshSemaphore);
 	CMGMCanRefreshSemaphoreHandle = osSemaphoreCreate(osSemaphore(CMGMCanRefreshSemaphore), 1);
-	osSemaphoreDef(ZGYROCanRefreshSemaphore);//外接单轴陀螺仪CAN接收信号量(有Relase，无进程Take)
+	osSemaphoreDef(ZGYROCanRefreshSemaphore);
 	ZGYROCanRefreshSemaphoreHandle = osSemaphoreCreate(osSemaphore(ZGYROCanRefreshSemaphore), 1);
 	
-	osSemaphoreDef(imurefreshGimbalSemaphore);//IMU数据刷新信号量(有Release，无进程Take)
+	osSemaphoreDef(imurefreshGimbalSemaphore);
 	imurefreshGimbalSemaphoreHandle = osSemaphoreCreate(osSemaphore(imurefreshGimbalSemaphore), 1);
 	
 //	osSemaphoreDef(imuSpiTxRxCpltSemaphore);
 //	imuSpiTxRxCpltSemaphoreHandle = osSemaphoreCreate(osSemaphore(imuSpiTxRxCpltSemaphore), 1);
-	osSemaphoreDef(refreshMPU6500Semaphore);//MPU6050数据刷新信号量：IO口外部中断Release，数据处理Task Take
+	osSemaphoreDef(refreshMPU6500Semaphore);
 	refreshMPU6500SemaphoreHandle = osSemaphoreCreate(osSemaphore(refreshMPU6500Semaphore), 1);
-/**
-******************************************************************************
-* 提示：
-* 这里示范了两种创建信号量的方式
-* osSemaphoreDef(),osSemaphoreCreate()是CMSIS要求的RTOS统一接口
-* vSemaphoreCreateBinary()是FreeRTOS提供的创建方式
-* 两种方式本质相同，osSemaphoreCreate()实际上调用了xSemaphoreCreateBinary()
-******************************************************************************
-*/
-	vSemaphoreCreateBinary(xSemaphore_mfuart);//mf(Manifold妙算)通信信号量，串口接收回掉函数Release，数据处理Task Take
-	vSemaphoreCreateBinary(xSemaphore_rcuart);//rc(Remote Control遥控)同上
+	osSemaphoreDef(refreshIMUSemaphore);
+	refreshIMUSemaphoreHandle = osSemaphoreCreate(osSemaphore(refreshIMUSemaphore), 1);
 	
-	motorCanTransmitSemaphore = xSemaphoreCreateCounting(10,0);//另一种信号量，未用 注意开启此功能需要在Cube中配置RTOS
+	vSemaphoreCreateBinary(xSemaphore_uart);
+	vSemaphoreCreateBinary(xSemaphore_rcuart);
+	motorCanTransmitSemaphore = xSemaphoreCreateCounting(10,0);
 }

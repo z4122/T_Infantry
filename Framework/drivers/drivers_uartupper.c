@@ -40,7 +40,7 @@ void ctrlUartRxCpltCallback(){
 		 if(HAL_UART_Receive_DMA(&CTRL_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
 				fw_Warning();
 				Error_Handler(); }
-				xSemaphoreGiveFromISR(xSemaphore_mfuart, &xHigherPriorityTaskWoken);	
+				xSemaphoreGiveFromISR(xSemaphore_uart, &xHigherPriorityTaskWoken);	
 			}				
 			else{
 			 HAL_UART_AbortReceive(&CTRL_UART);
@@ -55,11 +55,11 @@ void ctrlUartRxCpltCallback(){
 }
 
 
-void InitManifoldUart(){
+void ctrlUartInit(){
 	ctrlData.Success = 1;  
 	if(HAL_UART_Receive_DMA(&CTRL_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
 		Error_Handler();
-		printf( "InitManifoldUart error" );
+		printf( "ctrlUartInit error" );
 	} 
 }
 

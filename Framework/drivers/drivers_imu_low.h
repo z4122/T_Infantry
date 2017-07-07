@@ -38,10 +38,10 @@ uint8_t MPU6500_Read_Reg(uint8_t const reg);
 uint8_t MPU6500_Read_Regs(uint8_t const regAddr, uint8_t *pData, uint8_t len);
 void IMU_Get_Data(void);
 
-uint8_t InitMPU6500(void);
-uint8_t InitIST8310(void);
+uint8_t MPU6500_Init(void);
+uint8_t IST8310_Init(void);
 
-void IMUTask(void const * argument);
+void printIMUTask(void const * argument);
 
 void updateQuaternion(void);
 

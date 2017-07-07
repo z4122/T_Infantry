@@ -17,7 +17,7 @@
 
 void ctrlUartRxCpltCallback(void);
 
-void InitManifoldUart(void);
+void ctrlUartInit(void);
 void vSendUart(xdata_ctrlUart data);
 xdata_ctrlUart xUartprocess(uint8_t *pData);
 

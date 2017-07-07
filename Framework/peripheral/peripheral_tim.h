@@ -13,6 +13,6 @@
 #ifndef PERIPHERAL_TIM
 #define PERIPHERAL_TIM
 
-void InitUserTimer(void);
+void UserTimerInit(void);
 
 #endif

@@ -23,6 +23,8 @@ extern osSemaphoreId ZGYROCanHaveTransmitSemaphoreHandle;
 extern osSemaphoreId CMGMCanTransmitSemaphoreHandle;
 extern osSemaphoreId ZGYROCanTransmitSemaphoreHandle;
 
+extern osSemaphoreId motorCanReceiveSemaphoreHandle;
+
 extern osSemaphoreId CMGMCanRefreshSemaphoreHandle;
 extern osSemaphoreId ZGYROCanRefreshSemaphoreHandle;
 
@@ -31,8 +33,9 @@ extern osSemaphoreId imurefreshGimbalSemaphoreHandle;
 
 //extern osSemaphoreId imuSpiTxRxCpltSemaphoreHandle;
 extern osSemaphoreId refreshMPU6500SemaphoreHandle;
+extern osSemaphoreId refreshIMUSemaphoreHandle;
 
-extern xSemaphoreHandle xSemaphore_mfuart;
+extern xSemaphoreHandle xSemaphore_uart;
 extern xSemaphoreHandle xSemaphore_rcuart;
 extern xSemaphoreHandle motorCanTransmitSemaphore;
 

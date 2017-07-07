@@ -13,9 +13,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-extern bool g_bInited;
-void rtos_InitInfantry(void);
-void rtos_AddSemaphores(void);
-void rtos_AddThreads(void);
+extern bool isInited;
+void rtos_init(void);
+void rtos_addSemaphores(void);
+void rtos_addThreads(void);
 
 #endif
