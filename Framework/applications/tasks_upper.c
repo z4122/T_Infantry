@@ -25,7 +25,7 @@ NaiveIOPoolDefine(upperIOPool, {0});
 extern uint16_t yawAngle, pitchAngle;
 int forPidDebug = 0;
 
-extern float g_yawAngleTarget, g_pitchAngleTarget;
+extern float yawAngleTarget, pitchAngleTarget;
 extern xSemaphoreHandle xSemaphore_mfuart;
 extern xdata_ctrlUart ctrlData; 
 extern uint16_t x;
@@ -38,7 +38,7 @@ float yaw_speed = 0;
 
 extern float pitchRealAngle;
 extern float ZGyroModuleAngle;
-//extern float g_yawAngleTarget, g_pitchAngleTarget;
+//extern float yawAngleTarget, pitchAngleTarget;
 void ManifoldUartTask(void const * argument){
 	static uint8_t last_rune_locate = 0;
 	static uint8_t last_rune;

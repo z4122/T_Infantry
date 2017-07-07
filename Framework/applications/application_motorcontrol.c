@@ -18,14 +18,14 @@
 #include "drivers_canmotor_user.h"
 #include "rtos_semaphore.h"
 #include "utilities_debug.h"
-#include "tasks_timed.h"
+#include "tasks_cmcontrol.h"
 #include "math.h"
 #include <math.h>
 #include <stdlib.h>
 #include "tasks_motor.h"
 #include "drivers_uartjudge_low.h"
 
-extern tGameInfo g_mytGameInfo;
+extern tGameInfo mytGameInfo;
 //typedef struct{
 //	CAN_HandleTypeDef  *canNum;
 //	uint32_t id;
@@ -97,32 +97,32 @@ void setMotor(MotorId motorId, int16_t Intensity){
 	
 //读出功率进行电流限制
 //默认不限
-float CM_current_max = CM_CURRENT_MAX;
-float CMFLIntensity_max = CMFLINTENSITY_MAX;
-float CMFRIntensity_max = CMFRINTENSITY_MAX;
-float CMBLIntensity_max = CMBLINTENSITY_MAX;
-float CMBRIntensity_max = CMBRINTENSITY_MAX;
+float CM_current_max = CM_current_MAX;
+float CMFLIntensity_max = CMFLIntensity_MAX;
+float CMFRIntensity_max = CMFRIntensity_MAX;
+float CMBLIntensity_max = CMBLIntensity_MAX;
+float CMBRIntensity_max = CMBRIntensity_MAX;
 
 //10-40初步限制
-if (g_mytGameInfo.remainPower > 10 & g_mytGameInfo.remainPower < 40){
+if (mytGameInfo.remainPower > 10 & mytGameInfo.remainPower < 40){
 		
-	 CM_current_max = CM_CURRENT_LOWER;
-	 CMFLIntensity_max = CMFLINTENSITY_LOWER;
-	 CMFRIntensity_max = CMFRINTENSITY_LOWER;
-	 CMBLIntensity_max = CMBLINTENSITY_LOWER;
-	 CMBRIntensity_max = CMBRINTENSITY_LOWER;
+	 CM_current_max = CM_current_lower;
+	 CMFLIntensity_max = CMFLIntensity_lower;
+	 CMFRIntensity_max = CMFRIntensity_lower;
+	 CMBLIntensity_max = CMBLIntensity_lower;
+	 CMBRIntensity_max = CMBRIntensity_lower;
 }
 //0-10极限限制
-if (g_mytGameInfo.remainPower < 15 ){
+if (mytGameInfo.remainPower < 15 ){
 		
-	 CM_current_max = CM_CURRENT_BOTTOM;
-	 CMFLIntensity_max = CMFLINTENSITY_BOTTOM;
-	 CMFRIntensity_max = CMFRINTENSITY_BOOTOM;
-	 CMBLIntensity_max = CMBLINTENSITY_BOTTOM;
-	 CMBRIntensity_max = CMBRINTENSITY_BOTTOM;
+	 CM_current_max = CM_current_bottom;
+	 CMFLIntensity_max = CMFLIntensity_bottom;
+	 CMFRIntensity_max = CMFRIntensity_bottom;
+	 CMBLIntensity_max = CMBLIntensity_bottom;
+	 CMBRIntensity_max = CMBRIntensity_bottom;
 }
 //绝对不超
-if (g_mytGameInfo.remainPower < 7 ){
+if (mytGameInfo.remainPower < 7 ){
 		
 	 CM_current_max = 0;
 	 CMFLIntensity_max = 0;
@@ -270,7 +270,7 @@ CMFLIntensity = 0;
 }
 	
 
-uint8_t g_isGYRO_Rested = 0;
+uint8_t GYRO_RESETED = 0;
 void GYRO_RST(void)
 {
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(ZGYROTxIOPool);
@@ -298,5 +298,5 @@ void GYRO_RST(void)
 			}
 			taskEXIT_CRITICAL();
 		}
-	g_isGYRO_Rested = 1;
+	GYRO_RESETED = 1;
 }
