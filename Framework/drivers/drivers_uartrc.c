@@ -47,21 +47,7 @@ void InitRemoteControl(){
 void rcUartRxCpltCallback(){
 	static portBASE_TYPE xHigherPriorityTaskWoken;
 	 xHigherPriorityTaskWoken = pdFALSE; 
-//	static HAL_UART_StateTypeDef uart_state;
-//	fw_printfln("flag: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_RXNE));
-//	while(__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE) == 0){
-//		fw_Warning();
-//	}
-//	__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE);
-//	fw_printfln("flag1: %d",__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE));
-//	__HAL_UART_CLEAR_PEFLAG(&RC_UART);
-//	fw_printfln("flag12: %d",__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE));
-//	fw_printfln("flag: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE));
-//	 while(__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE) == 0)
-//   {}
-//	__HAL_UART_CLEAR_FLAG(&RC_UART, UART_FLAG_IDLE);
-//	fw_printfln("flag2: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE));
-//	fw_printfln("(thiscount_rc - lastcount_rc):  %d", (thiscount_rc - lastcount_rc));
+	 IOPool_getNextWrite(rcUartIOPool);
    xSemaphoreGiveFromISR(xSemaphore_rcuart, &xHigherPriorityTaskWoken);
 	if( xHigherPriorityTaskWoken == pdTRUE ){
    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
@@ -70,72 +56,70 @@ void rcUartRxCpltCallback(){
 
 
 
-RC_Ctl_t RC_CtrlData;   //remote control data
-ChassisSpeed_Ref_t ChassisSpeedRef; 
+RC_Ctl_t g_RC_CtrlData;   //remote control data
+ChassisSpeed_Ref_t g_ChassisSpeedRef; 
 Gimbal_Ref_t GimbalRef; 
-FrictionWheelState_e friction_wheel_state = FRICTION_WHEEL_OFF; 
+FrictionWheelState_e g_friction_wheel_state = FRICTION_WHEEL_OFF; 
 
 volatile Shoot_State_e shootState = NOSHOOTING; 
-InputMode_e inputmode = REMOTE_INPUT;   
+InputMode_e g_eInputmode = REMOTE_INPUT;   
 
-RampGen_t frictionRamp = RAMP_GEN_DAFAULT;  
-RampGen_t LRSpeedRamp = RAMP_GEN_DAFAULT;   
-RampGen_t FBSpeedRamp = RAMP_GEN_DAFAULT;   
+RampGen_t g_frictionRamp = RAMP_GEN_DAFAULT;  
+RampGen_t g_LRSpeedRamp = RAMP_GEN_DAFAULT;   
+RampGen_t g_FBSpeedRamp = RAMP_GEN_DAFAULT;   
 
 void RemoteTaskInit()
 {
-
-	frictionRamp.SetScale(&frictionRamp, FRICTION_RAMP_TICK_COUNT);
-	LRSpeedRamp.SetScale(&LRSpeedRamp, MOUSE_LR_RAMP_TICK_COUNT);
-	FBSpeedRamp.SetScale(&FBSpeedRamp, MOUSR_FB_RAMP_TICK_COUNT);
-	frictionRamp.ResetCounter(&frictionRamp);
-	LRSpeedRamp.ResetCounter(&LRSpeedRamp);
-	FBSpeedRamp.ResetCounter(&FBSpeedRamp);
-
-	GimbalRef.pitch_angle_dynamic_ref = 0.0f;
-	GimbalRef.yaw_angle_dynamic_ref = 0.0f;
-	ChassisSpeedRef.forward_back_ref = 0.0f;
-	ChassisSpeedRef.left_right_ref = 0.0f;
-	ChassisSpeedRef.rotate_ref = 0.0f;
-
+	//斜坡函数初始化
+	g_frictionRamp.SetScale(&g_frictionRamp, FRICTION_RAMP_TICK_COUNT);
+	g_LRSpeedRamp.SetScale(&g_LRSpeedRamp, MOUSE_LR_RAMP_TICK_COUNT);
+	g_FBSpeedRamp.SetScale(&g_FBSpeedRamp, MOUSR_FB_RAMP_TICK_COUNT);
+	g_frictionRamp.ResetCounter(&g_frictionRamp);
+	g_LRSpeedRamp.ResetCounter(&g_LRSpeedRamp);
+	g_FBSpeedRamp.ResetCounter(&g_FBSpeedRamp);
+  //速度初始化
+	g_ChassisSpeedRef.forward_back_ref = 0.0f;
+	g_ChassisSpeedRef.left_right_ref = 0.0f;
+	g_ChassisSpeedRef.rotate_ref = 0.0f;
+  //摩擦轮状态初始化
 	SetFrictionState(FRICTION_WHEEL_OFF);
 }
 /*拨杆数据处理*/
 void GetRemoteSwitchAction(RemoteSwitch_t *sw, uint8_t val)
 {
-	static uint32_t switch_cnt = 0;
+	static uint32_t s_switch_cnt = 0;
 
-	/* ×îÐÂ×´Ì¬Öµ */
+	/* 最新状态值 */
 	sw->switch_value_raw = val;
 	sw->switch_value_buf[sw->buf_index] = sw->switch_value_raw;
 
-	/* È¡×îÐÂÖµºÍÉÏÒ»´ÎÖµ */
+	/* 取最新值和上一次值 */
 	sw->switch_value1 = (sw->switch_value_buf[sw->buf_last_index] << 2)|
 	(sw->switch_value_buf[sw->buf_index]);
 
 
-	/* ×îÀÏµÄ×´Ì¬ÖµµÄË÷Òý */
+	/* 最老的状态值索引 */
 	sw->buf_end_index = (sw->buf_index + 1)%REMOTE_SWITCH_VALUE_BUF_DEEP;
 
-	/* ºÏ²¢Èý¸öÖµ */
+	/* 合并三个值 */
 	sw->switch_value2 = (sw->switch_value_buf[sw->buf_end_index]<<4)|sw->switch_value1;	
 
-	/* ³¤°´ÅÐ¶Ï */
+	/* 长按判断 */
 	if(sw->switch_value_buf[sw->buf_index] == sw->switch_value_buf[sw->buf_last_index])
 	{
-		switch_cnt++;	
+		s_switch_cnt++;	
 	}
 	else
 	{
-		switch_cnt = 0;
+		s_switch_cnt = 0;
 	}
 
-	if(switch_cnt >= 40)
+	if(s_switch_cnt >= 40)
 	{
 		sw->switch_long_value = sw->switch_value_buf[sw->buf_index]; 	
 	}
 
-	//Ë÷ÒýÑ­»·
+	//索引循环
 	sw->buf_last_index = sw->buf_index;
 	sw->buf_index++;		
 	if(sw->buf_index == REMOTE_SWITCH_VALUE_BUF_DEEP)
@@ -143,31 +127,26 @@ void GetRemoteSwitchAction(RemoteSwitch_t *sw, uint8_t val)
 		sw->buf_index = 0;	
 	}			
 }
-//return the state of the remote 0:no action 1:action 
-uint8_t IsRemoteBeingAction(void)
-{
-	return (abs(ChassisSpeedRef.forward_back_ref)>=10 || abs(ChassisSpeedRef.left_right_ref)>=10 || fabs(GimbalRef.yaw_speed_ref)>=10 || fabs(GimbalRef.pitch_speed_ref)>=10);
-}
 /*取得右上角拨杆数据*/
 void SetInputMode(Remote *rc)
 {
 	if(rc->s2 == 1)
 	{
-		inputmode = REMOTE_INPUT;
+		g_eInputmode = REMOTE_INPUT;
 	}
 	else if(rc->s2 == 3)
 	{
-		inputmode = KEY_MOUSE_INPUT;
+		g_eInputmode = KEY_MOUSE_INPUT;
 	}
 	else if(rc->s2 == 2)
 	{
-		inputmode = STOP;
+		g_eInputmode = STOP;
 	}	
 }
 
 InputMode_e GetInputMode()
 {
-	return inputmode;
+	return g_eInputmode;
 }
 
 /*
@@ -178,16 +157,17 @@ input: RemoteSwitch_t *sw, include the switch info
 #endif
 void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val) 
 {
+	//左上角拨杆状态，可以检测位置、动作
 	GetRemoteSwitchAction(sw, val);
-	switch(friction_wheel_state)
+	switch(g_friction_wheel_state)
 	{
 		case FRICTION_WHEEL_OFF:
 		{
 			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_1TO3)   
 			{
 				SetShootState(NOSHOOTING);
-				frictionRamp.ResetCounter(&frictionRamp);
-				friction_wheel_state = FRICTION_WHEEL_START_TURNNING;	 
+				g_frictionRamp.ResetCounter(&g_frictionRamp);
+				g_friction_wheel_state = FRICTION_WHEEL_START_TURNNING;	 
 				LASER_ON(); 
 			}				 		
 		}break;
@@ -198,15 +178,15 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 				LASER_OFF();
 				SetShootState(NOSHOOTING);
 				SetFrictionWheelSpeed(1000);
-				friction_wheel_state = FRICTION_WHEEL_OFF;
-				frictionRamp.ResetCounter(&frictionRamp);
+				g_friction_wheel_state = FRICTION_WHEEL_OFF;
+				g_frictionRamp.ResetCounter(&g_frictionRamp);
 			}
 			else
 			{
-				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
-				if(frictionRamp.IsOverflow(&frictionRamp))
+				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*g_frictionRamp.Calc(&g_frictionRamp)); 
+				if(g_frictionRamp.IsOverflow(&g_frictionRamp))
 				{
-					friction_wheel_state = FRICTION_WHEEL_ON; 	
+					g_friction_wheel_state = FRICTION_WHEEL_ON; 	
 				}
 				
 			}
@@ -216,9 +196,9 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   
 			{
 				LASER_OFF();
-				friction_wheel_state = FRICTION_WHEEL_OFF;				  
+				g_friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
-				frictionRamp.ResetCounter(&frictionRamp);
+				g_frictionRamp.ResetCounter(&g_frictionRamp);
 				SetShootState(NOSHOOTING);
 			}
 			else if(sw->switch_value_raw == 2)
@@ -236,15 +216,15 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 void MouseShootControl(Mouse *mouse)
 {
 	static int16_t closeDelayCount = 0;   
-	switch(friction_wheel_state)
+	switch(g_friction_wheel_state)
 	{
 		case FRICTION_WHEEL_OFF:
 		{
 			if(mouse->last_press_r == 0 && mouse->press_r == 1)   
 			{
 				SetShootState(NOSHOOTING);
-				frictionRamp.ResetCounter(&frictionRamp);
-				friction_wheel_state = FRICTION_WHEEL_START_TURNNING;	 
+				g_frictionRamp.ResetCounter(&g_frictionRamp);
+				g_friction_wheel_state = FRICTION_WHEEL_START_TURNNING;	 
 				LASER_ON(); 
 				closeDelayCount = 0;
 			}				 		
@@ -262,18 +242,18 @@ void MouseShootControl(Mouse *mouse)
 			if(closeDelayCount>50)   
 			{
 				LASER_OFF();
-				friction_wheel_state = FRICTION_WHEEL_OFF;				  
+				g_friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
-				frictionRamp.ResetCounter(&frictionRamp);
+				g_frictionRamp.ResetCounter(&g_frictionRamp);
 				SetShootState(NOSHOOTING);
 			}
 			else
 			{
 				//				
-				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
-				if(frictionRamp.IsOverflow(&frictionRamp))
+				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*g_frictionRamp.Calc(&g_frictionRamp)); 
+				if(g_frictionRamp.IsOverflow(&g_frictionRamp))
 				{
-					friction_wheel_state = FRICTION_WHEEL_ON; 	
+					g_friction_wheel_state = FRICTION_WHEEL_ON; 	
 				}
 				
 			}
@@ -292,9 +272,9 @@ void MouseShootControl(Mouse *mouse)
 			if(closeDelayCount>50)   //
 			{
 				LASER_OFF();
-				friction_wheel_state = FRICTION_WHEEL_OFF;				  
+				g_friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
-				frictionRamp.ResetCounter(&frictionRamp);
+				g_frictionRamp.ResetCounter(&g_frictionRamp);
 				SetShootState(NOSHOOTING);
 			}			
 			else if(mouse->last_press_l == 0 && mouse->press_l== 1)  //检测鼠标左键单击动作
@@ -328,12 +308,12 @@ void SetShootState(Shoot_State_e v)
 
 FrictionWheelState_e GetFrictionState()
 {
-	return friction_wheel_state;
+	return g_friction_wheel_state;
 }
 
 void SetFrictionState(FrictionWheelState_e v)
 {
-	friction_wheel_state = v;
+	g_friction_wheel_state = v;
 }
 void SetFrictionWheelSpeed(uint16_t x)
 {

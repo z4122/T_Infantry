@@ -166,7 +166,7 @@ void judgeUartRxCpltCallback(void){
 	}
 }
 
-tGameInfo mytGameInfo;
+tGameInfo g_mytGameInfo;
 uint8_t JUDGE_Received = 0;
 uint8_t JUDGE_State = 1;
 
@@ -174,30 +174,30 @@ void Judge_Refresh(void)
 {
 	//printf("verify OK\r\n");
 	
-//  mytGameInfo.remainTime = (0x00000000 | buffer[7]) | (buffer[8]<<8) | (buffer[9]<<16) | (buffer[10]<<24);
+//  g_mytGameInfo.remainTime = (0x00000000 | buffer[7]) | (buffer[8]<<8) | (buffer[9]<<16) | (buffer[10]<<24);
 //	
-//  mytGameInfo.remainLifeValue = (0x0000 | buffer[11]) | (buffer[12]<<8);
+//  g_mytGameInfo.remainLifeValue = (0x0000 | buffer[11]) | (buffer[12]<<8);
 //	
-//  unsigned char * b = (unsigned char*)&mytGameInfo.realChassisOutV;
+//  unsigned char * b = (unsigned char*)&g_mytGameInfo.realChassisOutV;
 //  char c[4] = {buffer[13],buffer[14],buffer[15],buffer[16]};
 //  for(int i = 0; i<4; i++){
 //      b[i] = (unsigned char)c[i];
 //  }
-////  fw_printf("COutV: %f \r\n",mytGameInfo.realChassisOutV);
+////  fw_printf("COutV: %f \r\n",g_mytGameInfo.realChassisOutV);
 //	
-//	b = (unsigned char*)&mytGameInfo.realChassisOutA;
+//	b = (unsigned char*)&g_mytGameInfo.realChassisOutA;
 //  c[0] = buffer[17];c[1] = buffer[18];c[2] = buffer[19];c[3] = buffer[20];
 //  for(int i = 0; i<4; i++){
 //      b[i] = (unsigned char)c[i];
 //  }
-////  fw_printf("COutA: %f \r\n",mytGameInfo.realChassisOutA);
+////  fw_printf("COutA: %f \r\n",g_mytGameInfo.realChassisOutA);
   char c[4];
-	unsigned char * b = (unsigned char*)&mytGameInfo.remainPower;
+	unsigned char * b = (unsigned char*)&g_mytGameInfo.remainPower;
   c[0] = buffer[38];c[1] = buffer[39];c[2] = buffer[40];c[3] = buffer[41];
   for(int i = 0; i<4; i++){
       b[i] = (unsigned char)c[i];
   }
- // fw_printf("remainPower: %f \r\n",mytGameInfo.remainPower);
+ // fw_printf("remainPower: %f \r\n",g_mytGameInfo.remainPower);
 	
 	
 	JUDGE_Received = 1;
