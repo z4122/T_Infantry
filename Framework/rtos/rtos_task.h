@@ -26,6 +26,7 @@ extern osThreadId getCtrlUartTaskHandle;
 //Motor
 extern osThreadId GMControlTaskHandle;
 extern osThreadId TimerTaskHandle;
+extern osThreadId PlateTaskHandle;
 
 extern osThreadId CMGMCanTransmitTaskHandle;
 extern osThreadId AMCanTransmitTaskHandle;

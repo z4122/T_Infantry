@@ -20,7 +20,7 @@
 #include "peripheral_define.h"
 #include "utilities_debug.h"
 
-
+/********************所有串口接收中断****************************/
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
 	if(UartHandle == &RC_UART){

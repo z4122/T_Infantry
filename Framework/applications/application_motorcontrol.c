@@ -65,7 +65,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 	//底盘功率限制，80W，能量槽满60，低于0掉血
     RestrictPower(&CMFLIntensity, &CMFRIntensity, &CMBLIntensity, &CMBRIntensity);
 	
-	if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY)
+	if(GetWorkState() == STOP_STATE)
 	{
 		CMFLIntensity = 0;
 		CMFRIntensity = 0;
@@ -80,7 +80,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(CMTxIOPool);
 		
 		pData->StdId = CM_TXID;
-  	    pData->Data[0] = (uint8_t)(CMFLIntensity >> 8);
+  	pData->Data[0] = (uint8_t)(CMFLIntensity >> 8);
 		pData->Data[1] = (uint8_t)CMFLIntensity;
 		pData->Data[2] = (uint8_t)(CMFRIntensity >> 8);
 		pData->Data[3] = (uint8_t)CMFRIntensity;
@@ -115,7 +115,6 @@ void setMotor(MotorId motorId, int16_t Intensity){
 }
 	
 
-uint8_t g_isGYRO_Rested = 0;
 void GYRO_RST(void)
 {
 	CanTxMsgTypeDef *pData = IOPool_pGetWriteData(ZGYROTxIOPool);
@@ -131,6 +130,4 @@ void GYRO_RST(void)
 	IOPool_getNextWrite(ZGYROTxIOPool);
 
 	TransmitGYROCAN();
-
-	g_isGYRO_Rested = 1;
 }

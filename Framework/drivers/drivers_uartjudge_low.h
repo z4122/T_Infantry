@@ -14,7 +14,7 @@
 #define DRIVERS_UARTJUDGE_LOW_H
 
 #include "utilities_iopool.h"
-
+#include "cmsis_os.h"
 
 typedef struct 
 {
@@ -24,6 +24,12 @@ typedef struct
     float realChassisOutA;
     float remainPower;
 }tGameInfo;
+
+typedef enum
+{
+	ONLINE,
+	OFFLINE
+}JudgeState_e;
 
 void judgeUartRxCpltCallback(void);
 void InitJudgeUart(void);

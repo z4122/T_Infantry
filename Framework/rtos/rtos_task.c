@@ -49,6 +49,7 @@ osThreadId getCtrlUartTaskHandle;
 //Motor
 osThreadId GMControlTaskHandle;
 osThreadId TimerTaskHandle;
+osThreadId PlateTaskHandle;
 
 osThreadId CMGMCanTransmitTaskHandle;
 osThreadId AMCanTransmitTaskHandle;
@@ -94,9 +95,13 @@ void rtos_AddThreads()
 //CM(ChasisMotor)底盘电机GM(Gimbla)云台电机控制任务
 	osThreadDef(GMC_Task, CMGMControlTask, osPriorityAboveNormal, 0, 1024);
   GMControlTaskHandle = osThreadCreate(osThread(GMC_Task), NULL);
+	
+//拨盘电机任务 //待移植
+//	osThreadDef(Plate_Task, PlateMotorTask, osPriorityAboveNormal, 0, 512);
+//  PlateTaskHandle = osThreadCreate(osThread(Plate_Task), NULL);
 //2ms定时任务，目前较为混乱 todo：状态机切换
 
-	osThreadDef(Timer_Task, Timer_2ms_lTask, osPriorityAboveNormal, 0, 256);
+	osThreadDef(Timer_Task, Timer_2ms_lTask, osPriorityAboveNormal, 0, 512);
   TimerTaskHandle = osThreadCreate(osThread(Timer_Task), NULL);
 
 }

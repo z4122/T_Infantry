@@ -142,7 +142,7 @@ void ControlYaw(void)
 		yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
 		NORMALIZE_ANGLE180(yawRealAngle);
 		
-		if(g_isGYRO_Rested == 2) 
+		if(GetWorkState() == NORMAL_STATE) 
 		{
 			yawRealAngle = -ZGyroModuleAngle;//yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
 			/*自瞄模式切换*/
@@ -226,7 +226,7 @@ void ControlRotate(void)
 	gap_angle  = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yaw_zero) * 360 / 8192.0f;
     NORMALIZE_ANGLE180(gap_angle);	
 	
-	if(g_isGYRO_Rested == 2) 
+	if(GetWorkState() == NORMAL_STATE) 
 	{
 		/*扭腰*/
 		//试图用PID

@@ -33,7 +33,7 @@
 #include "peripheral_define.h"
 #include "drivers_platemotor.h"
 #include "application_waveform.h"
-
+#include "drivers_uartjudge_low.h"
 extern PID_Regulator_t CMRotatePID ; 
 extern PID_Regulator_t CM1SpeedPID;
 extern PID_Regulator_t CM2SpeedPID;
@@ -49,11 +49,11 @@ Shoot_State_e this_shoot_state = NOSHOOTING;
 //uint32_t this_Encoder = 0;
 int flag = 0;
 
-WorkState_e workState = PREPARE_STATE;
+WorkState_e g_workState = PREPARE_STATE;
 WorkState_e lastWorkState = PREPARE_STATE;
 WorkState_e GetWorkState()
 {
-	return workState;
+	return g_workState;
 }
 /*2ms定时任务*/
 
@@ -74,80 +74,71 @@ int mouse_click_left = 0;
 
 int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 
+static int s_count_judge = 0;
 extern uint8_t JUDGE_Received;
 extern uint8_t JUDGE_State;
 
+static uint32_t s_time_tick_2ms = 0;
+
 void Timer_2ms_lTask(void const * argument)
 {
+	//RTOS提供，用来做2ms精确定时
+	//与后面的vTaskDelayUntil()配合使用
 	portTickType xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
+	//countwhile来获得不同定时任务
 	static int s_countWhile = 0;
-	static int countwhile1 = 0;
-//	static int countwhile3 = 0;
+
 	ShootMotorPositionPID.ref = 0x0;
 	ShootMotorPositionPID.fdb = 0x0;
-	static int count_judge = 0;
 //static int shootwhile = 0;
 //unsigned portBASE_TYPE StackResidue; //栈剩余
-	while(1)  {       //motor control frequency 2ms
-//监控任务
-//		SuperviseTask();    
-		WorkStateFSM();
-	  WorkStateSwitchProcess();
-//1s循环
-		if(s_countWhile >= 1000){//定时 1S
-		s_countWhile = 0;
-			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
-//			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
-//			fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
-//			fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
-//			fw_printfln("PitAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
-//				fw_printfln("GMYAWEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle );
-//			fw_printfln("in CMcontrol_task");
-//		StackResidue = uxTaskGetStackHighWaterMark( GMControlTaskHandle );
-//		fw_printfln("GM%ld",StackResidue);
-			if(JUDGE_State == 1){
-				fw_printfln("Judge not received");
-			}
-			else{
-				fw_printfln("Judge received");
-			}
-		}else{
-			s_countWhile++;
-		}
-//陀螺仪复位计时
-    if(countwhile1 > 3000){
-			if(g_isGYRO_Rested == 0)GYRO_RST();//给单轴陀螺仪将当前位置写零
-		}
-		else{countwhile1++;}
-		if(countwhile1 > 5500){
-			g_isGYRO_Rested = 2;//正常遥控器或者键盘控制模式，底盘跟随模式
-		}
-		else{countwhile1++;}
+	while(1)  
+	{       
+		WorkStateFSM();//状态机
+	  WorkStateSwitchProcess();//状态机动作
+		
+		//陀螺仪复位计时
+    if(s_time_tick_2ms == 2000)
+		{
+			GYRO_RST();//给单轴陀螺仪将当前位置写零，注意需要一定的稳定时间
+		}            //在从STOP切换到其他状态时，s_time_tick_2ms清零重加，会重新复位陀螺仪
 
-   if(JUDGE_Received==1){
-			count_judge = 0;
-		  JUDGE_State = 0;
-		}
-		else{
-			count_judge++;
-			if(count_judge > 150){//300ms
-       JUDGE_State = 1;
-			}
-		}
+		getJudgeState();
 		
 		ShooterMControlLoop();       //发射机构控制任务
 		
-		vTaskDelayUntil( &xLastWakeTime, ( 2 / portTICK_RATE_MS ) );
+		
+		if(s_countWhile >= 1000)
+		{//定时1s,发送调试信息
+			s_countWhile = 0;
+			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
+			//			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
+			//			fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
+			/*****查看任务栈空间剩余示例*******/
+			//		StackResidue = uxTaskGetStackHighWaterMark( GMControlTaskHandle );
+			//		fw_printfln("GM%ld",StackResidue);
+			if(JUDGE_State == OFFLINE)
+			{
+				fw_printfln("Judge not received");
+			}
+			else
+			{
+				fw_printfln("Judge received");
+			}
+		}
+		else
+		{
+			s_countWhile++;
+		}
+		
+		vTaskDelayUntil( &xLastWakeTime, ( 2 / portTICK_RATE_MS ) );//这里进入阻塞态等待2ms
 	}
 }
 	
 
-	static uint32_t time_tick_2ms = 0;
-void CMControtLoopTaskInit(void)
+void CMControlInit(void)
 {
-//上电计数初始化
-	time_tick_2ms = 0;   
 //底盘电机PID初始化，copy from官方开源程序
 	ShootMotorSpeedPID.Reset(&ShootMotorSpeedPID);
 	CMRotatePID.Reset(&CMRotatePID);
@@ -162,50 +153,38 @@ void CMControtLoopTaskInit(void)
 
 void WorkStateFSM(void)
 {
-	lastWorkState = workState;
-	time_tick_2ms ++;
-	switch(workState)
+	lastWorkState = g_workState;
+	s_time_tick_2ms ++;
+	switch(g_workState)
 	{
 		case PREPARE_STATE:
 		{
-			if(GetInputMode() == STOP )//|| Is_Serious_Error())
+			if(GetInputMode() == STOP )
 			{
-				workState = STOP_STATE;
+				g_workState = STOP_STATE;
 			}
-			else if(time_tick_2ms > PREPARE_TIME_TICK_MS)
+			else if(s_time_tick_2ms > PREPARE_TIME_TICK_MS)
 			{
-				workState = NORMAL_STATE;
+				g_workState = NORMAL_STATE;
 			}			
 		}break;
 		case NORMAL_STATE:     
 		{
-			if(GetInputMode() == STOP )//|| Is_Serious_Error())
+			if(GetInputMode() == STOP )
 			{
-				workState = STOP_STATE;
+				g_workState = STOP_STATE;
 			}
-			else if(GetShootState() != SHOOTING) //||(Get_Lost_Error(LOST_ERROR_RC) == LOST_ERROR_RC
-			{
-			//	fw_printfln("进入STANDBY");
-				workState = STANDBY_STATE;      
-			}			
-		}break;
-		case STANDBY_STATE:  
-		{
-			if(GetInputMode() == STOP )//|| Is_Serious_Error())
-			{
-				workState = STOP_STATE;
-			}
-			else if((GetShootState()==SHOOTING) || GetFrictionState() == FRICTION_WHEEL_START_TURNNING)
-			{
-				workState = NORMAL_STATE;
-			}				
 		}break;
 		case STOP_STATE:   
 		{
-			if(GetInputMode() != STOP )//&& !Is_Serious_Error())
+			if(GetInputMode() != STOP )
 			{
-				workState = PREPARE_STATE;   
+				g_workState = PREPARE_STATE;   
 			}
+		}break;
+		case RUNE_STATE:
+		{
+			
 		}break;
 		default:
 		{
@@ -216,13 +195,31 @@ void WorkStateFSM(void)
 void WorkStateSwitchProcess(void)
 {
 	//如果从其他模式切换到prapare模式，要将一系列参数初始化
-	if((lastWorkState != workState) && (workState == PREPARE_STATE))  
+	if((lastWorkState != g_workState) && (g_workState == PREPARE_STATE))  
 	{
-		CMControtLoopTaskInit();
+		//计数初始化
+	  s_time_tick_2ms = 0;   
+		CMControlInit();
 		RemoteTaskInit();
 	}
 }
   
+void getJudgeState(void)
+{
+	if(JUDGE_Received==1)
+	{
+		s_count_judge = 0;
+		JUDGE_State = ONLINE;
+	}
+	else
+	{
+		s_count_judge++;
+		if(s_count_judge > 150)
+		{//300ms
+			JUDGE_State = OFFLINE;
+		}
+	}
+}
 int32_t GetQuadEncoderDiff(void)
 {
   int32_t cnt = 0;    

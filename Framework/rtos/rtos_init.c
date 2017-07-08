@@ -38,7 +38,7 @@ void rtos_InitInfantry()
 	InitManifoldUart();//初始化妙算Manifold通信串口，用来做大神符、自动瞄准
 	InitRemoteControl();//初始化遥控器控制，接收机串口
 	
-	CMControtLoopTaskInit();//抄来的，待删
+	CMControlInit();//底盘PID初始化，copy from官方开源程序
 	InitCanReception();//初始化CAN接收(配置CAN过滤器)
 	
 	plateMotorInit();//初始化拨盘电机(电机PWM，编码器计数)
