@@ -203,7 +203,6 @@ void ControlYaw(void)
 /*Pitch电机*/
 void ControlPitch(void)
 {
-/*云台pitch轴*/
 	if(IOPool_hasNextRead(GMPITCHRxIOPool, 0))
 	{
 		uint16_t pitchZeroAngle = pitch_zero;

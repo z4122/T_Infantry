@@ -161,8 +161,8 @@ void Timer_2ms_lTask(void const * argument)
 	ShootMotorPositionPID.ref = 0x0;
 	ShootMotorPositionPID.fdb = 0x0;
 	static int count_judge = 0;
-	//static int shootwhile = 0;
-//	unsigned portBASE_TYPE StackResidue; //栈剩余
+//static int shootwhile = 0;
+//unsigned portBASE_TYPE StackResidue; //栈剩余
 	while(1)  {       //motor control frequency 2ms
 //监控任务
 //		SuperviseTask();    
@@ -198,20 +198,6 @@ void Timer_2ms_lTask(void const * argument)
 			g_isGYRO_Rested = 2;//正常遥控器或者键盘控制模式，底盘跟随模式
 		}
 		else{countwhile1++;}
-//10ms循环
-		if(countwhile2 >= 10){//定时 20MS
-		countwhile2 = 0;
-		this_fbspeed = (IOPool_pGetReadData(CMFLRxIOPool, 0)->RotateSpeed + IOPool_pGetReadData(CMFRRxIOPool, 0)->RotateSpeed 
-			             + IOPool_pGetReadData(CMBLRxIOPool, 0)->RotateSpeed + IOPool_pGetReadData(CMBRRxIOPool, 0)->RotateSpeed)/4.f;
-    diff_fbspeed = this_fbspeed - last_fbspeed;
-		last_fbspeed = this_fbspeed;
-
-//		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);//发送数据到上位机看波形
-			//printf("pitch:%f *** yaw:%f",pitchRealAngle,ZGyroModuleAngle);
-//		HAL_UART_Transmit(&DEBUG_UART,txbuf,strlen((char *)txbuf),1000);
-		}else{
-			countwhile2++;
-		}
 
    if(JUDGE_Received==1){
 			count_judge = 0;
