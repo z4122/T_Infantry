@@ -61,7 +61,7 @@ IOPoolDeclare(GMTxIOPool, CanTxMsgTypeDef);
 IOPoolDeclare(ZGYROTxIOPool, CanTxMsgTypeDef);
 
 
-void motorInit(void);
+void InitCanReception(void);
 void Set_CM_Speed(int16_t cm1_iq, int16_t cm2_iq, int16_t cm3_iq, int16_t cm4_iq);
 void TransmitCMGMCan(void);
 void TransmitGYROCAN(void);
