@@ -71,7 +71,7 @@ void InitRemoteControl(void);
 
 #define REMOTE_SWITCH_VALUE_BUF_DEEP   16u
 
-//RC_CtrlData
+//g_RC_CtrlData
 typedef struct{
 	uint8_t rc_bytes[RC_FRAME_LENGTH];
 }RC_Raw_t;
@@ -173,7 +173,7 @@ typedef struct RemoteSwitch_t
 	 uint8_t buf_end_index;
 }RemoteSwitch_t;
 
-extern ChassisSpeed_Ref_t ChassisSpeedRef;
+extern ChassisSpeed_Ref_t g_ChassisSpeedRef;
 extern Gimbal_Ref_t GimbalRef;
 InputMode_e GetInputMode(void);
 void RemoteTaskInit(void);
@@ -181,7 +181,6 @@ void SetShootState(Shoot_State_e v);
 Shoot_State_e GetShootState(void);
 void SetFrictionState(FrictionWheelState_e v);
 FrictionWheelState_e GetFrictionState(void);
-uint8_t IsRemoteBeingAction(void);
 void GetRemoteSwitchAction(RemoteSwitch_t *sw, uint8_t val);
 void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val);
 void MouseShootControl(Mouse *mouse);

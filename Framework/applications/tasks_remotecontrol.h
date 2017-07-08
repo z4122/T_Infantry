@@ -18,7 +18,7 @@
 
 void RControlTask(void const * argument);
 void RemoteTaskInit(void);
-void RemoteDataProcess(uint8_t *pData);
+void ProcessRemoteData(uint8_t *pData);
 void MouseKeyControlProcess(Mouse *mouse, Key *key);
 void RemoteControlProcess(Remote *rc);
 
