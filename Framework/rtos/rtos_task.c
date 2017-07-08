@@ -27,7 +27,7 @@
 #include "drivers_led_low.h"
 #include "tasks_remotecontrol.h"
 #include "tasks_upper.h"
-#include "tasks_cmcontrol.h"
+#include "tasks_timed.h"
 #include "drivers_canmotor_low.h"
 #include "tasks_motor.h"
 #include "drivers_sonar_low.h"
@@ -98,4 +98,5 @@ void rtos_AddThreads()
 
 	osThreadDef(Timer_Task, Timer_2ms_lTask, osPriorityAboveNormal, 0, 256);
   TimerTaskHandle = osThreadCreate(osThread(Timer_Task), NULL);
+
 }

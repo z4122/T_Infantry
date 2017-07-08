@@ -21,7 +21,6 @@
 #include "rtos_init.h"
 #include "rtos_semaphore.h"
 
-static uint32_t can_count = 0;
 volatile Encoder CM1Encoder = {0,0,0,0,0,0,0,0,0};
 volatile Encoder CM2Encoder = {0,0,0,0,0,0,0,0,0};
 volatile Encoder CM3Encoder = {0,0,0,0,0,0,0,0,0};
@@ -72,7 +71,8 @@ uint8_t isRcanStarted_CMGM = 0, isRcanStarted_ZGYRO = 0;
 
 CanRxMsgTypeDef CMGMCanRxMsg, ZGYROCanRxMsg;
 	
-void InitCanReception(){
+void InitCanReception()
+{
 	CMGMMOTOR_CAN.pRxMsg = &CMGMCanRxMsg;
 	/*##-- Configure the CAN2 Filter ###########################################*/
 	CAN_FilterConfTypeDef  sFilterConfig;
@@ -112,11 +112,7 @@ void InitCanReception(){
 	isRcanStarted_ZGYRO = 1;
 }
 
-//uint16_t pitchAngle = 0, yawAngle = 0;
-//uint32_t flAngle = 0, frAngle = 0, blAngle = 0, brAngle = 0;
-//uint16_t flSpeed = 0, frSpeed = 0, blSpeed = 0, brSpeed = 0;
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
-	//CanRxMsgTypeDef *temp = IOPool_pGetWriteData(motorCanRxIOPool);
 	if(hcan == &CMGMMOTOR_CAN){
 		switch(CMGMCanRxMsg.StdId){
 			case CMFL_RXID:
@@ -155,7 +151,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 			fw_Error_Handler();
 		}
 		if(HAL_CAN_Receive_IT(&CMGMMOTOR_CAN, CAN_FIFO0) != HAL_OK){
-			//fw_Warning();
+			fw_Warning();
 			isRcanStarted_CMGM = 0;
 		}else{
 			isRcanStarted_CMGM = 1;
@@ -163,18 +159,22 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 		if(g_bInited == 1){
 			osSemaphoreRelease(CMGMCanRefreshSemaphoreHandle);
 		}
-	}else if(hcan == &ZGYRO_CAN){
-		switch(ZGYROCanRxMsg.StdId){
-			case ZGYRO_RXID:{
-				//LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_ZGYRO));
-			CanRxMsgTypeDef *msg =	&ZGYROCanRxMsg;
-			ZGyroModuleAngle = -0.01f*((int32_t)(msg->Data[0]<<24)|(int32_t)(msg->Data[1]<<16) | (int32_t)(msg->Data[2]<<8) | (int32_t)(msg->Data[3])); 
-			}break;
-				
+	}
+	else if(hcan == &ZGYRO_CAN)
+	{
+		switch(ZGYROCanRxMsg.StdId)
+		{
+			case ZGYRO_RXID:
+			 {
+				CanRxMsgTypeDef *msg = &ZGYROCanRxMsg;
+				ZGyroModuleAngle = -0.01f*((int32_t)(msg->Data[0]<<24)|(int32_t)(msg->Data[1]<<16) | (int32_t)(msg->Data[2]<<8) | (int32_t)(msg->Data[3])); 
+			 }
+			 break;
 			default:
 			fw_Error_Handler();
 		}
-		if(HAL_CAN_Receive_IT(&ZGYRO_CAN, CAN_FIFO0) != HAL_OK){
+		if(HAL_CAN_Receive_IT(&ZGYRO_CAN, CAN_FIFO0) != HAL_OK)
+		{
 			//fw_Warning();
 			isRcanStarted_ZGYRO = 0;
 		}else{
@@ -184,101 +184,69 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 			osSemaphoreRelease(ZGYROCanRefreshSemaphoreHandle);
 		}
 	}
-
 }
 
-
-void CMGMCanTransmitTask(void const * argument){
-	while(1){
-//		osSemaphoreWait(CMGMCanHaveTransmitSemaphoreHandle, osWaitForever);//osWaitForever
-//		fw_printfln("in cantransmit");
-		xSemaphoreTake(motorCanTransmitSemaphore, osWaitForever);
-		//fw_printfln("osWaitForeverCMGMCanHaveTransmitSemaphoreHandle");
-		if(IOPool_hasNextRead(CMTxIOPool, 0)){
-			osSemaphoreWait(CMGMCanTransmitSemaphoreHandle, osWaitForever);
-			IOPool_getNextRead(CMTxIOPool, 0);
-			CMGMMOTOR_CAN.pTxMsg = IOPool_pGetReadData(CMTxIOPool, 0);
-			taskENTER_CRITICAL();
-			if(HAL_CAN_Transmit_IT(&CMGMMOTOR_CAN) != HAL_OK){
-				fw_Warning();
-				osSemaphoreRelease(CMGMCanTransmitSemaphoreHandle);
-			}
-			taskEXIT_CRITICAL();
-		}
-		if(IOPool_hasNextRead(GMTxIOPool, 0)){
-			osSemaphoreWait(CMGMCanTransmitSemaphoreHandle, osWaitForever);
-			IOPool_getNextRead(GMTxIOPool, 0);
-			CMGMMOTOR_CAN.pTxMsg = IOPool_pGetReadData(GMTxIOPool, 0);
-			taskENTER_CRITICAL();
-			if(HAL_CAN_Transmit_IT(&CMGMMOTOR_CAN) != HAL_OK){
-				fw_Warning();
-				osSemaphoreRelease(CMGMCanTransmitSemaphoreHandle);
-			}
-			taskEXIT_CRITICAL();
-		}
-		if(isRcanStarted_CMGM == 0){
-				if(CMGMMOTOR_CAN.State == HAL_CAN_STATE_BUSY_RX){
-					CMGMMOTOR_CAN.State = HAL_CAN_STATE_READY;
-				}
-				if(HAL_CAN_Receive_IT(&CMGMMOTOR_CAN, CAN_FIFO0) != HAL_OK){
-					fw_Warning();
-				}else{
-					isRcanStarted_CMGM = 1;
-				}
-			}
-	}
-}
-
-void ZGYROCanTransmitTask(void const * argument){
-	while(1){
-		osSemaphoreWait(ZGYROCanHaveTransmitSemaphoreHandle, osWaitForever);//osWaitForever
-		if(IOPool_hasNextRead(ZGYROTxIOPool, 0)){
-			osSemaphoreWait(ZGYROCanTransmitSemaphoreHandle, osWaitForever);
-			IOPool_getNextRead(ZGYROTxIOPool, 0);
-			ZGYRO_CAN.pTxMsg = IOPool_pGetReadData(ZGYROTxIOPool, 0);
-			taskENTER_CRITICAL();
-			if(HAL_CAN_Transmit_IT(&ZGYRO_CAN) != HAL_OK){
-				fw_Warning();
-				osSemaphoreRelease(ZGYROCanTransmitSemaphoreHandle);
-			}
-			taskEXIT_CRITICAL();
-		}
-		if(isRcanStarted_ZGYRO == 0){
-				if(ZGYRO_CAN.State == HAL_CAN_STATE_BUSY_RX){
-					ZGYRO_CAN.State = HAL_CAN_STATE_READY;
-				}
-				if(HAL_CAN_Receive_IT(&ZGYRO_CAN, CAN_FIFO0) != HAL_OK){
-					fw_Warning();
-				}else{
-					isRcanStarted_ZGYRO = 1;
-				}
-			}
-	}
-}
-
-
-void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan){
+void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
+{
 	if(hcan == &CMGMMOTOR_CAN){
 		osSemaphoreRelease(CMGMCanTransmitSemaphoreHandle);
-	}else if(hcan == &ZGYRO_CAN){
+	}
+	else if(hcan == &ZGYRO_CAN)
+	{
 		osSemaphoreRelease(ZGYROCanTransmitSemaphoreHandle);
 	}
 }
 
-void Set_CM_Speed(int16_t cm1_iq, int16_t cm2_iq, int16_t cm3_iq, int16_t cm4_iq)
+void TransmitCMGMCan(void)
 {
-   	CanTxMsgTypeDef *tx_message = IOPool_pGetWriteData(CMTxIOPool);
-		tx_message->StdId = CM_TXID;
-    tx_message->Data[0] = (uint8_t)(cm1_iq >> 8);
-    tx_message->Data[1] = (uint8_t)cm1_iq;
-    tx_message->Data[2] = (uint8_t)(cm2_iq >> 8);
-    tx_message->Data[3] = (uint8_t)cm2_iq;
-    tx_message->Data[4] = (uint8_t)(cm3_iq >> 8);
-    tx_message->Data[5] = (uint8_t)cm3_iq;
-    tx_message->Data[6] = (uint8_t)(cm4_iq >> 8);
-    tx_message->Data[7] = (uint8_t)cm4_iq;
-		IOPool_getNextWrite(CMTxIOPool);
+		if(IOPool_hasNextRead(CMTxIOPool, 0))
+		{
+			osSemaphoreWait(CMGMCanTransmitSemaphoreHandle, osWaitForever);
+			
+			IOPool_getNextRead(CMTxIOPool, 0);
+			CMGMMOTOR_CAN.pTxMsg = IOPool_pGetReadData(CMTxIOPool, 0);
+			
+			taskENTER_CRITICAL();
+			if(HAL_CAN_Transmit_IT(&CMGMMOTOR_CAN) != HAL_OK){
+				fw_Warning();
+			}
+			taskEXIT_CRITICAL();
+		}
+		
+		if(IOPool_hasNextRead(GMTxIOPool, 0))
+		{
+			osSemaphoreWait(CMGMCanTransmitSemaphoreHandle, osWaitForever);
+			
+			IOPool_getNextRead(GMTxIOPool, 0);
+			CMGMMOTOR_CAN.pTxMsg = IOPool_pGetReadData(GMTxIOPool, 0);
+			
+			taskENTER_CRITICAL();
+			if(HAL_CAN_Transmit_IT(&CMGMMOTOR_CAN) != HAL_OK){
+				fw_Warning();
+			}
+			taskEXIT_CRITICAL();
+		}
 }
+
+void TransmitGYROCAN(void){
+	if(IOPool_hasNextRead(ZGYROTxIOPool, 0))
+	{
+			osSemaphoreWait(ZGYROCanTransmitSemaphoreHandle, osWaitForever);
+		
+			IOPool_getNextRead(ZGYROTxIOPool, 0);
+			ZGYRO_CAN.pTxMsg = IOPool_pGetReadData(ZGYROTxIOPool, 0);
+		
+			taskENTER_CRITICAL();
+			if(HAL_CAN_Transmit_IT(&ZGYRO_CAN) != HAL_OK)
+			{
+				fw_Warning();
+			}
+			taskEXIT_CRITICAL();
+	}
+}
+
+
+
 
 /*
 ***********************************************************************************************
@@ -345,18 +313,4 @@ void GetEncoderBias(volatile Encoder *v, Motor820RRxMsg_t * msg)
             v->ecd_value = v->ecd_bias;
             v->last_raw_value = v->ecd_bias;
             v->temp_count++;
-}
-/*
-************************************************************************************************************************
-*Name        : CanReceiveMsgProcess
-* Description: This function process the can message representing the encoder data received from the CAN2 bus.
-* Arguments  : msg     is a pointer to the can message.
-* Returns    : void
-* Note(s)    : none
-************************************************************************************************************************
-*/
-void CANReceiveMsgProcess_820R(Motor820RRxMsg_t * msg, volatile Encoder * CMxEncoder)
-{      
-    can_count++;
-		(can_count<=50) ? GetEncoderBias(CMxEncoder ,msg):EncoderProcess(CMxEncoder ,msg);       //获取到编码器的初始偏差值            
 }

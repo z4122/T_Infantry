@@ -1640,6 +1640,30 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>114</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Framework\drivers\drivers_cmpower.c</PathWithFileName>
+      <FilenameWithoutPath>drivers_cmpower.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>115</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\Framework\drivers\drivers_cmpower.h</PathWithFileName>
+      <FilenameWithoutPath>drivers_cmpower.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
   </Group>
 
   <Group>
@@ -1650,7 +1674,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>114</FileNumber>
+      <FileNumber>116</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1662,7 +1686,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>115</FileNumber>
+      <FileNumber>117</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1674,7 +1698,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>116</FileNumber>
+      <FileNumber>118</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1686,7 +1710,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>117</FileNumber>
+      <FileNumber>119</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1698,7 +1722,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>118</FileNumber>
+      <FileNumber>120</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1710,7 +1734,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>119</FileNumber>
+      <FileNumber>121</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1722,7 +1746,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>120</FileNumber>
+      <FileNumber>122</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1734,7 +1758,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>121</FileNumber>
+      <FileNumber>123</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1746,7 +1770,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>122</FileNumber>
+      <FileNumber>124</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1758,7 +1782,7 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>123</FileNumber>
+      <FileNumber>125</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1770,25 +1794,25 @@
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>124</FileNumber>
+      <FileNumber>126</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Framework\applications\tasks_cmcontrol.c</PathWithFileName>
-      <FilenameWithoutPath>tasks_cmcontrol.c</FilenameWithoutPath>
+      <PathWithFileName>..\Framework\applications\tasks_timed.c</PathWithFileName>
+      <FilenameWithoutPath>tasks_timed.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>11</GroupNumber>
-      <FileNumber>125</FileNumber>
+      <FileNumber>127</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Framework\applications\tasks_cmcontrol.h</PathWithFileName>
-      <FilenameWithoutPath>tasks_cmcontrol.h</FilenameWithoutPath>
+      <PathWithFileName>..\Framework\applications\tasks_timed.h</PathWithFileName>
+      <FilenameWithoutPath>tasks_timed.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

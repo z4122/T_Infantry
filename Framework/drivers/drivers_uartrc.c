@@ -84,20 +84,18 @@ RampGen_t FBSpeedRamp = RAMP_GEN_DAFAULT;
 
 void RemoteTaskInit()
 {
-
+  /*斜坡初始化，copy from官方程序，实现被封装在RMLib*/
 	frictionRamp.SetScale(&frictionRamp, FRICTION_RAMP_TICK_COUNT);
 	LRSpeedRamp.SetScale(&LRSpeedRamp, MOUSE_LR_RAMP_TICK_COUNT);
 	FBSpeedRamp.SetScale(&FBSpeedRamp, MOUSR_FB_RAMP_TICK_COUNT);
 	frictionRamp.ResetCounter(&frictionRamp);
 	LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 	FBSpeedRamp.ResetCounter(&FBSpeedRamp);
-
-	GimbalRef.pitch_angle_dynamic_ref = 0.0f;
-	GimbalRef.yaw_angle_dynamic_ref = 0.0f;
+  /*底盘速度初始化*/
 	ChassisSpeedRef.forward_back_ref = 0.0f;
 	ChassisSpeedRef.left_right_ref = 0.0f;
 	ChassisSpeedRef.rotate_ref = 0.0f;
-
+  /*摩擦轮*/
 	SetFrictionState(FRICTION_WHEEL_OFF);
 }
 /*拨杆数据处理*/
@@ -178,6 +176,7 @@ input: RemoteSwitch_t *sw, include the switch info
 #endif
 void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val) 
 {
+	/*左上角拨杆状态获取*/
 	GetRemoteSwitchAction(sw, val);
 	switch(friction_wheel_state)
 	{
@@ -203,6 +202,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			}
 			else
 			{
+				/*斜坡函数必须有，避免电流过大烧坏主控板*/
 				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
@@ -269,7 +269,7 @@ void MouseShootControl(Mouse *mouse)
 			}
 			else
 			{
-				//				
+		    /*摩擦轮转速修改 FRICTION_WHEEL_MAX_DUTY*/
 				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
@@ -288,7 +288,6 @@ void MouseShootControl(Mouse *mouse)
 			{
 				closeDelayCount = 0;
 			}
-			
 			if(closeDelayCount>50)   //
 			{
 				LASER_OFF();
@@ -310,10 +309,6 @@ void MouseShootControl(Mouse *mouse)
 	mouse->last_press_r = mouse->press_r;
 	mouse->last_press_l = mouse->press_l;
 }
-
-
-
-
 
 
 Shoot_State_e GetShootState()

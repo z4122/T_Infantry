@@ -989,6 +989,16 @@
               <FileType>5</FileType>
               <FilePath>..\Framework\drivers\drivers_platemotor.h</FilePath>
             </File>
+            <File>
+              <FileName>drivers_cmpower.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\drivers\drivers_cmpower.c</FilePath>
+            </File>
+            <File>
+              <FileName>drivers_cmpower.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\drivers\drivers_cmpower.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1045,14 +1055,14 @@
               <FilePath>..\Framework\applications\tasks_remotecontrol.h</FilePath>
             </File>
             <File>
-              <FileName>tasks_cmcontrol.c</FileName>
+              <FileName>tasks_timed.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Framework\applications\tasks_cmcontrol.c</FilePath>
+              <FilePath>..\Framework\applications\tasks_timed.c</FilePath>
             </File>
             <File>
-              <FileName>tasks_cmcontrol.h</FileName>
+              <FileName>tasks_timed.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\Framework\applications\tasks_cmcontrol.h</FilePath>
+              <FilePath>..\Framework\applications\tasks_timed.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -17,9 +17,17 @@
 
 //#define MOTOR_ARMED
 //#define Infantry_1_Aim
-//#define Infantry_2//5
+#define Infantry_2//5
 //#define Infantry_3//4
-#define Infantry_4//1
+//#define Infantry_4//1
 void CMGMControlTask(void const * argument);
+void UpdateFromManifold(void);
+void ControlYaw(void);
+void ControlPitch(void);
+void ControlRotate(void);
+void ControlCMFL(void);
+void ControlCMFR(void);
+void ControlCMBL(void);
+void ControlCMBR(void);
 
 #endif

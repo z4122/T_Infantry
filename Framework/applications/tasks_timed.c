@@ -12,25 +12,24 @@
 	* 状态机切换，串口定时输出，看门狗等
   ******************************************************************************
   */
-#include "tasks_cmcontrol.h"
+#include <tim.h>
+#include <stdint.h>
+#include <FreeRTOS.h>
+#include <semphr.h>
+#include <cmsis_os.h>
+#include <task.h>
+#include <usart.h>
+#include "tasks_timed.h"
 #include "pid_Regulator.h"
 #include "drivers_uartrc_low.h"
 #include "drivers_uartrc_user.h"
 #include "tasks_remotecontrol.h"
 #include "application_motorcontrol.h"
-#include "tasks_cmcontrol.h"
 #include "drivers_canmotor_low.h"
 #include "drivers_canmotor_user.h"
 #include "utilities_debug.h"
 #include "rtos_semaphore.h"
 #include "rtos_task.h"
-#include "tim.h"
-#include "stdint.h"
-#include "FreeRTOS.h"
-#include "semphr.h"
-#include "cmsis_os.h"
-#include "task.h"
-#include "usart.h"
 #include "peripheral_define.h"
 #include "drivers_platemotor.h"
 
@@ -67,10 +66,10 @@ extern float ZGyroModuleAngle;
 float ZGyroModuleAngleMAX;
 float ZGyroModuleAngleMIN;
 extern float yawRealAngle;
-extern uint8_t GYRO_RESETED;
+extern uint8_t g_isGYRO_Rested;
 extern float pitchRealAngle;
 extern float gYroZs;
-extern float yawAngleTarget;
+extern float g_yawAngleTarget;
 extern float yawRealAngle;
 
 extern uint8_t JUDGE_STATE;
@@ -155,24 +154,24 @@ void Timer_2ms_lTask(void const * argument)
 {
 	portTickType xLastWakeTime;
 	xLastWakeTime = xTaskGetTickCount();
-	static int countwhile = 0;
+	static int s_countWhile = 0;
 	static int countwhile1 = 0;
 	static int countwhile2 = 0;
 //	static int countwhile3 = 0;
 	ShootMotorPositionPID.ref = 0x0;
 	ShootMotorPositionPID.fdb = 0x0;
 	static int count_judge = 0;
-	//static int shootwhile = 0;
-//	unsigned portBASE_TYPE StackResidue; //栈剩余
+//static int shootwhile = 0;
+//unsigned portBASE_TYPE StackResidue; //栈剩余
 	while(1)  {       //motor control frequency 2ms
 //监控任务
 //		SuperviseTask();    
 		WorkStateFSM();
 	  WorkStateSwitchProcess();
 //1s循环
-		if(countwhile >= 1000){//定时 1S
-		countwhile = 0;
-//			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
+		if(s_countWhile >= 1000){//定时 1S
+		s_countWhile = 0;
+			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
 //			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
 //			fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
 //			fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
@@ -188,54 +187,18 @@ void Timer_2ms_lTask(void const * argument)
 				fw_printfln("Judge received");
 			}
 		}else{
-			countwhile++;
+			s_countWhile++;
 		}
 //陀螺仪复位计时
     if(countwhile1 > 3000){
-			if(GYRO_RESETED == 0)GYRO_RST();//给单轴陀螺仪将当前位置写零
+			if(g_isGYRO_Rested == 0)GYRO_RST();//给单轴陀螺仪将当前位置写零
 		}
 		else{countwhile1++;}
 		if(countwhile1 > 5500){
-			GYRO_RESETED = 2;//正常遥控器或者键盘控制模式，底盘跟随模式
+			g_isGYRO_Rested = 2;//正常遥控器或者键盘控制模式，底盘跟随模式
 		}
 		else{countwhile1++;}
-//10ms循环
-		if(countwhile2 >= 10){//定时 20MS
-		countwhile2 = 0;
-		this_fbspeed = (IOPool_pGetReadData(CMFLRxIOPool, 0)->RotateSpeed + IOPool_pGetReadData(CMFRRxIOPool, 0)->RotateSpeed 
-			             + IOPool_pGetReadData(CMBLRxIOPool, 0)->RotateSpeed + IOPool_pGetReadData(CMBRRxIOPool, 0)->RotateSpeed)/4.f;
-    diff_fbspeed = this_fbspeed - last_fbspeed;
-		last_fbspeed = this_fbspeed;
 
-//		send_data_to_PC(&DEBUG_UART,pitchRealAngle,ZGyroModuleAngle, gYroZs);//发送数据到上位机看波形
-			//printf("pitch:%f *** yaw:%f",pitchRealAngle,ZGyroModuleAngle);
-//		HAL_UART_Transmit(&DEBUG_UART,txbuf,strlen((char *)txbuf),1000);
-		}else{
-			countwhile2++;
-		}
-		
-//		if(judge_dog >= 100){//定时 200MS
-//			JUDGE_STATE = 0;
-//			}	
-//		else if(JUDGE_STATE== 1){
-//			judge_dog = 0;
-//		}
-//		else {
-//				judge_dog++;
-//			}
-//		}
-		
-//		if(count_judge > 150){
-//			if(JUDGE_Received){
-//				JUDGE_State = 1;
-//			}else{
-//			JUDGE_State = 0;
-//			}
-//			count_judge = 0;
-//		}
-//		else{
-//			count_judge++;
-//		}
    if(JUDGE_Received==1){
 			count_judge = 0;
 		  JUDGE_State = 0;
@@ -257,22 +220,9 @@ void Timer_2ms_lTask(void const * argument)
 	static uint32_t time_tick_2ms = 0;
 void CMControtLoopTaskInit(void)
 {
-	//计数初始化
-	time_tick_2ms = 0;   //中断中的计数清零
-  //监控任务初始化
-	/*
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_RC));
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_IMU));
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_ZGYRO));
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_MOTOR1));
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_MOTOR2));
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_MOTOR3));
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_MOTOR4));
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_MOTOR5));
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_MOTOR6));
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_DEADLOCK));
-    LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_NOCALI));
-  */  
+//上电计数初始化
+	time_tick_2ms = 0;   
+//底盘电机PID初始化，copy from官方开源程序
 	ShootMotorSpeedPID.Reset(&ShootMotorSpeedPID);
 	CMRotatePID.Reset(&CMRotatePID);
 	CM1SpeedPID.Reset(&CM1SpeedPID);
@@ -307,7 +257,7 @@ void WorkStateFSM(void)
 			{
 				workState = STOP_STATE;
 			}
-			else if(!IsRemoteBeingAction()  && GetShootState() != SHOOTING) //||(Get_Lost_Error(LOST_ERROR_RC) == LOST_ERROR_RC
+			else if(GetShootState() != SHOOTING) //||(Get_Lost_Error(LOST_ERROR_RC) == LOST_ERROR_RC
 			{
 			//	fw_printfln("进入STANDBY");
 				workState = STANDBY_STATE;      
@@ -319,7 +269,7 @@ void WorkStateFSM(void)
 			{
 				workState = STOP_STATE;
 			}
-			else if(IsRemoteBeingAction() || (GetShootState()==SHOOTING) || GetFrictionState() == FRICTION_WHEEL_START_TURNNING)
+			else if((GetShootState()==SHOOTING) || GetFrictionState() == FRICTION_WHEEL_START_TURNNING)
 			{
 				workState = NORMAL_STATE;
 			}				
@@ -346,9 +296,6 @@ void WorkStateSwitchProcess(void)
 		RemoteTaskInit();
 	}
 }
-//底盘控制任务 没用到
-extern int16_t yawZeroAngle;
-
   
 int32_t GetQuadEncoderDiff(void)
 {
