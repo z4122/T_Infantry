@@ -17,24 +17,23 @@
 #include "rtos_semaphore.h"
 #include "drivers_uartrc_user.h"
 #include "utilities_debug.h"
-#include <math.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <time.h>
-#include <usart.h>
 #include "tasks_upper.h"
-#include "tasks_timed.h"
+#include "tasks_cmcontrol.h"
 #include "tasks_remotecontrol.h"
 #include "drivers_led_user.h"
 #include "utilities_minmax.h"
 #include "pid_regulator.h"
 #include "application_motorcontrol.h"
 #include "drivers_sonar_user.h"
-
+#include "usart.h"
 #include "peripheral_define.h"
 #include "drivers_uartupper_user.h"
-
+#include "math.h"
+#include <stdlib.h>
+#include "stdint.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 //PID_INIT(Kp, Ki, Kd, KpMax, KiMax, KdMax, OutputMax)
 #ifdef Infantry_1_Aim
@@ -69,19 +68,28 @@ fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10
 #define yaw_zero 1040
 #define pitch_zero 6400//6050
 #endif
-//底盘电机PID
+#ifdef Infantry_1_Aim
+PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT_old; 
+PID_Regulator_t CM1SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT_old;
+PID_Regulator_t CM2SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT_old;
+PID_Regulator_t CM3SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT_old;
+PID_Regulator_t CM4SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT_old;
+#else
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT; 
 PID_Regulator_t CM1SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
 PID_Regulator_t CM2SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
 PID_Regulator_t CM3SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
 PID_Regulator_t CM4SpeedPID = CHASSIS_MOTOR_SPEED_PID_DEFAULT;
+#endif
+fw_PID_Regulator_t testPositionPID = fw_PID_INIT(6.0, 0.0, 0.0, 1000000.0, 1000000.0, 1000000.0, 1000000.0);
+fw_PID_Regulator_t testSpeedPID = fw_PID_INIT(1.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);//0.0, 0.00003
 
-//拨盘电机PID
 fw_PID_Regulator_t platePositionPID = fw_PID_INIT(40.0, 0.0, 0.0, 1000000.0, 1000000.0, 1000000.0, 1000000.0);
 fw_PID_Regulator_t plateSpeedPID = fw_PID_INIT(1.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 4900.0);//0.0, 0.00003
 
 extern float gYroXs, gYroYs, gYroZs;
 
+extern PID_Regulator_t CMRotatePID;
 extern volatile Encoder CM1Encoder;
 extern volatile Encoder CM2Encoder;
 extern volatile Encoder CM3Encoder;
@@ -93,16 +101,16 @@ extern Location_Number_s Location_Number[];
 
 extern uint8_t CReceive;
 extern uint8_t rune_flag;
-extern uint8_t g_isGYRO_Rested;
+extern uint8_t GYRO_RESETED;
 extern float ZGyroModuleAngle;
-float g_yawAngleTarget = 0.0;
-float g_pitchAngleTarget = 0.0;
+float yawAngleTarget = 0.0;
+float pitchAngleTarget = 0.0;
 extern float diff_fbspeed;
 extern uint8_t fb_move_flag;
 extern uint8_t fb_move_flag1;
 float gap_angle = 0.0;
 int8_t flUpDown = 0, frUpDown = 0, blUpDown = 0, brUpDown = 0, allUpDown = 0;
-int g_isTwist_Started = 0;
+int twist_state = 0;
 int twist_count = 0;
 int twist =0;
 float mm =0;
@@ -152,114 +160,17 @@ void ControlYaw(void)
 			int16_t yawIntensity = 0;		
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
-			gap_angle  = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
-			
-			
-			
-			NORMALIZE_ANGLE180(yawRealAngle);
-			NORMALIZE_ANGLE180(gap_angle);	
-		if(g_isGYRO_Rested == 2) {
-				/*扭腰*/
-			//试图用PID
-				if (g_isTwist_Started == 1){
-//				CMRotatePID.ref = 0; //一定角度之间进行扭腰
-//					twist_target = 30;
-//					if (CMRotatePID.ref < twist_target){
-//						twist_target = 30;
-//			      CMRotatePID.ref = CMRotatePID.ref + 0.001f ;   //
-//		        CMRotatePID.fdb = gap_angle;
-//						fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
-//					}
-//			  	else{
-//					  twist_target = -30;
-//			      CMRotatePID.ref = CMRotatePID.ref - 0.001f ;   //
-//		        CMRotatePID.fdb = gap_angle;
-//				  }
-//	         CMRotatePID.Calc(&CMRotatePID);   
-//		       g_ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-//					fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
-					
-//					CMRotatePID.output = 0; //一定角度之间进行扭腰
-//					twist_target = 20;
-//					if (CMRotatePID.output < twist_target){
-//						twist_target = 20;
-//						CMRotatePID.output = CMRotatePID.output + 4;
-//					}
-//			  	else{
-//					  twist_target = -20;
-//						CMRotatePID.output = CMRotatePID.output - 4;
-//				  }
-//		       g_ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-					//fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
-					
-					
-					
-					
-					CMRotatePID.output = 0; //一定角度之间进行扭腰
-					twist = (twist_count / 600)%2 ;	
-					if (twist == nn){
-						CMRotatePID.output = -10;
-						twist_count = twist_count + 1;
-					}
-			  	if (twist == (1-nn)){
-					  CMRotatePID.output = 10;
-						twist_count = twist_count + 1;
-				  }
-		       g_ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-			  }				
-			else {
-/******发送数据1  yaw角度*******/
-				
-				
-			  /*产生扭腰随机数*/  
-		srand(xTaskGetTickCount());
-		mm = (1.0f*rand()/RAND_MAX);//产生随机方向
-		nn = floor(2.0f*mm);
-				
-	/*底盘跟随编码器旋转PID计算*/		
-				
-		 CMRotatePID.ref = 0;
-		 CMRotatePID.fdb = yawRealAngle;
-	   CMRotatePID.Calc(&CMRotatePID);   
-		 g_ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-
-		//fw_printfln("CMRotatePID.output:%f",CMRotatePID.output);
-//				g_ChassisSpeedRef.rotate_ref = 0;
-
-//陀螺仪值获取
-//		 yawRealAngle = -ZGyroModuleAngle;//此时底盘跟随已经设定完毕，yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
-						
-		//fw_printfln("GMYawEncoder.ecd_angle:%f",GMYawEncoder.ecd_angle);
-			}
-			yawRealAngle = -ZGyroModuleAngle;//此时底盘跟随已经设定完毕，yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
-/*自瞄模式切换*/
-			if(GetShootMode() == AUTO) {
-				g_ChassisSpeedRef.rotate_ref = 0;
-				if((GetLocateState() == Located)){
-				g_ChassisSpeedRef.rotate_ref = 0;
-				}
-				if((GetLocateState() == Locating) && (CReceive != 0))	{
-				g_yawAngleTarget = yawRealAngle - yawAdd ;
-				fw_printfln("yawAdd-in control:%f",yawAdd );
-				CReceive--;
-				}
-//大神符
-				else if((GetLocateState() == Located) && (rune_flag != 0)){
-					if(GetRuneState() == AIMING){
-						fw_printfln("rune:%d", rune);
-						g_yawAngleTarget = Location_Number[rune - 1].yaw_position;
-						rune_flag--;
-					}
-				}
-		  }
-				if(fb_move_flag != 0){
-		//			sum_flag = sum_flag - 0.001f;
-					if(diff_fbspeed > 200){
-						sum_flag = sum_flag	+ 0.0025f * diff_fbspeed;
-					}
-					if(diff_fbspeed < -350){
-						sum_flag = sum_flag	+ 0.0035f * diff_fbspeed;
->>>>>>> parent of 0810d8b... Revert "注释：failed"
+	
+		 if(GYRO_RESETED == 2) 
+		 {
+				yawRealAngle = -ZGyroModuleAngle;//yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
+				/*自瞄模式切换*/
+				if(GetShootMode() == AUTO) 
+				{
+					ChassisSpeedRef.rotate_ref = 0;
+					if((GetLocateState() == Located))
+					{
+					ChassisSpeedRef.rotate_ref = 0;
 					}
 					if((GetLocateState() == Locating) && (CReceive != 0))	
 					{
@@ -277,7 +188,6 @@ void ControlYaw(void)
 							rune_flag--;
 						}
 					}
-<<<<<<< HEAD
 				}//end of autoshoot
 		  }
 			NORMALIZE_ANGLE180(yawRealAngle);
@@ -285,26 +195,12 @@ void ControlYaw(void)
 			
 			yawIntensity = ProcessYawPID(yawAngleTarget, yawRealAngle, -gYroZs);
 		  setMotor(GMYAW, yawIntensity);
-=======
-					fb_move_flag1 = fb_move_flag1 - 1;
-				}
-				else{
-					sum_flag1 = 0;
-				}
-		}
-//			MINMAX(g_yawAngleTarget, -45, 45);
-			yawIntensity = PID_PROCESS_Double(yawPositionPID,yawSpeedPID,g_yawAngleTarget + sum_flag + sum_flag1,yawRealAngle,-gYroZs);
-
-
-     //fw_printfln("yawRealAngle:%f",yawRealAngle);
-			setMotor(GMYAW, yawIntensity);
->>>>>>> parent of 0810d8b... Revert "注释：failed"
 		}
 }
 /*Pitch电机*/
 void ControlPitch(void)
 {
-
+/*云台pitch轴*/
 	if(IOPool_hasNextRead(GMPITCHRxIOPool, 0))
 	{
 		uint16_t pitchZeroAngle = pitch_zero;
@@ -321,7 +217,6 @@ void ControlPitch(void)
 			{
 				//fw_printfln("pitchAdd:%f",pitchAdd );
 				pitchAngleTarget = pitchRealAngle + pitchAdd ;
-
 				CReceive --;
 			}//大神符
 			else if((GetLocateState() == Located) && (rune_flag != 0))

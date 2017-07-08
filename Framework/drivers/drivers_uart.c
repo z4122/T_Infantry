@@ -23,16 +23,14 @@
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
-	if(UartHandle == &RC_UART)
-	{
+	if(UartHandle == &RC_UART){
 		HAL_UART_DMAPause(&RC_UART);
-	  rcUartRxCpltCallback();
-	}else if(UartHandle == &CTRL_UART)
-	{
+		   rcUartRxCpltCallback();
+		
+	}else if(UartHandle == &CTRL_UART){
 		ctrlUartRxCpltCallback();
 	}
-	else if(UartHandle == &JUDGE_UART)
-	{
+	else if(UartHandle == &JUDGE_UART){
 		judgeUartRxCpltCallback();
 	}
 }   

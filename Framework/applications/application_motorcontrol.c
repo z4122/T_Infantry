@@ -18,7 +18,7 @@
 #include "drivers_canmotor_user.h"
 #include "rtos_semaphore.h"
 #include "utilities_debug.h"
-#include "tasks_timed.h"
+#include "tasks_cmcontrol.h"
 #include "math.h"
 #include <math.h>
 #include <stdlib.h>
@@ -26,14 +26,7 @@
 #include "drivers_uartjudge_low.h"
 #include "drivers_cmpower.h"
 
-
-extern tGameInfo g_mytGameInfo;
-//typedef struct{
-//	CAN_HandleTypeDef  *canNum;
-//	uint32_t id;
-//}MotorCanNumId;
-int16_t CMFLIntensity = 0, CMFRIntensity = 0, CMBLIntensity = 0, CMBRIntensity = 0;
-
+extern tGameInfo mytGameInfo;
 extern uint8_t JUDGE_State;
 
 void setMotor(MotorId motorId, int16_t Intensity){
@@ -121,33 +114,22 @@ void setMotor(MotorId motorId, int16_t Intensity){
 }
 	
 
-uint8_t g_isGYRO_Rested = 0;
+uint8_t GYRO_RESETED = 0;
 void GYRO_RST(void)
 {
-		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(ZGYROTxIOPool);
-		pData->StdId = ZGYRO_TXID;
-		pData->Data[0] = 0x00;
-		pData->Data[1] = 0x01;
-		pData->Data[2] = 0x02;
-		pData->Data[3] = 0x03;
-		pData->Data[4] = 0x04;
-		pData->Data[5] = 0x05;
-		pData->Data[6] = 0x06;
-		pData->Data[7] = 0x07;
-		IOPool_getNextWrite(ZGYROTxIOPool);
-//		if(osSemaphoreRelease(ZGYROCanHaveTransmitSemaphoreHandle) == osErrorOS){
-//			fw_Warning();
-//		}
-	if(IOPool_hasNextRead(ZGYROTxIOPool, 0)){
-			osSemaphoreWait(ZGYROCanTransmitSemaphoreHandle, osWaitForever);
-			IOPool_getNextRead(ZGYROTxIOPool, 0);
-			ZGYRO_CAN.pTxMsg = IOPool_pGetReadData(ZGYROTxIOPool, 0);
-			taskENTER_CRITICAL();
-			if(HAL_CAN_Transmit_IT(&ZGYRO_CAN) != HAL_OK){
-				fw_Warning();
-				osSemaphoreRelease(ZGYROCanTransmitSemaphoreHandle);
-			}
-			taskEXIT_CRITICAL();
-		}
-	g_isGYRO_Rested = 1;
+	CanTxMsgTypeDef *pData = IOPool_pGetWriteData(ZGYROTxIOPool);
+	pData->StdId = ZGYRO_TXID;
+	pData->Data[0] = 0x00;
+	pData->Data[1] = 0x01;
+	pData->Data[2] = 0x02;
+	pData->Data[3] = 0x03;
+	pData->Data[4] = 0x04;
+	pData->Data[5] = 0x05;
+	pData->Data[6] = 0x06;
+	pData->Data[7] = 0x07;
+	IOPool_getNextWrite(ZGYROTxIOPool);
+
+	TransmitGYROCAN();
+
+	GYRO_RESETED = 1;
 }
