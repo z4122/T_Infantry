@@ -21,5 +21,13 @@
 //#define Infantry_3//4
 //#define Infantry_4//1
 void CMGMControlTask(void const * argument);
+void UpdateFromManifold(void);
+void ControlYaw(void);
+void ControlPitch(void);
+void ControlRotate(void);
+void ControlCMFL(void);
+void ControlCMFR(void);
+void ControlCMBL(void);
+void ControlCMBR(void);
 
 #endif

@@ -116,25 +116,43 @@ int twist =0;
 float mm =0;
 float nn =0;
 
+static float yawAdd;
+static float pitchAdd;
+static uint8_t rune;
+
 int16_t twist_target = 0;
+
 void CMGMControlTask(void const * argument){
-	static float yawAdd;
-	static float pitchAdd;
-	static uint8_t rune;
-	static float sum_flag  = 0;
-	static float sum_flag1 = 0;
-	while(1){
+	while(1)
+	{
 		osSemaphoreWait(CMGMCanRefreshSemaphoreHandle, osWaitForever);
 		
-		if(IOPool_hasNextRead(upperIOPool, 0))
-		{
-			IOPool_getNextRead(upperIOPool, 0);
-			yawAdd = IOPool_pGetReadData(upperIOPool, 0)->yawAdd;
-			pitchAdd = IOPool_pGetReadData(upperIOPool, 0)->pitchAdd;
-			rune = IOPool_pGetReadData(upperIOPool, 0)->rune;
-		}
+		UpdateFromManifold();
+		ControlYaw();
+		ControlPitch();
 		
-		/*云台yaw轴*/
+	  ControlRotate();
+//		ChassisSpeedRef.rotate_ref = 0;//取消底盘跟随
+		ControlCMFL();
+		ControlCMFR();
+		ControlCMBL();
+		ControlCMBR();
+	}//end of while
+}
+/*从妙算通信串口任务获得数据*/
+void UpdateFromManifold()
+{
+	if(IOPool_hasNextRead(upperIOPool, 0))
+	{
+		IOPool_getNextRead(upperIOPool, 0);
+		yawAdd = IOPool_pGetReadData(upperIOPool, 0)->yawAdd;
+		pitchAdd = IOPool_pGetReadData(upperIOPool, 0)->pitchAdd;
+		rune = IOPool_pGetReadData(upperIOPool, 0)->rune;
+	}
+}
+/*Yaw电机*/
+void ControlYaw(void)
+{
 		if(IOPool_hasNextRead(GMYAWRxIOPool, 0))
 		{
 			uint16_t yawZeroAngle = yaw_zero;
@@ -142,42 +160,10 @@ void CMGMControlTask(void const * argument){
 			int16_t yawIntensity = 0;		
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
-			gap_angle  = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
 	
-			NORMALIZE_ANGLE180(yawRealAngle);
-			NORMALIZE_ANGLE180(gap_angle);	
 		 if(GYRO_RESETED == 2) 
 		 {
-				/*扭腰*/
-				//试图用PID
-				if (twist_state == 1)
-				{
-					CMRotatePID.output = 0; //一定角度之间进行扭腰
-					twist = (twist_count / 600)%2 ;	
-					if (twist == nn){
-						CMRotatePID.output = -10;
-						twist_count = twist_count + 1;
-					}
-					if (twist == (1-nn)){
-						CMRotatePID.output = 10;
-						twist_count = twist_count + 1;
-					}
-					 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-				}				
-				else
-				{
-					/*产生扭腰随机数*/  
-					 srand(xTaskGetTickCount());
-					 mm = (1.0f*rand()/RAND_MAX);//产生随机方向
-					 nn = floor(2.0f*mm);
-							
-					/*底盘跟随编码器旋转PID计算*/		
-					 CMRotatePID.ref = 0;
-					 CMRotatePID.fdb = yawRealAngle;
-					 CMRotatePID.Calc(&CMRotatePID);   
-					 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-				}
-				yawRealAngle = -ZGyroModuleAngle;//此时底盘跟随已经设定完毕，yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
+				yawRealAngle = -ZGyroModuleAngle;//yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
 				/*自瞄模式切换*/
 				if(GetShootMode() == AUTO) 
 				{
@@ -204,129 +190,178 @@ void CMGMControlTask(void const * argument){
 					}
 				}//end of autoshoot
 		  }
-		  
-			yawIntensity = ProcessYawPID(yawAngleTarget + sum_flag + sum_flag1,yawRealAngle,-gYroZs);
+			NORMALIZE_ANGLE180(yawRealAngle);
+			NORMALIZE_ANGLE180(gap_angle);	
+			
+			yawIntensity = ProcessYawPID(yawAngleTarget, yawRealAngle, -gYroZs);
 		  setMotor(GMYAW, yawIntensity);
 		}
+}
+/*Pitch电机*/
+void ControlPitch(void)
+{
+/*云台pitch轴*/
+	if(IOPool_hasNextRead(GMPITCHRxIOPool, 0))
+	{
+		uint16_t pitchZeroAngle = pitch_zero;
+		int16_t pitchIntensity = 0;
 		
-    /*云台pitch轴*/
-		if(IOPool_hasNextRead(GMPITCHRxIOPool, 0))
+		IOPool_getNextRead(GMPITCHRxIOPool, 0);
+		pitchRealAngle = -(IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - pitchZeroAngle) * 360 / 8192.0;
+		NORMALIZE_ANGLE180(pitchRealAngle);
+		
+		//自瞄模式切换
+		if(GetShootMode() == AUTO) 
 		{
-			uint16_t pitchZeroAngle = pitch_zero;
-			int16_t pitchIntensity = 0;
-			
-			IOPool_getNextRead(GMPITCHRxIOPool, 0);
-			pitchRealAngle = -(IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - pitchZeroAngle) * 360 / 8192.0;
-			NORMALIZE_ANGLE180(pitchRealAngle);
-			
-      //自瞄模式切换
-			if(GetShootMode() == AUTO) 
+			if((GetLocateState() == Locating) && (CReceive != 0))	
 			{
-				if((GetLocateState() == Locating) && (CReceive != 0))	
+				//fw_printfln("pitchAdd:%f",pitchAdd );
+				pitchAngleTarget = pitchRealAngle + pitchAdd ;
+				CReceive --;
+			}//大神符
+			else if((GetLocateState() == Located) && (rune_flag != 0))
+			{
+				if(GetRuneState() == AIMING)
 				{
-					//fw_printfln("pitchAdd:%f",pitchAdd );
-					pitchAngleTarget = pitchRealAngle + pitchAdd ;
-					CReceive --;
-				}//大神符
-				else if((GetLocateState() == Located) && (rune_flag != 0))
-				{
-					if(GetRuneState() == AIMING)
-					{
-						pitchAngleTarget = Location_Number[rune - 1].pitch_position;
-						rune_flag--;
-					}
+					pitchAngleTarget = Location_Number[rune - 1].pitch_position;
+					rune_flag--;
 				}
-		  }
-			#ifdef Infantry_2
-			MINMAX(pitchAngleTarget, -10.0f, 26.3f);
-			#endif
-			#ifdef Infantry_3
-			MINMAX(pitchAngleTarget, -18.f, 30);
-			#endif
-			#ifdef Infantry_4
-			MINMAX(pitchAngleTarget, -9.0f, 32);
-			#endif
-			pitchIntensity = ProcessPitchPID(pitchAngleTarget,pitchRealAngle,-gYroXs);
-			setMotor(GMPITCH, pitchIntensity);
+			}
 		}
+		#ifdef Infantry_2
+		MINMAX(pitchAngleTarget, -10.0f, 26.3f);
+		#endif
+		#ifdef Infantry_3
+		MINMAX(pitchAngleTarget, -18.f, 30);
+		#endif
+		#ifdef Infantry_4
+		MINMAX(pitchAngleTarget, -9.0f, 32);
+		#endif
 		
-//		ChassisSpeedRef.rotate_ref = 0;//取消底盘跟随
+		pitchIntensity = ProcessPitchPID(pitchAngleTarget,pitchRealAngle,-gYroXs);
+		setMotor(GMPITCH, pitchIntensity);
+	}
+}
+/*底盘转动控制：跟随云台/扭腰等*/
+void ControlRotate(void)
+{
+	gap_angle  = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yaw_zero) * 360 / 8192.0f;
 
-		if(IOPool_hasNextRead(CMFLRxIOPool, 0))
-		{
-			IOPool_getNextRead(CMFLRxIOPool, 0);
-			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMFLRxIOPool, 0);
-			
-			CM2SpeedPID.ref =  - ChassisSpeedRef.forward_back_ref*0.075 
-			                   + ChassisSpeedRef.left_right_ref*0.075 
-			                   + ChassisSpeedRef.rotate_ref;
-			CM2SpeedPID.ref = 160 * CM2SpeedPID.ref;
-			CM2SpeedPID.fdb = pData->RotateSpeed;
-			#ifdef Infantry_4
-			CM2SpeedPID.ref = 1.2f * CM2SpeedPID.ref;
-			#endif
-		  CM2SpeedPID.Calc(&CM2SpeedPID);
-			
-		  setMotor(CMFR, CHASSIS_SPEED_ATTENUATION * CM2SpeedPID.output);
-	  }
-		
-		
-		if(IOPool_hasNextRead(CMFRRxIOPool, 0))
-		{
-			IOPool_getNextRead(CMFRRxIOPool, 0);
-			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMFRRxIOPool, 0);
-			
-			CM1SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 
-			                   + ChassisSpeedRef.left_right_ref*0.075 
-			                   + ChassisSpeedRef.rotate_ref;	
-			CM1SpeedPID.ref = 160 * CM1SpeedPID.ref;
-			CM1SpeedPID.fdb = pData->RotateSpeed;
-			#ifdef Infantry_4
-			CM1SpeedPID.ref = 1.2f * CM1SpeedPID.ref;
-			#endif
-		  CM1SpeedPID.Calc(&CM1SpeedPID);
-			
-		  setMotor(CMFL, CHASSIS_SPEED_ATTENUATION * CM1SpeedPID.output);
+	if(GYRO_RESETED == 2) 
+	{
+	/*扭腰*/
+	//试图用PID
+	if (twist_state == 1)
+	{
+		CMRotatePID.output = 0; //一定角度之间进行扭腰
+		twist = (twist_count / 600)%2 ;	
+		if (twist == nn){
+			CMRotatePID.output = -10;
+			twist_count = twist_count + 1;
 		}
-		
-		
-		if(IOPool_hasNextRead(CMBLRxIOPool, 0))
-		{
-			IOPool_getNextRead(CMBLRxIOPool, 0);
-			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMBLRxIOPool, 0);
-			
-			CM3SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 
-			                   - ChassisSpeedRef.left_right_ref*0.075 
-			                   + ChassisSpeedRef.rotate_ref;
-			CM3SpeedPID.ref = 160 * CM3SpeedPID.ref;
-			CM3SpeedPID.fdb = pData->RotateSpeed;
-			#ifdef Infantry_4
-			CM3SpeedPID.ref = 1.2f * CM3SpeedPID.ref;
-			#endif
-		  CM3SpeedPID.Calc(&CM3SpeedPID);
-			
-		  setMotor(CMBL, CHASSIS_SPEED_ATTENUATION * CM3SpeedPID.output);
+		if (twist == (1-nn)){
+			CMRotatePID.output = 10;
+			twist_count = twist_count + 1;
 		}
+		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+	}				
+	else
+	{
+		/*产生扭腰随机数*/  
+		 srand(xTaskGetTickCount());
+		 mm = (1.0f*rand()/RAND_MAX);//产生随机方向
+		 nn = floor(2.0f*mm);
+				
+		/*底盘跟随编码器旋转PID计算*/		
+		 CMRotatePID.ref = 0;
+		 CMRotatePID.fdb = gap_angle;
+		 CMRotatePID.Calc(&CMRotatePID);   
+		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+	}
+}
+}
+/*底盘电机控制FL(ForwardLeft)FR BL BR*/
+void ControlCMFL(void)
+{		
+	if(IOPool_hasNextRead(CMFLRxIOPool, 0))
+	{
+		IOPool_getNextRead(CMFLRxIOPool, 0);
+		Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMFLRxIOPool, 0);
 		
+		CM2SpeedPID.ref =  - ChassisSpeedRef.forward_back_ref*0.075 
+											 + ChassisSpeedRef.left_right_ref*0.075 
+											 + ChassisSpeedRef.rotate_ref;
+		CM2SpeedPID.ref = 160 * CM2SpeedPID.ref;
+		CM2SpeedPID.fdb = pData->RotateSpeed;
+		#ifdef Infantry_4
+		CM2SpeedPID.ref = 1.2f * CM2SpeedPID.ref;
+		#endif
+		CM2SpeedPID.Calc(&CM2SpeedPID);
 		
-		if(IOPool_hasNextRead(CMBRRxIOPool, 0))
-		{
-			IOPool_getNextRead(CMBRRxIOPool, 0);
-			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMBRRxIOPool, 0);
-			
-			CM4SpeedPID.ref =  - ChassisSpeedRef.forward_back_ref*0.075 
-			                   - ChassisSpeedRef.left_right_ref*0.075 
-			                   + ChassisSpeedRef.rotate_ref;
-		  CM4SpeedPID.ref = 160 * CM4SpeedPID.ref;
-			CM4SpeedPID.fdb = pData->RotateSpeed;
-			#ifdef Infantry_4
-			CM4SpeedPID.ref = 1.2f * CM4SpeedPID.ref;
-			#endif
-		  CM4SpeedPID.Calc(&CM4SpeedPID);
-			
-		  setMotor(CMBR, CHASSIS_SPEED_ATTENUATION * CM4SpeedPID.output);
-		}
-	}//end of while
+		setMotor(CMFR, CHASSIS_SPEED_ATTENUATION * CM2SpeedPID.output);
+	}
 }
 
+void ControlCMFR(void)
+{
+	if(IOPool_hasNextRead(CMFRRxIOPool, 0))
+	{
+		IOPool_getNextRead(CMFRRxIOPool, 0);
+		Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMFRRxIOPool, 0);
+		
+		CM1SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 
+											 + ChassisSpeedRef.left_right_ref*0.075 
+											 + ChassisSpeedRef.rotate_ref;	
+		CM1SpeedPID.ref = 160 * CM1SpeedPID.ref;
+		CM1SpeedPID.fdb = pData->RotateSpeed;
+		#ifdef Infantry_4
+		CM1SpeedPID.ref = 1.2f * CM1SpeedPID.ref;
+		#endif
+		CM1SpeedPID.Calc(&CM1SpeedPID);
+		
+		setMotor(CMFL, CHASSIS_SPEED_ATTENUATION * CM1SpeedPID.output);
+	}
+}
+	
+void ControlCMBL(void)
+{
+	if(IOPool_hasNextRead(CMBLRxIOPool, 0))
+	{
+		IOPool_getNextRead(CMBLRxIOPool, 0);
+		Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMBLRxIOPool, 0);
+		
+		CM3SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 
+											 - ChassisSpeedRef.left_right_ref*0.075 
+											 + ChassisSpeedRef.rotate_ref;
+		CM3SpeedPID.ref = 160 * CM3SpeedPID.ref;
+		CM3SpeedPID.fdb = pData->RotateSpeed;
+		#ifdef Infantry_4
+		CM3SpeedPID.ref = 1.2f * CM3SpeedPID.ref;
+		#endif
+		CM3SpeedPID.Calc(&CM3SpeedPID);
+		
+		setMotor(CMBL, CHASSIS_SPEED_ATTENUATION * CM3SpeedPID.output);
+	}
+}
+
+void ControlCMBR()
+{
+	if(IOPool_hasNextRead(CMBRRxIOPool, 0))
+	{
+		IOPool_getNextRead(CMBRRxIOPool, 0);
+		Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMBRRxIOPool, 0);
+		
+		CM4SpeedPID.ref =  - ChassisSpeedRef.forward_back_ref*0.075 
+											 - ChassisSpeedRef.left_right_ref*0.075 
+											 + ChassisSpeedRef.rotate_ref;
+		CM4SpeedPID.ref = 160 * CM4SpeedPID.ref;
+		CM4SpeedPID.fdb = pData->RotateSpeed;
+		#ifdef Infantry_4
+		CM4SpeedPID.ref = 1.2f * CM4SpeedPID.ref;
+		#endif
+		CM4SpeedPID.Calc(&CM4SpeedPID);
+		
+		setMotor(CMBR, CHASSIS_SPEED_ATTENUATION * CM4SpeedPID.output);
+	}
+}
 
