@@ -18,7 +18,7 @@
 #include "drivers_uartrc_user.h"
 #include "utilities_debug.h"
 #include "tasks_upper.h"
-#include "tasks_cmcontrol.h"
+#include "tasks_timed.h"
 #include "tasks_remotecontrol.h"
 #include "drivers_led_user.h"
 #include "utilities_minmax.h"
@@ -101,7 +101,7 @@ extern Location_Number_s Location_Number[];
 
 extern uint8_t CReceive;
 extern uint8_t rune_flag;
-extern uint8_t GYRO_RESETED;
+extern uint8_t g_isGYRO_Rested;
 extern float ZGyroModuleAngle;
 float yawAngleTarget = 0.0;
 float pitchAngleTarget = 0.0;
@@ -139,6 +139,9 @@ void CMGMControlTask(void const * argument){
 		ControlCMBR();
 	}//end of while
 }
+
+
+
 /*从妙算通信串口任务获得数据*/
 void UpdateFromManifold()
 {
@@ -161,7 +164,7 @@ void ControlYaw(void)
 			IOPool_getNextRead(GMYAWRxIOPool, 0); 
 			yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
 	
-		 if(GYRO_RESETED == 2) 
+		 if(g_isGYRO_Rested == 2) 
 		 {
 				yawRealAngle = -ZGyroModuleAngle;//yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
 				/*自瞄模式切换*/
@@ -247,7 +250,7 @@ void ControlRotate(void)
 {
 	gap_angle  = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yaw_zero) * 360 / 8192.0f;
 
-	if(GYRO_RESETED == 2) 
+	if(g_isGYRO_Rested == 2) 
 	{
 	/*扭腰*/
 	//试图用PID

@@ -17,7 +17,7 @@
 #include "stddef.h"
 #include "drivers_ramp.h"
 #include "pid_regulator.h"
-#include "tasks_cmcontrol.h"
+#include "tasks_timed.h"
 #include "usart.h"
 #include "peripheral_define.h"
 #include "pwm_server_motor.h"
@@ -50,7 +50,7 @@ extern RampGen_t FBSpeedRamp  ;   //mouseǰ���ƶ�б��
 extern RC_Ctl_t RC_CtrlData; 
 extern xSemaphoreHandle xSemaphore_rcuart;
 extern float yawAngleTarget, pitchAngleTarget;
-extern uint8_t GYRO_RESETED ;
+extern uint8_t g_isGYRO_Rested ;
 extern int twist_state ;
 void RControlTask(void const * argument){
 	uint8_t data[18];
@@ -141,14 +141,14 @@ void RemoteDataProcess(uint8_t *pData)
 	{
 		case REMOTE_INPUT:
 		{
-			if(GYRO_RESETED == 2){ //if gyro has been reseted
+			if(g_isGYRO_Rested == 2){ //if gyro has been reseted
 			SetEmergencyFlag(NORMAL);
 			RemoteControlProcess(&(RC_CtrlData.rc));//execute new order
 			}
 		}break;
 		case KEY_MOUSE_INPUT:
 		{
-			if(GYRO_RESETED == 2){
+			if(g_isGYRO_Rested == 2){
 			MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
 			SetEmergencyFlag(NORMAL);
 			SetShootMode(AUTO);

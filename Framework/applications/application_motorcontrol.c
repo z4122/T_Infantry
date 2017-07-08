@@ -18,7 +18,7 @@
 #include "drivers_canmotor_user.h"
 #include "rtos_semaphore.h"
 #include "utilities_debug.h"
-#include "tasks_cmcontrol.h"
+#include "tasks_timed.h"
 #include "math.h"
 #include <math.h>
 #include <stdlib.h>
@@ -114,7 +114,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 }
 	
 
-uint8_t GYRO_RESETED = 0;
+uint8_t g_isGYRO_Rested = 0;
 void GYRO_RST(void)
 {
 	CanTxMsgTypeDef *pData = IOPool_pGetWriteData(ZGYROTxIOPool);
@@ -131,5 +131,5 @@ void GYRO_RST(void)
 
 	TransmitGYROCAN();
 
-	GYRO_RESETED = 1;
+	g_isGYRO_Rested = 1;
 }

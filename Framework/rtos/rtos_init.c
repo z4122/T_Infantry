@@ -21,7 +21,7 @@
 #include "peripheral_tim.h"
 #include "drivers_uartupper_low.h"
 #include "drivers_uartrc_low.h"
-#include "tasks_cmcontrol.h"
+#include "tasks_timed.h"
 #include "drivers_imu_low.h"
 #include "utilities_tim.h"
 #include "drivers_buzzer_low.h"

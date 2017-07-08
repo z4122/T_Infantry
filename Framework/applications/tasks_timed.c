@@ -310,12 +310,6 @@ void WorkStateSwitchProcess(void)
 		RemoteTaskInit();
 	}
 }
-<<<<<<< HEAD:Framework/applications/tasks_cmcontrol.c
-//底盘控制任务 没用到
-extern int16_t yawZeroAngle;
-=======
->>>>>>> parent of 0810d8b... Revert "注释：failed":Framework/applications/tasks_timed.c
-
   
 int32_t GetQuadEncoderDiff(void)
 {
