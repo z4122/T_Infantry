@@ -15,11 +15,11 @@
 #ifndef TASKS_MOTOR_H
 #define TASKS_MOTOR_H
 
-//#define MOTOR_ARMED
-//#define Infantry_1_Aim
-#define Infantry_2//5
-//#define Infantry_3//4
-//#define Infantry_4//1
+/*通过define使一套程序使用多台车*/
+//#define INFANTRY_1
+//#define INFANTRY_4
+#define INFANTRY_5
+
 void CMGMControlTask(void const * argument);
 void UpdateFromManifold(void);
 void ControlYaw(void);

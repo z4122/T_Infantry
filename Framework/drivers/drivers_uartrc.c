@@ -40,29 +40,19 @@ void InitRemoteControl(){
 	if(HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18) != HAL_OK){
 			Error_Handler();
 	} 
-//	__HAL_UART_ENABLE_IT(&RC_UART, UART_FLAG_IDLE);
+//	__HAL_UART_ENABLE_IT(&RC_UART, UART_FLAG_IDLE);//空闲中断方式更优，未调通
 	RemoteTaskInit();
 }
 
 void rcUartRxCpltCallback(){
 	static portBASE_TYPE xHigherPriorityTaskWoken;
 	 xHigherPriorityTaskWoken = pdFALSE; 
-//	static HAL_UART_StateTypeDef uart_state;
-//	fw_printfln("flag: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_RXNE));
-//	while(__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE) == 0){
-//		fw_Warning();
-//	}
-//	__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE);
-//	fw_printfln("flag1: %d",__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE));
-//	__HAL_UART_CLEAR_PEFLAG(&RC_UART);
-//	fw_printfln("flag12: %d",__HAL_UART_GET_IT_SOURCE(&RC_UART, UART_FLAG_IDLE));
-//	fw_printfln("flag: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE));
-//	 while(__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE) == 0)
-//   {}
-//	__HAL_UART_CLEAR_FLAG(&RC_UART, UART_FLAG_IDLE);
-//	fw_printfln("flag2: %x",__HAL_UART_GET_FLAG(&RC_UART,UART_FLAG_IDLE));
-//	fw_printfln("(thiscount_rc - lastcount_rc):  %d", (thiscount_rc - lastcount_rc));
+	//释放信号量
    xSemaphoreGiveFromISR(xSemaphore_rcuart, &xHigherPriorityTaskWoken);
+	//切换上下文，RTOS提供
+	//当在中断外有多个不同优先级任务等待信号量时
+	//在退出中断前进行一次切换上下文
+	//这里无用
 	if( xHigherPriorityTaskWoken == pdTRUE ){
    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 	 }
@@ -171,7 +161,7 @@ InputMode_e GetInputMode()
 /*
 input: RemoteSwitch_t *sw, include the switch info
 */
-#ifdef Infantry_4
+#ifdef INFANTRY_1
 #define FRICTION_WHEEL_MAX_DUTY             1500
 #endif
 void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val) 

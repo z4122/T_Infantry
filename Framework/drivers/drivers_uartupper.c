@@ -26,9 +26,9 @@
 NaiveIOPoolDefine(ctrlUartIOPool, {0});
 
 
-xdata_ctrlUart ctrlData; //ÃîËã½ÓÊÕ±äÁ¿
+xdata_ctrlUart ctrlData; 
 
-void ctrlUartRxCpltCallback(){
+void manifoldUartRxCpltCallback(){
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
 	fw_printfln("upper received");
@@ -37,15 +37,15 @@ void ctrlUartRxCpltCallback(){
 	uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
 	ctrlData = xUartprocess( pData );
 	 if( ctrlData.Success == 1) 	{
-		 if(HAL_UART_Receive_DMA(&CTRL_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+		 if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
 				fw_Warning();
 				Error_Handler(); }
 				xSemaphoreGiveFromISR(xSemaphore_mfuart, &xHigherPriorityTaskWoken);	
 			}				
 			else{
-			 HAL_UART_AbortReceive(&CTRL_UART);
+			 HAL_UART_AbortReceive(&MANIFOLD_UART);
 			 printf("dataprocess error\r\n");		
-			if(HAL_UART_Receive_DMA(&CTRL_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+			if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
 				fw_Warning();
 				Error_Handler(); }						
 			 }
@@ -57,7 +57,7 @@ void ctrlUartRxCpltCallback(){
 
 void InitManifoldUart(){
 	ctrlData.Success = 1;  
-	if(HAL_UART_Receive_DMA(&CTRL_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
 		Error_Handler();
 		printf( "InitManifoldUart error" );
 	} 

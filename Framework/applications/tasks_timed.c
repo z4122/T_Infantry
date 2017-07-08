@@ -32,7 +32,7 @@
 #include "rtos_task.h"
 #include "peripheral_define.h"
 #include "drivers_platemotor.h"
-
+#include "application_waveform.h"
 
 extern PID_Regulator_t CMRotatePID ; 
 extern PID_Regulator_t CM1SpeedPID;
@@ -42,11 +42,6 @@ extern PID_Regulator_t CM4SpeedPID;
 PID_Regulator_t ShootMotorPositionPID = SHOOT_MOTOR_POSITION_PID_DEFAULT;      //shoot motor
 PID_Regulator_t ShootMotorSpeedPID = SHOOT_MOTOR_SPEED_PID_DEFAULT;
 
-extern volatile Encoder CM1Encoder;
-extern volatile Encoder CM2Encoder;
-extern volatile Encoder CM3Encoder;
-extern volatile Encoder CM4Encoder;
-extern volatile Encoder GMYawEncoder;
 
 Shoot_State_e last_shoot_state = NOSHOOTING;
 Shoot_State_e this_shoot_state = NOSHOOTING;
@@ -73,77 +68,9 @@ extern float g_yawAngleTarget;
 extern float yawRealAngle;
 
 extern uint8_t JUDGE_STATE;
-//*********debug by ZY*********
-typedef struct{
-	uint16_t head;
-	uint8_t id;
-	uint8_t dlc;
-	float dataPitch;
-	float dataYaw;
-	uint8_t checkSum;
-}data_to_PC;
-
-
-uint8_t data_send_to_PC[17];
-data_to_PC my_data_to_PC;
-void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float zySpd)
-{
-//	my_data_to_PC.head=0xAAAA;
-//	my_data_to_PC.id=0xF1;
-//	my_data_to_PC.dlc=8;
-//	my_data_to_PC.dataPitch=zyPitch;
-//	my_data_to_PC.dataYaw=zyYaw;
-//	
-//	uint8_t * pTemp;
-//	//uint8_t temp;
-//	int i;
-//	my_data_to_PC.checkSum=0;
-//	pTemp = (uint8_t *)&(my_data_to_PC);  
-//	for(i=0;i<12;i++)
-//	{
-//		 my_data_to_PC.checkSum+=pTemp[i];
-//	}
-	
-	
-	uint8_t * pTemp;
-	int i;
-	data_send_to_PC[0]=0xAA;
-	data_send_to_PC[1]=0xAA;
-	data_send_to_PC[2]=0xF1;
-	data_send_to_PC[3]=12;
-	pTemp=(uint8_t *)&zyPitch;
-	for(i=0;i<4;i++)
-	{
-		 data_send_to_PC[4+i]=pTemp[3-i];
-	}
-	
-	pTemp=(uint8_t *)&zyYaw;
-	for(i=0;i<4;i++)
-	{
-		 data_send_to_PC[8+i]=pTemp[3-i];
-	}
-	
-	pTemp=(uint8_t *)&zySpd;
-	for(i=0;i<4;i++)
-	{
-		 data_send_to_PC[12+i]=pTemp[3-i];
-	}
-	
-	data_send_to_PC[16]=0;
-	for(i=0;i<16;i++)
-	{
-		 data_send_to_PC[16]+=data_send_to_PC[i];
-	}
-	
-	HAL_UART_Transmit(huart,data_send_to_PC,17,1000);
-}
-
-//*********debug by ZY*********
 
 int mouse_click_left = 0;
-float this_fbspeed = 0;
-float last_fbspeed = 0;
-float diff_fbspeed = 0;
+
 
 int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 
@@ -156,7 +83,6 @@ void Timer_2ms_lTask(void const * argument)
 	xLastWakeTime = xTaskGetTickCount();
 	static int s_countWhile = 0;
 	static int countwhile1 = 0;
-	static int countwhile2 = 0;
 //	static int countwhile3 = 0;
 	ShootMotorPositionPID.ref = 0x0;
 	ShootMotorPositionPID.fdb = 0x0;
