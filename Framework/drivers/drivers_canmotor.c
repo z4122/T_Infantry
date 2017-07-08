@@ -66,7 +66,7 @@ NaiveIOPoolDefine(ZGYROTxIOPool, DataPoolInit);
 uint8_t isRcanStarted_CMGM = 0, isRcanStarted_ZGYRO = 0;
 
 CanRxMsgTypeDef CMGMCanRxMsg, ZGYROCanRxMsg;
-	
+/********************CAN接收******************************/
 void InitCanReception()
 {
 	//CAN接收过滤器配置
@@ -188,7 +188,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 		}
 	}
 }
-
+/********************CAN发送*****************************/
 void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
 {
 	if(hcan == &CMGMMOTOR_CAN){

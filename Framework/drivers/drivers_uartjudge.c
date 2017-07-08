@@ -132,21 +132,28 @@ uint8_t received = 0;
 uint8_t buffer[44] = {0}; 
 uint8_t buffercnt = 0;
 
-void judgeUartRxCpltCallback(void){
+void judgeUartRxCpltCallback(void)
+{
 //	fw_printfln("judge receive");
-			if(receiving) 
+		if(receiving) 
 		{
 			buffer[buffercnt] = tmp_judge;
 			buffercnt++;
 			
 			if(buffercnt == 5)
 			{
-				if (myVerify_CRC8_Check_Sum(buffer, 5)==0) {receiving = 0;buffercnt = 0;}
+				if (myVerify_CRC8_Check_Sum(buffer, 5)==0) 
+				{
+				receiving = 0;buffercnt = 0;
+				}
 			}
 			
 			if(buffercnt == 44)
 			{
-				if (myVerify_CRC16_Check_Sum(buffer, 44)) Judge_Refresh();
+				if (myVerify_CRC16_Check_Sum(buffer, 44)) 
+				{
+					Judge_Refresh();
+				}
 				receiving = 0;
 				buffercnt = 0;
 			}
@@ -161,9 +168,10 @@ void judgeUartRxCpltCallback(void){
 				buffercnt++;
 			}
 		}
-		if(HAL_UART_Receive_DMA(&JUDGE_UART, &tmp_judge, 1) != HAL_OK){
+		if(HAL_UART_Receive_DMA(&JUDGE_UART, &tmp_judge, 1) != HAL_OK)
+		{
 			Error_Handler();
-	}
+	  }
 }
 
 tGameInfo mytGameInfo;

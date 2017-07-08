@@ -77,7 +77,7 @@ void RControlTask(void const * argument){
 					data[i] = pData[i];
 				}
 
-            /*处理数据*/
+      /*处理数据*/
 			RemoteDataProcess(data);	//process raw data then execute new order
 			/*扔掉多余数据，重新开启接收中断*/
 			HAL_UART_AbortReceive(&RC_UART);
@@ -190,7 +190,7 @@ void RemoteControlProcess(Remote *rc)
 
 extern uint8_t JUDGE_State;
 
-#ifndef Infantry_4
+#ifndef INFANTRY_1
   #define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 2
   #define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 2
 #else

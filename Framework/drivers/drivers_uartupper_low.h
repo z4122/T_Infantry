@@ -15,7 +15,7 @@
 
 #include "drivers_uartupper_user.h"
 
-void ctrlUartRxCpltCallback(void);
+void manifoldUartRxCpltCallback(void);
 
 void InitManifoldUart(void);
 void vSendUart(xdata_ctrlUart data);

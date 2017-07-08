@@ -52,6 +52,6 @@ void vRefreshLocation(float yaw_center, float pitch_center);
 	
 IOPoolDeclare(ctrlUartIOPool, struct{uint8_t ch[size_frame];});
 
-void ctrlUartRxCpltCallback(void);
+void manifoldUartRxCpltCallback(void);
 
 #endif

@@ -20,18 +20,19 @@
 #include "tasks_motor.h"
 void InitUserTimer(void)
 {
-//	HAL_TIM_Encoder_Start(&PLATE_TIM, TIM_CHANNEL_ALL);
-//	HAL_TIM_PWM_Start(&PLATE_MOTOR_TIM , TIM_CHANNEL_1);//���̵��
+
 	HAL_TIM_PWM_Start(&FRICTION_TIM, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&FRICTION_TIM, TIM_CHANNEL_2);
+	
+	//弹舱盖舵机，已取消
 	pwm_server_motor_init(0);
-#ifdef Infantry_4
+#ifdef INFANTRY_1
 				pwm_server_motor_set_angle(0,0.f);
 #endif
-#ifdef Infantry_3
+#ifdef INFANTRY_4
 				pwm_server_motor_set_angle(0,0.f);
 #endif
-#ifdef Infantry_2
+#ifdef INFANTRY_5
 				pwm_server_motor_set_angle(0,0.f);
 #endif
 				SetSlabState(OPEN);
