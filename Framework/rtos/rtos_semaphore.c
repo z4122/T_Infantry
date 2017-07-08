@@ -35,9 +35,9 @@ xSemaphoreHandle xSemaphore_rcuart;
 xSemaphoreHandle motorCanTransmitSemaphore;
 void rtos_AddSemaphores()
 {
-	osSemaphoreDef(CMGMCanTransmitSemaphore);//电机CAN发送信号量(未用)
+	osSemaphoreDef(CMGMCanTransmitSemaphore);//电机CAN发送信号量
 	CMGMCanTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(CMGMCanTransmitSemaphore), 1);
-	osSemaphoreDef(ZGYROCanTransmitSemaphore);//外接单轴陀螺仪CAN发送信号量(未用)
+	osSemaphoreDef(ZGYROCanTransmitSemaphore);//外接单轴陀螺仪CAN发送信号量
 	ZGYROCanTransmitSemaphoreHandle = osSemaphoreCreate(osSemaphore(ZGYROCanTransmitSemaphore), 1);
 
 	osSemaphoreDef(CMGMCanRefreshSemaphore);//电机CAN接收信号量
