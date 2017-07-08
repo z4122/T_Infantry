@@ -27,6 +27,7 @@ static float CMBRIntensity_max = CMBRIntensity_MAX;
 
 void RestrictPower(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3, int16_t *intensity4)
 {
+	//根据能量槽剩余做动态上限
   dynamicUpperBound();
 	
   int16_t *CMFLIntensity = intensity1;
@@ -36,6 +37,7 @@ void RestrictPower(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3
 	
 	float sum = (abs(*CMFLIntensity) + abs(*CMFRIntensity) + abs(*CMBLIntensity) + abs(*CMBRIntensity));
 	
+	//单独限制 + 总和比例限制
 	MINMAX(*CMFLIntensity, -CMFLIntensity_max, CMFLIntensity_max);
 	MINMAX(*CMFRIntensity, -CMFRIntensity_max, CMFRIntensity_max);
 	MINMAX(*CMBLIntensity, -CMBLIntensity_max, CMBLIntensity_max);

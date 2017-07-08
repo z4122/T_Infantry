@@ -42,11 +42,6 @@ extern PID_Regulator_t CM4SpeedPID;
 PID_Regulator_t ShootMotorPositionPID = SHOOT_MOTOR_POSITION_PID_DEFAULT;      //shoot motor
 PID_Regulator_t ShootMotorSpeedPID = SHOOT_MOTOR_SPEED_PID_DEFAULT;
 
-extern volatile Encoder CM1Encoder;
-extern volatile Encoder CM2Encoder;
-extern volatile Encoder CM3Encoder;
-extern volatile Encoder CM4Encoder;
-extern volatile Encoder GMYawEncoder;
 
 Shoot_State_e last_shoot_state = NOSHOOTING;
 Shoot_State_e this_shoot_state = NOSHOOTING;
@@ -141,9 +136,7 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float z
 //*********debug by ZY*********
 
 int mouse_click_left = 0;
-float this_fbspeed = 0;
-float last_fbspeed = 0;
-float diff_fbspeed = 0;
+
 
 int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 
@@ -156,7 +149,6 @@ void Timer_2ms_lTask(void const * argument)
 	xLastWakeTime = xTaskGetTickCount();
 	static int s_countWhile = 0;
 	static int countwhile1 = 0;
-	static int countwhile2 = 0;
 //	static int countwhile3 = 0;
 	ShootMotorPositionPID.ref = 0x0;
 	ShootMotorPositionPID.fdb = 0x0;

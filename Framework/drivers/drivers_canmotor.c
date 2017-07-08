@@ -21,11 +21,7 @@
 #include "rtos_init.h"
 #include "rtos_semaphore.h"
 
-volatile Encoder CM1Encoder = {0,0,0,0,0,0,0,0,0};
-volatile Encoder CM2Encoder = {0,0,0,0,0,0,0,0,0};
-volatile Encoder CM3Encoder = {0,0,0,0,0,0,0,0,0};
-volatile Encoder CM4Encoder = {0,0,0,0,0,0,0,0,0};
-volatile Encoder GMYawEncoder = {0,0,0,0,0,0,0,0,0};
+
 float ZGyroModuleAngle = 0.0f;
 
 //RxIOPool
@@ -73,6 +69,8 @@ CanRxMsgTypeDef CMGMCanRxMsg, ZGYROCanRxMsg;
 	
 void InitCanReception()
 {
+	//CANæ¥æ”¶è¿‡æ»¤å™¨é…ç½®
+	//http://www.eeworld.com.cn/mcu/article_2016122732674_3.html
 	CMGMMOTOR_CAN.pRxMsg = &CMGMCanRxMsg;
 	/*##-- Configure the CAN2 Filter ###########################################*/
 	CAN_FilterConfTypeDef  sFilterConfig;
@@ -116,6 +114,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 	if(hcan == &CMGMMOTOR_CAN){
 		switch(CMGMCanRxMsg.StdId){
 			case CMFL_RXID:
+				//è¯»å–0 1å­—èŠ‚ä¸ºè§’åº¦ï¼Œ2 3å­—èŠ‚ä¸ºé€Ÿåº¦
 				IOPool_pGetWriteData(CMFLRxIOPool)->angle = CanRxGetU16(CMGMCanRxMsg, 0);
 				IOPool_pGetWriteData(CMFLRxIOPool)->RotateSpeed = CanRxGetU16(CMGMCanRxMsg, 1);
 				IOPool_getNextWrite(CMFLRxIOPool);
@@ -150,6 +149,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 			default:
 			fw_Error_Handler();
 		}
+		//HAL CANæ€»çº¿å­˜åœ¨ä¸€å®šbugï¼Œä½¿ç”¨è‡ªå·±çš„æ ‡å¿—ä½
 		if(HAL_CAN_Receive_IT(&CMGMMOTOR_CAN, CAN_FIFO0) != HAL_OK){
 			fw_Warning();
 			isRcanStarted_CMGM = 0;
@@ -157,6 +157,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 			isRcanStarted_CMGM = 1;
 		}
 		if(g_bInited == 1){
+			//é‡Šæ”¾ä¿¡å·é‡äº¤ç»™æ§åˆ¶ä»»åŠ¡
 			osSemaphoreRelease(CMGMCanRefreshSemaphoreHandle);
 		}
 	}
@@ -166,6 +167,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 		{
 			case ZGYRO_RXID:
 			 {
+				//å•è½´é™€èºä»ªæ²¡æœ‰datasheetï¼Œå®Œå…¨å‚ç…§å®˜æ–¹ç¨‹åº
 				CanRxMsgTypeDef *msg = &ZGYROCanRxMsg;
 				ZGyroModuleAngle = -0.01f*((int32_t)(msg->Data[0]<<24)|(int32_t)(msg->Data[1]<<16) | (int32_t)(msg->Data[2]<<8) | (int32_t)(msg->Data[3])); 
 			 }
@@ -181,6 +183,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 			isRcanStarted_ZGYRO = 1;
 		}
 		if(g_bInited == 1){
+			//è¿™ä¸ªä¿¡å·é‡å¹¶æ²¡æœ‰äººç†0.o
 			osSemaphoreRelease(ZGYROCanRefreshSemaphoreHandle);
 		}
 	}
@@ -201,11 +204,12 @@ void TransmitCMGMCan(void)
 {
 		if(IOPool_hasNextRead(CMTxIOPool, 0))
 		{
+			//ä½¿ç”¨ä¿¡å·é‡ä¿æŠ¤CANå‘é€èµ„æºï¼Œåœ¨å‘é€ä¸­æ–­ä¸­release
 			osSemaphoreWait(CMGMCanTransmitSemaphoreHandle, osWaitForever);
 			
 			IOPool_getNextRead(CMTxIOPool, 0);
 			CMGMMOTOR_CAN.pTxMsg = IOPool_pGetReadData(CMTxIOPool, 0);
-			
+			//ä½¿ç”¨ä¸´ç•ŒåŒºé¿å…è¢«æŠ¢å 
 			taskENTER_CRITICAL();
 			if(HAL_CAN_Transmit_IT(&CMGMMOTOR_CAN) != HAL_OK){
 				fw_Warning();
@@ -253,7 +257,10 @@ void TransmitGYROCAN(void){
 *Name          :EncoderProcess
 *Input         :can message
 *Return        :void
-*Description   :to get the initiatial encoder of the chassis motor 201 202 203 204
+*Description   :å¯¹ç¼–ç å™¨æ•°æ®è¿›è¡Œå¤„ç†å¾—åˆ°é€Ÿåº¦
+*               copy fromå®˜æ–¹ç¨‹åº
+*								æ­¥å…µæœªç”¨åˆ°
+*								å€¼å¾—å‚è€ƒ
 *
 *
 ***********************************************************************************************
@@ -265,7 +272,7 @@ void EncoderProcess(volatile Encoder *v, Motor820RRxMsg_t * msg)
 	v->last_raw_value = v->raw_value;
 	v->raw_value = msg->angle;
 	v->diff = v->raw_value - v->last_raw_value;
-	if(v->diff < -7500)    //Á½´Î±àÂëÆ÷µÄ·´À¡Öµ²î±ğÌ«´ó£¬±íÊ¾È¦Êı·¢ÉúÁË¸Ä±ä
+	if(v->diff < -7500)    
 	{
 		v->round_cnt++;
 		v->ecd_raw_rate = v->diff + 8192;
@@ -279,38 +286,27 @@ void EncoderProcess(volatile Encoder *v, Motor820RRxMsg_t * msg)
 	{
 		v->ecd_raw_rate = v->diff;
 	}
-	//¼ÆËãµÃµ½Á¬ĞøµÄ±àÂëÆ÷Êä³öÖµ
+
 	v->ecd_value = v->raw_value + v->round_cnt * 8192;
-	//¼ÆËãµÃµ½½Ç¶ÈÖµ£¬·¶Î§Õı¸ºÎŞÇî´ó
+	
 	v->ecd_angle = (float)(v->raw_value - v->ecd_bias)*360/8192 + v->round_cnt * 360;
 	v->rate_buf[v->buf_count++] = v->ecd_raw_rate;
 	if(v->buf_count == RATE_BUF_SIZE)
 	{
 		v->buf_count = 0;
 	}
-	//¼ÆËãËÙ¶ÈÆ½¾ùÖµ
+	
 	for(i = 0;i < RATE_BUF_SIZE; i++)
 	{
 		temp_sum += v->rate_buf[i];
 	}
 	v->filter_rate = (int32_t)(temp_sum/RATE_BUF_SIZE);					
 }
-/*
-***********************************************************************************************
-*Name          :GetEncoderBias
-*Input         :can message
-*Return        :void
-*Description   :to get the initiatial encoder of the chassis motor 201 202 203 204
-*
-*
-***********************************************************************************************
-*/
 
 void GetEncoderBias(volatile Encoder *v, Motor820RRxMsg_t * msg)
 {
-
-            v->ecd_bias = msg->angle;  //±£´æ³õÊ¼±àÂëÆ÷Öµ×÷ÎªÆ«²î  
-            v->ecd_value = v->ecd_bias;
-            v->last_raw_value = v->ecd_bias;
-            v->temp_count++;
+	v->ecd_bias = msg->angle;  
+	v->ecd_value = v->ecd_bias;
+	v->last_raw_value = v->ecd_bias;
+	v->temp_count++;
 }
