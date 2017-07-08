@@ -71,7 +71,8 @@ uint8_t isRcanStarted_CMGM = 0, isRcanStarted_ZGYRO = 0;
 
 CanRxMsgTypeDef CMGMCanRxMsg, ZGYROCanRxMsg;
 	
-void InitCanReception(){
+void InitCanReception()
+{
 	CMGMMOTOR_CAN.pRxMsg = &CMGMCanRxMsg;
 	/*##-- Configure the CAN2 Filter ###########################################*/
 	CAN_FilterConfTypeDef  sFilterConfig;
@@ -179,12 +180,9 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 		}else{
 			isRcanStarted_ZGYRO = 1;
 		}
-<<<<<<< HEAD
-=======
 		if(g_bInited == 1){
 			osSemaphoreRelease(ZGYROCanRefreshSemaphoreHandle);
 		}
->>>>>>> parent of 8b6ace5... Revert "Merge remote-tracking branch 'refs/remotes/origin/master' into 新主控-步兵"
 	}
 }
 

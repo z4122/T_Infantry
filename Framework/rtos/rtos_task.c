@@ -98,8 +98,5 @@ void rtos_AddThreads()
 
 	osThreadDef(Timer_Task, Timer_2ms_lTask, osPriorityAboveNormal, 0, 256);
   TimerTaskHandle = osThreadCreate(osThread(Timer_Task), NULL);
-<<<<<<< HEAD
-	
-=======
->>>>>>> parent of 8b6ace5... Revert "Merge remote-tracking branch 'refs/remotes/origin/master' into 新主控-步兵"
+
 }
