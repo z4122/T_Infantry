@@ -12,13 +12,12 @@
 	* 状态机切换，串口定时输出，看门狗等
   ******************************************************************************
   */
-#include "tasks_cmcontrol.h"
+#include "tasks_timed.h"
 #include "pid_Regulator.h"
 #include "drivers_uartrc_low.h"
 #include "drivers_uartrc_user.h"
 #include "tasks_remotecontrol.h"
 #include "application_motorcontrol.h"
-#include "tasks_cmcontrol.h"
 #include "drivers_canmotor_low.h"
 #include "drivers_canmotor_user.h"
 #include "utilities_debug.h"

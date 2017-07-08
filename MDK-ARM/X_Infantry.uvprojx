@@ -1064,6 +1064,16 @@
               <FileType>5</FileType>
               <FilePath>..\Framework\applications\tasks_timed.h</FilePath>
             </File>
+            <File>
+              <FileName>application_waveform.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\applications\application_waveform.c</FilePath>
+            </File>
+            <File>
+              <FileName>application_waveform.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\applications\application_waveform.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

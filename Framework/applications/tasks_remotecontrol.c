@@ -120,30 +120,30 @@ void RControlTask(void const * argument){
 
 void RemoteDataProcess(uint8_t *pData)
 {
-    if(pData == NULL)
-    {
-        return;
-    }
-    RC_CtrlData.rc.ch0 = ((int16_t)pData[0] | ((int16_t)pData[1] << 8)) & 0x07FF; 
-    RC_CtrlData.rc.ch1 = (((int16_t)pData[1] >> 3) | ((int16_t)pData[2] << 5)) & 0x07FF;
-    RC_CtrlData.rc.ch2 = (((int16_t)pData[2] >> 6) | ((int16_t)pData[3] << 2) |
-                         ((int16_t)pData[4] << 10)) & 0x07FF;
-    RC_CtrlData.rc.ch3 = (((int16_t)pData[4] >> 1) | ((int16_t)pData[5]<<7)) & 0x07FF;
-    
-    RC_CtrlData.rc.s1 = ((pData[5] >> 4) & 0x000C) >> 2;
-    RC_CtrlData.rc.s2 = ((pData[5] >> 4) & 0x0003);
-
-    RC_CtrlData.mouse.x = ((int16_t)pData[6]) | ((int16_t)pData[7] << 8);
-    RC_CtrlData.mouse.y = ((int16_t)pData[8]) | ((int16_t)pData[9] << 8);
-    RC_CtrlData.mouse.z = ((int16_t)pData[10]) | ((int16_t)pData[11] << 8);    
-
-    RC_CtrlData.mouse.press_l = pData[12];
-    RC_CtrlData.mouse.press_r = pData[13];
- 
-    RC_CtrlData.key.v = ((int16_t)pData[14]) | ((int16_t)pData[15] << 8);//16 bits correspond to 16 keys
-		
-	SetInputMode(&RC_CtrlData.rc);
+	if(pData == NULL)
+	{
+			return;
+	}
+	RC_CtrlData.rc.ch0 = ((int16_t)pData[0] | ((int16_t)pData[1] << 8)) & 0x07FF; 
+	RC_CtrlData.rc.ch1 = (((int16_t)pData[1] >> 3) | ((int16_t)pData[2] << 5)) & 0x07FF;
+	RC_CtrlData.rc.ch2 = (((int16_t)pData[2] >> 6) | ((int16_t)pData[3] << 2) |
+											 ((int16_t)pData[4] << 10)) & 0x07FF;
+	RC_CtrlData.rc.ch3 = (((int16_t)pData[4] >> 1) | ((int16_t)pData[5]<<7)) & 0x07FF;
 	
+	RC_CtrlData.rc.s1 = ((pData[5] >> 4) & 0x000C) >> 2;
+	RC_CtrlData.rc.s2 = ((pData[5] >> 4) & 0x0003);
+
+	RC_CtrlData.mouse.x = ((int16_t)pData[6]) | ((int16_t)pData[7] << 8);
+	RC_CtrlData.mouse.y = ((int16_t)pData[8]) | ((int16_t)pData[9] << 8);
+	RC_CtrlData.mouse.z = ((int16_t)pData[10]) | ((int16_t)pData[11] << 8);    
+
+	RC_CtrlData.mouse.press_l = pData[12];
+	RC_CtrlData.mouse.press_r = pData[13];
+
+	RC_CtrlData.key.v = ((int16_t)pData[14]) | ((int16_t)pData[15] << 8);//16 bits correspond to 16 keys
+	
+	SetInputMode(&RC_CtrlData.rc);
+
 	switch(GetInputMode())
 	{
 		case REMOTE_INPUT:
@@ -177,8 +177,8 @@ void RemoteControlProcess(Remote *rc)
     if(GetWorkState()!=PREPARE_STATE)
     {
 		SetShootMode(MANUL);
-        ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
-        ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
+		ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
+		ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
 		
 		MINMAX(rc->ch2, 480, 1520);
  		pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
@@ -190,6 +190,7 @@ void RemoteControlProcess(Remote *rc)
 
 extern uint8_t JUDGE_State;
 
+//为不同操作手调整鼠标灵敏度
 #ifndef INFANTRY_1
   #define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 2
   #define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 2
@@ -258,7 +259,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 		}
 		
-	    /*裁判系统离线时的功率限制方式*/
+	  /*裁判系统离线时的功率限制方式*/
 		if(JUDGE_State==1)
 		{
 			if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500)
