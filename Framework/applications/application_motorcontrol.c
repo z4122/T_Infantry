@@ -27,12 +27,6 @@
 #include "drivers_cmpower.h"
 
 extern tGameInfo mytGameInfo;
-//typedef struct{
-//	CAN_HandleTypeDef  *canNum;
-//	uint32_t id;
-//}MotorCanNumId;
-
-
 extern uint8_t JUDGE_State;
 
 void setMotor(MotorId motorId, int16_t Intensity){
@@ -42,7 +36,8 @@ void setMotor(MotorId motorId, int16_t Intensity){
 	static int16_t GMYAWIntensity = 0, GMPITCHIntensity = 0;
 	static int8_t GMReady = 0;
 	
-	switch(motorId){
+	switch(motorId)
+	{
 		case CMFL:
 			if(CMReady & 0x1){CMReady = 0xF;}else{CMReady |= 0x1;}
 			CMFLIntensity = Intensity;break;
@@ -69,14 +64,15 @@ void setMotor(MotorId motorId, int16_t Intensity){
 	
   RestrictPower(&CMFLIntensity, &CMFRIntensity, &CMBLIntensity, &CMBRIntensity);
 	
-	if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY){
-			CMFLIntensity = 0;
-			CMFRIntensity = 0;
-			CMBLIntensity = 0;
-			CMBRIntensity = 0;
-			GMYAWIntensity = 0;
-			GMPITCHIntensity = 0;
-		}
+	if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY)
+	{
+		CMFLIntensity = 0;
+		CMFRIntensity = 0;
+		CMBLIntensity = 0;
+		CMBRIntensity = 0;
+		GMYAWIntensity = 0;
+		GMPITCHIntensity = 0;
+	}
 
 	if(CMReady == 0xF)
 	{
@@ -96,9 +92,10 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		
 		TransmitCMGMCan();
 		CMReady = 0;
- }
+  }
 	
-	if(GMReady == 0x3){
+	if(GMReady == 0x3)
+	{
 		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(GMTxIOPool);
 		pData->StdId = GM_TXID;
 		pData->Data[0] = (uint8_t)(GMYAWIntensity >> 8);
@@ -120,19 +117,19 @@ void setMotor(MotorId motorId, int16_t Intensity){
 uint8_t GYRO_RESETED = 0;
 void GYRO_RST(void)
 {
-		CanTxMsgTypeDef *pData = IOPool_pGetWriteData(ZGYROTxIOPool);
-		pData->StdId = ZGYRO_TXID;
-		pData->Data[0] = 0x00;
-		pData->Data[1] = 0x01;
-		pData->Data[2] = 0x02;
-		pData->Data[3] = 0x03;
-		pData->Data[4] = 0x04;
-		pData->Data[5] = 0x05;
-		pData->Data[6] = 0x06;
-		pData->Data[7] = 0x07;
-		IOPool_getNextWrite(ZGYROTxIOPool);
+	CanTxMsgTypeDef *pData = IOPool_pGetWriteData(ZGYROTxIOPool);
+	pData->StdId = ZGYRO_TXID;
+	pData->Data[0] = 0x00;
+	pData->Data[1] = 0x01;
+	pData->Data[2] = 0x02;
+	pData->Data[3] = 0x03;
+	pData->Data[4] = 0x04;
+	pData->Data[5] = 0x05;
+	pData->Data[6] = 0x06;
+	pData->Data[7] = 0x07;
+	IOPool_getNextWrite(ZGYROTxIOPool);
 
-		TransmitGYROCAN();
-	
-	  GYRO_RESETED = 1;
+	TransmitGYROCAN();
+
+	GYRO_RESETED = 1;
 }

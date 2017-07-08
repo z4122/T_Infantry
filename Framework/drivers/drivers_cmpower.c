@@ -52,8 +52,8 @@ void RestrictPower(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3
 
 void dynamicUpperBound()
 {
-	if (mytGameInfo.remainPower > 10 & mytGameInfo.remainPower < 40){
-			
+	if (mytGameInfo.remainPower > 10 && mytGameInfo.remainPower < 40)
+	{
 		 CM_current_max = CM_current_lower;
 		 CMFLIntensity_max = CMFLIntensity_lower;
 		 CMFRIntensity_max = CMFRIntensity_lower;
@@ -61,8 +61,8 @@ void dynamicUpperBound()
 		 CMBRIntensity_max = CMBRIntensity_lower;
 	}
 
-	if (mytGameInfo.remainPower < 15 ){
-			
+	if (mytGameInfo.remainPower < 15 )
+	{
 		 CM_current_max = CM_current_bottom;
 		 CMFLIntensity_max = CMFLIntensity_bottom;
 		 CMFRIntensity_max = CMFRIntensity_bottom;
@@ -70,8 +70,8 @@ void dynamicUpperBound()
 		 CMBRIntensity_max = CMBRIntensity_bottom;
 	}
 
-	if (mytGameInfo.remainPower < 7 ){
-			
+	if (mytGameInfo.remainPower < 7)
+	{
 		 CM_current_max = 0;
 		 CMFLIntensity_max = 0;
 		 CMFRIntensity_max = 0;
@@ -79,8 +79,8 @@ void dynamicUpperBound()
 		 CMBRIntensity_max = 0;
 	}
 
-	if (JUDGE_State == 1){
-			
+	if (JUDGE_State == 1)
+	{
 		 CM_current_max = 13000;
 		 CMFLIntensity_max = 4500;
 		 CMFRIntensity_max = 4500;
