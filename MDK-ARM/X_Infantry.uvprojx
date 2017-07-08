@@ -1074,6 +1074,16 @@
               <FileType>5</FileType>
               <FilePath>..\Framework\applications\application_waveform.h</FilePath>
             </File>
+            <File>
+              <FileName>tasks_platemotor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\applications\tasks_platemotor.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasks_platemotor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\applications\tasks_platemotor.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

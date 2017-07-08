@@ -148,26 +148,23 @@ void RemoteDataProcess(uint8_t *pData)
 	{
 		case REMOTE_INPUT:
 		{
-			if(g_isGYRO_Rested == 2)
+			if(GetWorkState() == NORMAL_STATE)
 			{ //if gyro has been reseted
-				SetEmergencyFlag(NORMAL);
-				RemoteControlProcess(&(RC_CtrlData.rc));//execute new order
+				RemoteControlProcess(&(RC_CtrlData.rc));//遥控器模式
 			}
 		}break;
 		case KEY_MOUSE_INPUT:
 		{
-			if(g_isGYRO_Rested == 2)
+			if(GetWorkState() == NORMAL_STATE)
 			{
-				MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);
-				SetEmergencyFlag(NORMAL);
+				MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);//键鼠模式
 				SetShootMode(AUTO);//调试自瞄用
 	//			RemoteShootControl(&switch1, RC_CtrlData.rc.s1);
 			}
 		}break;
 		case STOP:
 		{
-			SetEmergencyFlag(EMERGENCY);
-			
+			 //停止
 		}break;
 	}
 }

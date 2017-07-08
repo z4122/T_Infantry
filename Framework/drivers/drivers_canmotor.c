@@ -10,6 +10,8 @@
   * CAN总线初始化
 	* CAN接收处理
 	* CAN发送任务
+	* CAN1 CMGM电机
+	* CAN2 单轴陀螺仪
   ******************************************************************************
   */
 #include <cmsis_os.h>
@@ -109,7 +111,7 @@ void InitCanReception()
 	}
 	isRcanStarted_ZGYRO = 1;
 }
-
+/*********************所有CAN接收终端****************************/
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 	if(hcan == &CMGMMOTOR_CAN){
 		switch(CMGMCanRxMsg.StdId){
