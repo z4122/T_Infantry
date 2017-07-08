@@ -112,10 +112,6 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		IOPool_getNextWrite(GMTxIOPool);
 		GMReady = 0;
 
-//		if(osSemaphoreRelease(CMGMCanHaveTransmitSemaphoreHandle) == osErrorOS){
-//	//		fw_Warning();
-//		}
-
     TransmitCMGMCan();
 	}
 }

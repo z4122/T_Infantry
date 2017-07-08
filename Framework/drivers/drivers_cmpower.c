@@ -12,6 +12,7 @@
   */
 #include "drivers_uartjudge_low.h"
 #include "drivers_cmpower.h"
+#include "utilities_minmax.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -35,45 +36,20 @@ void RestrictPower(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3
 	
 	float sum = (abs(*CMFLIntensity) + abs(*CMFRIntensity) + abs(*CMBLIntensity) + abs(*CMBRIntensity));
 	
-	if ((*CMFLIntensity > CMFLIntensity_max))
+	MINMAX(*CMFLIntensity, -CMFLIntensity_max, CMFLIntensity_max);
+	MINMAX(*CMFRIntensity, -CMFRIntensity_max, CMFRIntensity_max);
+	MINMAX(*CMBLIntensity, -CMBLIntensity_max, CMBLIntensity_max);
+  MINMAX(*CMBRIntensity, -CMBRIntensity_max, CMBRIntensity_max);
+
+	if(sum > CM_current_max)
 	{
-		*CMFLIntensity = CMFLIntensity_max;
-	}
-	else if ((*CMFLIntensity < -CMFLIntensity_max))
-	{
-		*CMFLIntensity = -CMFLIntensity_max;
-	}
-	if(*CMFRIntensity > CMFRIntensity_max)
-	{
-	  *CMFRIntensity = CMFRIntensity_max;
-	}
-	else if(*CMFRIntensity < -CMFRIntensity_max)
-	{
-	  *CMFRIntensity = -CMFRIntensity_max;
-	}
-	if(*CMBLIntensity > CMBLIntensity_max)
-	{
-	  *CMBLIntensity = CMBLIntensity_max;
-	}
-	else if(*CMBLIntensity < -CMBLIntensity_max)
-	{
-	  *CMBLIntensity = -CMBLIntensity_max;
-	}
-	if(*CMBRIntensity > CMBRIntensity_max)
-	{
-	  *CMBRIntensity = CMBRIntensity_max;
-	}
-	else	if(*CMBRIntensity < -CMBRIntensity_max)
-	{
-	  *CMBRIntensity = -CMBRIntensity_max;
-	}
-	if( sum > CM_current_max){
 		*CMFLIntensity = (CM_current_max/sum) * (*CMFLIntensity);
 		*CMFRIntensity = (CM_current_max/sum) * (*CMFRIntensity);
 		*CMBLIntensity = (CM_current_max/sum) * (*CMBLIntensity);
 		*CMBRIntensity = (CM_current_max/sum) * (*CMBRIntensity);
 	}
 }	
+
 void dynamicUpperBound()
 {
 	if (mytGameInfo.remainPower > 10 & mytGameInfo.remainPower < 40){
