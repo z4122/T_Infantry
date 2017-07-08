@@ -88,8 +88,4 @@ void rtos_addThreads(){
 	osThreadDef(Timer_Task, Timer_2ms_lTask, osPriorityAboveNormal, 0, 256);
   TimerTaskHandle = osThreadCreate(osThread(Timer_Task), NULL);
 	
-	osThreadDef(CMGMC_T_Task, CMGMCanTransmitTask, osPriorityRealtime, 0, 512);
-  CMGMCanTransmitTaskHandle = osThreadCreate(osThread(CMGMC_T_Task), NULL);
-	osThreadDef(AMC_T_Task, ZGYROCanTransmitTask, osPriorityRealtime, 0, 512);
-  AMCanTransmitTaskHandle = osThreadCreate(osThread(AMC_T_Task), NULL);
 }

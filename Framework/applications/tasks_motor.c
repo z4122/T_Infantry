@@ -127,7 +127,6 @@ void CMGMControlTask(void const * argument){
 	static float sum_flag  = 0;
 	static float sum_flag1 = 0;
 	while(1){
-//  osSemaphoreWait(imurefreshGimbalSemaphoreHandle, osWaitForever);
 		osSemaphoreWait(CMGMCanRefreshSemaphoreHandle, osWaitForever);
 		if(IOPool_hasNextRead(upperIOPool, 0)){
 		IOPool_getNextRead(upperIOPool, 0);
@@ -334,15 +333,9 @@ void CMGMControlTask(void const * argument){
 		if(IOPool_hasNextRead(CMFLRxIOPool, 0)){
 			IOPool_getNextRead(CMFLRxIOPool, 0);
 			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMFLRxIOPool, 0);
-#ifdef Infantry_1_Aim
-			CANReceiveMsgProcess_820R(pData, &CM2Encoder);
-			CM2SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-			CM2SpeedPID.fdb = CM2Encoder.filter_rate;
-#else
 			CM2SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
 			CM2SpeedPID.ref = 160 * CM2SpeedPID.ref;
 			CM2SpeedPID.fdb = pData->RotateSpeed;
-#endif
 #ifdef Infantry_4
 			CM2SpeedPID.ref = 1.2f * CM2SpeedPID.ref;
 #endif
@@ -354,16 +347,9 @@ void CMGMControlTask(void const * argument){
 		  if(IOPool_hasNextRead(CMFRRxIOPool, 0)){
 			IOPool_getNextRead(CMFRRxIOPool, 0);
 			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMFRRxIOPool, 0);
-			CANReceiveMsgProcess_820R(pData, &CM1Encoder);
-#ifdef Infantry_1_Aim	
-			CANReceiveMsgProcess_820R(pData, &CM1Encoder);				
-		  CM1SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-      CM1SpeedPID.fdb = CM1Encoder.filter_rate;
-#else
 			CM1SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;	
 			CM1SpeedPID.ref = 160 * CM1SpeedPID.ref;
 			CM1SpeedPID.fdb = pData->RotateSpeed;
-#endif
 #ifdef Infantry_4
 			CM1SpeedPID.ref = 1.2f * CM1SpeedPID.ref;
 #endif
@@ -375,15 +361,9 @@ void CMGMControlTask(void const * argument){
 		if(IOPool_hasNextRead(CMBLRxIOPool, 0)){
 			IOPool_getNextRead(CMBLRxIOPool, 0);
 			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMBLRxIOPool, 0);
-#ifdef Infantry_1_Aim
-			CANReceiveMsgProcess_820R(pData, &CM3Encoder);
-			CM3SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-			CM3SpeedPID.fdb = CM3Encoder.filter_rate;
-#else		
 			CM3SpeedPID.ref =  ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
 			CM3SpeedPID.ref = 160 * CM3SpeedPID.ref;
 			CM3SpeedPID.fdb = pData->RotateSpeed;
-#endif
 #ifdef Infantry_4
 			CM3SpeedPID.ref = 1.2f * CM3SpeedPID.ref;
 #endif
@@ -393,14 +373,8 @@ void CMGMControlTask(void const * argument){
 		if(IOPool_hasNextRead(CMBRRxIOPool, 0)){
 			IOPool_getNextRead(CMBRRxIOPool, 0);
 			Motor820RRxMsg_t *pData = IOPool_pGetReadData(CMBRRxIOPool, 0);
-#ifdef Infantry_1_Aim
-			CANReceiveMsgProcess_820R(pData, &CM4Encoder);
-			CM4SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-			CM4SpeedPID.fdb = CM4Encoder.filter_rate;
-#else
 			CM4SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
 		  CM4SpeedPID.ref = 160 * CM4SpeedPID.ref;
-#endif
 			CM4SpeedPID.fdb = pData->RotateSpeed;
 #ifdef Infantry_4
 			CM4SpeedPID.ref = 1.2f * CM4SpeedPID.ref;

@@ -989,6 +989,16 @@
               <FileType>5</FileType>
               <FilePath>..\Framework\drivers\drivers_platemotor.h</FilePath>
             </File>
+            <File>
+              <FileName>drivers_cmpower.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\drivers\drivers_cmpower.c</FilePath>
+            </File>
+            <File>
+              <FileName>drivers_cmpower.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Framework\drivers\drivers_cmpower.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
