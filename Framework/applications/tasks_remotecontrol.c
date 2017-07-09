@@ -21,6 +21,7 @@
 #include "usart.h"
 #include "peripheral_define.h"
 #include "pwm_server_motor.h"
+#include "drivers_uartjudge_low.h"
 #include "tasks_motor.h"
 //**//
 #include "utilities_minmax.h"
@@ -257,7 +258,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		}
 		
 		/*裁判系统离线时的功率限制方式*/
-		if(JUDGE_State==1)
+		if(JUDGE_State == OFFLINE)
 		{
 			if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500)
 			{
