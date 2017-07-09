@@ -1,10 +1,23 @@
-#include "tasks_cmcontrol.h"
+/**
+  ******************************************************************************
+  * File Name          : tasks_cmcontrol.c
+  * Description        : 2ms定时任务
+  ******************************************************************************
+  *
+  * Copyright (c) 2017 Team TPP-Shanghai Jiao Tong University
+  * All rights reserved.
+  *
+	* 2ms定时
+	* 通过count可以获得500ms,1s等定时任务
+	* 状态机切换，串口定时输出，看门狗等
+  ******************************************************************************
+  */
+#include "tasks_timed.h"
 #include "pid_Regulator.h"
 #include "drivers_uartrc_low.h"
 #include "drivers_uartrc_user.h"
 #include "tasks_remotecontrol.h"
 #include "application_motorcontrol.h"
-#include "tasks_cmcontrol.h"
 #include "drivers_canmotor_low.h"
 #include "drivers_canmotor_user.h"
 #include "utilities_debug.h"
@@ -49,18 +62,20 @@ WorkState_e GetWorkState()
 }
 /*2ms定时任务*/
 
-extern float ZGyroModuleAngle;
+extern float ZGyroModuleAngle;//Yaw轴角度
 float ZGyroModuleAngleMAX;
 float ZGyroModuleAngleMIN;
 extern float yawRealAngle;
 extern uint8_t GYRO_RESETED;
-extern float pitchRealAngle;
-extern float gYroZs;
+extern float pitchRealAngle;//Pitch轴角度
+extern float gYroZs;////Yaw轴角速度
 extern float yawAngleTarget;
 extern float yawRealAngle;
 
 extern uint8_t JUDGE_STATE;
 //*********debug by ZY*********
+
+/*
 typedef struct{
 	uint16_t head;
 	uint8_t id;
@@ -69,10 +84,22 @@ typedef struct{
 	float dataYaw;
 	uint8_t checkSum;
 }data_to_PC;
+*/
 
 
-uint8_t data_send_to_PC[17];
-data_to_PC my_data_to_PC;
+uint8_t data_send_to_PC[17];//要发送给上位机的报文
+//data_to_PC my_data_to_PC;
+
+/*
+发送给上位机的数据帧定义
+@前2个字节为帧头0xAAAA
+@第3个字节为帧ID，应设置为0xF1~0xFA中的一个
+@第4个字节为报文数据长度(dlc)
+@第5个字节开始到第5+dlc-1个字节为要传输的数据内容段，每个数据场为高字节在前，地字节在后
+@第5+dlc个字节为CheckSum,为第1个字节到第5+dlc-1个字节所有字节的值相加后，保留结果的低八位作为CheckSum
+@我们需要传输3个float数据，pitchRealAngle(Pitch),ZGyroModuleAngle(Yaw), gYroZs(Speed),dlc应该为3*4 bytes=12 bytes
+@所以整个报文长度为5+12=17个字节
+*/
 void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float zySpd)
 {
 //	my_data_to_PC.head=0xAAAA;
@@ -95,10 +122,15 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float z
 	uint8_t * pTemp;
 	int i;
 	data_send_to_PC[0]=0xAA;
-	data_send_to_PC[1]=0xAA;
-	data_send_to_PC[2]=0xF1;
-	data_send_to_PC[3]=12;
-	pTemp=(uint8_t *)&zyPitch;
+	data_send_to_PC[1]=0xAA;//前两个字节为帧头0xAA
+	data_send_to_PC[2]=0xF1;//第3个字节为帧ID，设为0xF1
+	data_send_to_PC[3]=12;//第4个字节为数据长度dlc，需要传输3个float数据(3*4 bytes=12 bytes)
+	pTemp=(uint8_t *)&zyPitch;//将数据场首指针转换为uint8_t型指针，方便后续操作
+	
+	/*第一个float数据Pitch轴角度，传输时要将高位放在前面，低位放在后面
+	STM32是小端存储(Little Endian),高位数据储存在高地址中。
+	所以需要如下的转换，将高位数据移到数据帧的前面来。其他两个数据Yaw和速度Spd用同样方法处理
+	*/
 	for(i=0;i<4;i++)
 	{
 		 data_send_to_PC[4+i]=pTemp[3-i];
@@ -116,13 +148,13 @@ void send_data_to_PC(UART_HandleTypeDef *huart,float zyPitch,float zyYaw,float z
 		 data_send_to_PC[12+i]=pTemp[3-i];
 	}
 	
-	data_send_to_PC[16]=0;
+	data_send_to_PC[16]=0;//第17个字节为本帧报文的CheckSum，按照前述CheckSum的要求求和计算即可
 	for(i=0;i<16;i++)
 	{
 		 data_send_to_PC[16]+=data_send_to_PC[i];
 	}
 	
-	HAL_UART_Transmit(huart,data_send_to_PC,17,1000);
+	HAL_UART_Transmit(huart,data_send_to_PC,17,1000);//向上位机发送本帧报文，共17个字节
 }
 
 //*********debug by ZY*********
@@ -334,54 +366,7 @@ void WorkStateSwitchProcess(void)
 }
 //底盘控制任务 没用到
 extern int16_t yawZeroAngle;
-void CMControlLoop(void)
-{  
-	//底盘旋转量计算
-	if(GetWorkState()==PREPARE_STATE) //启动阶段，底盘不旋转
-	{
-		ChassisSpeedRef.rotate_ref = 0;	 
-	}
-	else
-	{
-		 //底盘跟随编码器旋转PID计算
-		 CMRotatePID.ref = 48;
-		 CMRotatePID.fdb = GMYawEncoder.ecd_angle;
-//		fw_printfln("%f",GMYawEncoder.ecd_angle );
-		 CMRotatePID.Calc(&CMRotatePID);   
-		 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
-		 ChassisSpeedRef.rotate_ref = 0;
-	}
-/*	if(Is_Lost_Error_Set(LOST_ERROR_RC))      //如果遥控器丢失，强制将速度设定值reset
-	{
-		ChassisSpeedRef.forward_back_ref = 0;
-		ChassisSpeedRef.left_right_ref = 0;
-	}
-*/	
-	CM1SpeedPID.ref =  -ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-	CM2SpeedPID.ref = ChassisSpeedRef.forward_back_ref*0.075 + ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-	CM3SpeedPID.ref = ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
-	CM4SpeedPID.ref = -ChassisSpeedRef.forward_back_ref*0.075 - ChassisSpeedRef.left_right_ref*0.075 + ChassisSpeedRef.rotate_ref;
 
-	CM1SpeedPID.fdb = CM1Encoder.filter_rate;
-	CM2SpeedPID.fdb = CM2Encoder.filter_rate;
-	CM3SpeedPID.fdb = CM3Encoder.filter_rate;
-	CM4SpeedPID.fdb = CM4Encoder.filter_rate;
-	
-	CM1SpeedPID.Calc(&CM1SpeedPID);
-	CM2SpeedPID.Calc(&CM2SpeedPID);
-	CM3SpeedPID.Calc(&CM3SpeedPID);
-	CM4SpeedPID.Calc(&CM4SpeedPID);
-	
-	 if((GetWorkState() == STOP_STATE)  || GetWorkState() == CALI_STATE || GetWorkState() == PREPARE_STATE || GetEmergencyFlag() == EMERGENCY)   //||Is_Serious_Error()|| dead_lock_flag == 1紧急停车，编码器校准，无控制输入时都会使底盘控制停止
-	 {
-		 Set_CM_Speed(0,0,0,0);
-	 }
-	 else
-	 {
-		 Set_CM_Speed(CHASSIS_SPEED_ATTENUATION * CM1SpeedPID.output, CHASSIS_SPEED_ATTENUATION * CM2SpeedPID.output, CHASSIS_SPEED_ATTENUATION * CM3SpeedPID.output, CHASSIS_SPEED_ATTENUATION * CM4SpeedPID.output);		 
-	 } 
-	 
-}
   
 int32_t GetQuadEncoderDiff(void)
 {
