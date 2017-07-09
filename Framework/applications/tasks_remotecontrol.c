@@ -21,6 +21,7 @@
 #include "usart.h"
 #include "peripheral_define.h"
 #include "pwm_server_motor.h"
+#include "drivers_uartjudge_low.h"
 #include "tasks_motor.h"
 //**//
 #include "utilities_minmax.h"
@@ -171,8 +172,8 @@ void RemoteDataProcess(uint8_t *pData)
 
 void RemoteControlProcess(Remote *rc)
 {
-    if(GetWorkState()!=PREPARE_STATE)
-    {
+	if(GetWorkState()!=PREPARE_STATE)
+	{
 		SetShootMode(MANUL);
 		ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
 		ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
@@ -200,14 +201,14 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 {
 	static uint16_t forward_back_speed = 0;
 	static uint16_t left_right_speed = 0;
-    if(GetWorkState()!=PREPARE_STATE)
-    {
+	if(GetWorkState()!=PREPARE_STATE)
+	{
 		VAL_LIMIT(mouse->x, -150, 150); 
 		VAL_LIMIT(mouse->y, -150, 150); 
-		
-        pitchAngleTarget -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  
-        yawAngleTarget    -= mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
-		
+	
+		pitchAngleTarget -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  
+		yawAngleTarget    -= mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
+
 		//speed mode: normal speed/high speed 
 		if(key->v & 0x10)//Shift
 		{
@@ -256,8 +257,8 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
 		}
 		
-	  /*裁判系统离线时的功率限制方式*/
-		if(JUDGE_State==1)
+		/*裁判系统离线时的功率限制方式*/
+		if(JUDGE_State == OFFLINE)
 		{
 			if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500)
 			{
@@ -310,8 +311,8 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		{
 			twist_state = 0;
 		}
-	
-	  MouseShootControl(mouse);
+
+		MouseShootControl(mouse);
 	}
 }
 
