@@ -37,7 +37,7 @@ float yaw_speed = 0;
 
 
 extern float pitchRealAngle;
-extern float ZGyroModuleAngle;
+extern float ZGyroModuleAngle;	//陀螺仪角度
 //extern float yawAngleTarget, pitchAngleTarget;
 void ManifoldUartTask(void const * argument){
 	static uint8_t last_rune_locate = 0;
