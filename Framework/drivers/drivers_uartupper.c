@@ -22,13 +22,19 @@
 #include "utilities_debug.h"
 #include "usart.h"
 #include "rtos_semaphore.h"
+#include "tasks_platemotor.h"
+
 
 NaiveIOPoolDefine(ctrlUartIOPool, {0});
 
+extern PID_Regulator_t ShootMotorPositionPID;
 
 xdata_ctrlUart ctrlData; 
 
 void manifoldUartRxCpltCallback(){
+	
+	ShootOneBullet(&ShootMotorPositionPID);
+	
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
 	fw_printfln("upper received");
