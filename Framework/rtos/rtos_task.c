@@ -31,7 +31,6 @@
 #include "drivers_canmotor_low.h"
 #include "tasks_motor.h"
 #include "drivers_sonar_low.h"
-#include "tasks_platemotor.h"
 //#include "drivers_mpu6050_low.h"
 //#include "tasks_mpu6050.h"
 
@@ -98,8 +97,8 @@ void rtos_AddThreads()
   GMControlTaskHandle = osThreadCreate(osThread(GMC_Task), NULL);
 	
 //拨盘电机任务 //待移植
-	osThreadDef(Plate_Task, PlateMotorTask, osPriorityAboveNormal, 0, 512);
-  PlateTaskHandle = osThreadCreate(osThread(Plate_Task), NULL);
+//	osThreadDef(Plate_Task, PlateMotorTask, osPriorityAboveNormal, 0, 512);
+//  PlateTaskHandle = osThreadCreate(osThread(Plate_Task), NULL);
 //2ms定时任务，状态机切换，调试信息输出等
 
 	osThreadDef(Timer_Task, Timer_2ms_lTask, osPriorityAboveNormal, 0, 512);
