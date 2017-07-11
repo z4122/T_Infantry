@@ -24,6 +24,7 @@
 #include "drivers_uartrc_low.h"
 #include "drivers_uartrc_user.h"
 #include "tasks_remotecontrol.h"
+#include "tasks_platemotor.h"
 #include "application_motorcontrol.h"
 #include "drivers_canmotor_low.h"
 #include "drivers_canmotor_user.h"
@@ -112,9 +113,9 @@ void Timer_2ms_lTask(void const * argument)
 		if(s_countWhile >= 1000)
 		{//定时1s,发送调试信息
 			s_countWhile = 0;
-			//fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
-						fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
-						fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
+			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
+			//			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
+			//			fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
 			/*****查看任务栈空间剩余示例*******/
 			//		StackResidue = uxTaskGetStackHighWaterMark( GMControlTaskHandle );
 			//		fw_printfln("GM%ld",StackResidue);
@@ -124,7 +125,7 @@ void Timer_2ms_lTask(void const * argument)
 			}
 			else
 			{
-				//fw_printfln("Judge received");
+				fw_printfln("Judge received");
 			}
 		}
 		else
@@ -174,12 +175,6 @@ void WorkStateFSM(void)
 			{
 				g_workState = STOP_STATE;
 			}
-			//ZY
-			else if(GetInputMode()==KEY_MOUSE_INPUT)
-			{
-				g_workState= RUNE_STATE;
-			}
-			//ZY
 		}break;
 		case STOP_STATE:   
 		{
@@ -187,21 +182,10 @@ void WorkStateFSM(void)
 			{
 				g_workState = PREPARE_STATE;   
 			}
-			else if(GetInputMode()==KEY_MOUSE_INPUT)
-			{
-				g_workState= RUNE_STATE;
-			}
 		}break;
 		case RUNE_STATE:
 		{
-			if(GetInputMode()==REMOTE_INPUT)
-			{
-				g_workState = PREPARE_STATE;   
-			}
-			else if(GetInputMode() == STOP )
-			{
-				g_workState = STOP_STATE;
-			}
+			
 		}break;
 		default:
 		{
@@ -254,17 +238,19 @@ void ShooterMControlLoop(void)
 {				      			
 	if(GetShootState() == SHOOTING && GetInputMode()==KEY_MOUSE_INPUT && Stuck==0)
 	{
-		ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;//打一发弹编码器输出脉冲数
+		//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;//打一发弹编码器输出脉冲数
+		ShootOneBullet(&ShootMotorPositionPID);
 	}
 
 	//遥控器输入模式下，只要处于发射态，就一直转动
 	if(GetShootState() == SHOOTING && GetInputMode() == REMOTE_INPUT && Stuck==0)
 	{
-		RotateAdd += 8;
-		fw_printfln("ref = %f",ShootMotorPositionPID.ref);
+		RotateAdd += 4;
+		//fw_printfln("ref = %f",ShootMotorPositionPID.ref);
 		if(RotateAdd>OneShoot)
 		{
-			ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
+			//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
+			ShootOneBullet(&ShootMotorPositionPID);
 			RotateAdd = 0;
 		}
 	}
@@ -276,19 +262,31 @@ void ShooterMControlLoop(void)
 	if(GetFrictionState()==FRICTION_WHEEL_ON)//拨盘转动前提条件：摩擦轮转动
 	{
 		this_fdb = GetQuadEncoderDiff(); 
-		fw_printfln("this_fdb = %d",this_fdb);
-		if(this_fdb<last_fdb-100)
+		//fw_printfln("this_fdb = %d",this_fdb);
+		
+		//卡弹处理
+//		if(abs(ShootMotorPositionPID.ref-ShootMotorPositionPID.fdb)>100 && (abs(this_fdb-last_fdb)<5 || abs(this_fdb+65535-last_fdb)<5)) //认为卡弹
+//		{//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - OneShoot;
+//		}
+	//	else
+		//{
+		if(this_fdb<last_fdb-10000 && getPlateMotorDir()==FORWARD)	//cnt寄存器溢出判断 正转
 		{
 			ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb+(65535+this_fdb-last_fdb);
 		}
+		else if(this_fdb>last_fdb+10000 && getPlateMotorDir()==REVERSE)	//cnt寄存器溢出判断 反转
+		{
+			ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb-(65535-this_fdb+last_fdb);
+		}
 		else
 			ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb + this_fdb-last_fdb;
-		
+	//	}
 		last_fdb = this_fdb;
-		fw_printfln("fdb = %f",ShootMotorPositionPID.fdb);
+		//fw_printfln("fdb = %f",ShootMotorPositionPID.fdb);
 		ShootMotorPositionPID.Calc(&ShootMotorPositionPID);
-		
-		if(ShootMotorPositionPID.output<0) //反馈大于参考，需要反转
+//		ShootMotorSpeedPID.ref = ShootMotorPositionPID.output;
+//		ShootMotorSpeedPID.fdb = 
+		if(ShootMotorPositionPID.output<0) //反转
 		{
 			setPlateMotorDir(REVERSE);
 			ShootMotorPositionPID.output = -ShootMotorPositionPID.output;

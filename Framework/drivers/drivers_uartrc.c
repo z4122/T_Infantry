@@ -194,6 +194,8 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			{
 				/*斜坡函数必须有，避免电流过大烧坏主控板*/
 				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
+				//SetFrictionWheelSpeed(1000);
+				//friction_wheel_state = FRICTION_WHEEL_ON; 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
 					friction_wheel_state = FRICTION_WHEEL_ON; 	
