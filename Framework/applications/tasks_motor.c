@@ -35,8 +35,6 @@
 #include "peripheral_define.h"
 #include "drivers_uartupper_user.h"
 
-#include "utilities_debug.h"
-
 
 //PID_INIT(Kp, Ki, Kd, KpMax, KiMax, KdMax, OutputMax)
 //云台PID
@@ -62,8 +60,8 @@ fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(15.0, 0.0, 0.5, 10000.0, 10000
 fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 1.5, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(35.0, 0.0, 2.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
-#define yaw_zero 1027//1040
-#define pitch_zero 6200//6400
+#define yaw_zero 1040
+#define pitch_zero 6400
 #endif
 //底盘速度PID
 PID_Regulator_t CMRotatePID = CHASSIS_MOTOR_ROTATE_PID_DEFAULT; 
@@ -97,8 +95,6 @@ int twist =0;
 float mm =0;
 float nn =0;
 int16_t twist_target = 0;
-
-extern float zyYawTarget,zyPitchTarget;//张雁调试大符
 
 void CMGMControlTask(void const * argument){
 	while(1)
@@ -150,36 +146,30 @@ void ControlYaw(void)
 		{
 			yawRealAngle = -ZGyroModuleAngle;//yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
 			/*自瞄模式切换*/
-			
-//			if(GetShootMode() == AUTO) 
-//			{
-//				ChassisSpeedRef.rotate_ref = 0;
-//				if((GetLocateState() == Located))
-//				{
-//				ChassisSpeedRef.rotate_ref = 0;
-//				}
-//				if((GetLocateState() == Locating) && (CReceive != 0))	
-//				{
-//				yawAngleTarget = yawRealAngle - yawAdd ;
-//				fw_printfln("yawAdd-in control:%f",yawAdd );
-//				CReceive--;
-//				}
-//				//大神符
-//				else if((GetLocateState() == Located) && (rune_flag != 0))
-//				{
-//					if(GetRuneState() == AIMING)
-//					{
-//						fw_printfln("rune:%d", rune);
-//						yawAngleTarget = Location_Number[rune - 1].yaw_position;
-//						rune_flag--;
-//					}
-//				}
-//			}//end of autoshoot
-		}
-		else if(GetWorkState()==RUNE_STATE)
-		{
-			//fw_printfln("Rune State:%f",yawAngleTarget);
-			//yawAngleTarget=zyYawTartet;
+			if(GetShootMode() == AUTO) 
+			{
+				ChassisSpeedRef.rotate_ref = 0;
+				if((GetLocateState() == Located))
+				{
+				ChassisSpeedRef.rotate_ref = 0;
+				}
+				if((GetLocateState() == Locating) && (CReceive != 0))	
+				{
+				yawAngleTarget = yawRealAngle - yawAdd ;
+				fw_printfln("yawAdd-in control:%f",yawAdd );
+				CReceive--;
+				}
+				//大神符
+				else if((GetLocateState() == Located) && (rune_flag != 0))
+				{
+					if(GetRuneState() == AIMING)
+					{
+						fw_printfln("rune:%d", rune);
+						yawAngleTarget = Location_Number[rune - 1].yaw_position;
+						rune_flag--;
+					}
+				}
+			}//end of autoshoot
 		}
 						
 		yawIntensity = ProcessYawPID(yawAngleTarget, yawRealAngle, -gYroZs);
@@ -199,28 +189,23 @@ void ControlPitch(void)
 		NORMALIZE_ANGLE180(pitchRealAngle);
 		
 		//自瞄模式切换
-//		if(GetShootMode() == AUTO) 
-//		{
-//			if((GetLocateState() == Locating) && (CReceive != 0))	
-//			{
-//				//fw_printfln("pitchAdd:%f",pitchAdd );
-//				pitchAngleTarget = pitchRealAngle + pitchAdd ;
-//				CReceive --;
-//			}//大神符
-//			else if((GetLocateState() == Located) && (rune_flag != 0))
-//			{
-//				if(GetRuneState() == AIMING)
-//				{
-//					pitchAngleTarget = Location_Number[rune - 1].pitch_position;
-//					rune_flag--;
-//				}
-//			}
-//		}
-		if(GetWorkState()==RUNE_STATE)
+		if(GetShootMode() == AUTO) 
 		{
-			//fw_printfln("Rune State:%d",1);
+			if((GetLocateState() == Locating) && (CReceive != 0))	
+			{
+				//fw_printfln("pitchAdd:%f",pitchAdd );
+				pitchAngleTarget = pitchRealAngle + pitchAdd ;
+				CReceive --;
+			}//大神符
+			else if((GetLocateState() == Located) && (rune_flag != 0))
+			{
+				if(GetRuneState() == AIMING)
+				{
+					pitchAngleTarget = Location_Number[rune - 1].pitch_position;
+					rune_flag--;
+				}
+			}
 		}
-		
 		#ifdef INFANTRY_5
 		MINMAX(pitchAngleTarget, -10.0f, 26.3f);
 		#endif
