@@ -27,13 +27,13 @@
 
 NaiveIOPoolDefine(ctrlUartIOPool, {0});
 
-extern PID_Regulator_t ShootMotorPositionPID;
+
 
 xdata_ctrlUart ctrlData; 
 
 void manifoldUartRxCpltCallback(){
 	
-	ShootOneBullet(&ShootMotorPositionPID);
+	//ShootOneBullet();
 	
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
