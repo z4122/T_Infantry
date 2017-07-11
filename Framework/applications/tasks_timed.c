@@ -112,9 +112,9 @@ void Timer_2ms_lTask(void const * argument)
 		if(s_countWhile >= 1000)
 		{//定时1s,发送调试信息
 			s_countWhile = 0;
-			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
-			//			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
-			//			fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
+			//fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
+						fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
+						fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
 			/*****查看任务栈空间剩余示例*******/
 			//		StackResidue = uxTaskGetStackHighWaterMark( GMControlTaskHandle );
 			//		fw_printfln("GM%ld",StackResidue);
@@ -124,7 +124,7 @@ void Timer_2ms_lTask(void const * argument)
 			}
 			else
 			{
-				fw_printfln("Judge received");
+				//fw_printfln("Judge received");
 			}
 		}
 		else
@@ -174,6 +174,12 @@ void WorkStateFSM(void)
 			{
 				g_workState = STOP_STATE;
 			}
+			//ZY
+			else if(GetInputMode()==KEY_MOUSE_INPUT)
+			{
+				g_workState= RUNE_STATE;
+			}
+			//ZY
 		}break;
 		case STOP_STATE:   
 		{
@@ -181,10 +187,21 @@ void WorkStateFSM(void)
 			{
 				g_workState = PREPARE_STATE;   
 			}
+			else if(GetInputMode()==KEY_MOUSE_INPUT)
+			{
+				g_workState= RUNE_STATE;
+			}
 		}break;
 		case RUNE_STATE:
 		{
-			
+			if(GetInputMode()==REMOTE_INPUT)
+			{
+				g_workState = PREPARE_STATE;   
+			}
+			else if(GetInputMode() == STOP )
+			{
+				g_workState = STOP_STATE;
+			}
 		}break;
 		default:
 		{

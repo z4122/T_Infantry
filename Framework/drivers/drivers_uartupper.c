@@ -28,36 +28,63 @@ NaiveIOPoolDefine(ctrlUartIOPool, {0});
 
 xdata_ctrlUart ctrlData; 
 
+float zyYawAdd,zyPitchAdd,zyYawTarget,zyPitchTarget;
+extern float yawAngleTarget, pitchAngleTarget;
+Location_Number_s Location_Number[9] = {{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}};//张雁大符相关
+
+extern float pitchRealAngle;
+extern float ZGyroModuleAngle;
 void manifoldUartRxCpltCallback(){
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
 	fw_printfln("upper received");
 	IOPool_getNextWrite(ctrlUartIOPool);
 	IOPool_getNextRead(ctrlUartIOPool, 0);
+	zyYawAdd=0;
+	zyYawTarget=0;
 	uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
-	ctrlData = xUartprocess( pData );
-	 if( ctrlData.Success == 1) 	{
-		 if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
-				fw_Warning();
-				Error_Handler(); }
-				xSemaphoreGiveFromISR(xSemaphore_mfuart, &xHigherPriorityTaskWoken);	
-			}				
-			else{
-			 HAL_UART_AbortReceive(&MANIFOLD_UART);
-			 printf("dataprocess error\r\n");		
-			if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
-				fw_Warning();
-				Error_Handler(); }						
-			 }
- if( xHigherPriorityTaskWoken == pdTRUE ){
- portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-}
+	
+	//fw_printfln("manifold callback:%x",*pData);
+	//int temp=*pData;
+	zyYawAdd=*pData;
+	//zyYawTarget=Location_Number[temp].yaw_position;
+	zyYawTarget=-ZGyroModuleAngle+zyYawAdd;
+	yawAngleTarget=zyYawTarget;
+	//pitchAngleTarget=Location_Number[temp].pitch_position;
+	//fw_printfln("manifold callback:%x,%f,",*pData,zyYawAdd);
+	fw_printfln("manifold callback:%x,%f,yawTarget:%f",*pData,zyYawAdd,zyYawTarget);
+	//xSemaphoreGiveFromISR(xSemaphore_mfuart, &xHigherPriorityTaskWoken);
+//	ctrlData = xUartprocess( pData );
+//	 if( ctrlData.Success == 1) 	{
+//		 if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+//				fw_Warning();
+//				Error_Handler(); }
+//				xSemaphoreGiveFromISR(xSemaphore_mfuart, &xHigherPriorityTaskWoken);	
+//			}				
+//			else{
+//			 HAL_UART_AbortReceive(&MANIFOLD_UART);
+//			 printf("dataprocess error\r\n");		
+//			if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+//				fw_Warning();
+//				Error_Handler(); }						
+//			 }
+		//HAL_UART_AbortReceive((&MANIFOLD_UART));
+		if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, 1) != HAL_OK)
+		{
+			Error_Handler();
+			printf( "InitManifoldUart error" );
+		} 
+		 if( xHigherPriorityTaskWoken == pdTRUE ){
+		 portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+		}
+		 //osSemaphoreRelease(CMGMCanRefreshSemaphoreHandle);
 }
 
 
 void InitManifoldUart(){
 	ctrlData.Success = 1;  
-	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+	vRefreshLocation(1027, 6200);
+	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, 1) != HAL_OK){
 		Error_Handler();
 		printf( "InitManifoldUart error" );
 	} 
@@ -180,7 +207,7 @@ float dis_pitch = 15;//5.33;
 float location_center_yaw = 0;
 float location_center_pitch = 0;
 
-Location_Number_s Location_Number[9] = {{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}};
+
 
 void vRefreshLocation(float yaw_center, float pitch_center){
 	Location_Number[0].yaw_position = yaw_center + dis_yaw;
