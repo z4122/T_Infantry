@@ -44,60 +44,38 @@ void manifoldUartRxCpltCallback(){
 	
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
-//	fw_printfln("upper received");
 	IOPool_getNextWrite(ctrlUartIOPool);
 	IOPool_getNextRead(ctrlUartIOPool, 0);
 	zyYawAdd=0;
 	zyYawTarget=0;
 	uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
 	
-	//fw_printfln("manifold callback:%x",*pData);
-	
 	if(GetWorkState()==RUNE_STATE)
 	{
-		
-		//zyYawAdd=*pData;
 		int temp=*pData;
 		yawAngleTarget=Location_Number[temp].yaw_position;
-		//zyYawTarget=yawRealAngle+zyYawAdd;
-		//yawAngleTarget=zyYawTarget;
 		pitchAngleTarget=Location_Number[temp].pitch_position;
-		//fw_printfln("manifold callback:%x,%f,",*pData,zyYawAdd);
+//		fw_printfln("manifold callback:%x,%f,",*pData,zyYawAdd);
 		//fw_printfln("manifold callback:%x,%f,yawTarget:%f",*pData,zyYawAdd,zyYawTarget);
 		
 		ShootOneBullet();//拨盘啵一个
-		fw_printfln("Shoot state:%f \t\n",ShootMotorPositionPID.ref);
-
-	}
+}
 	else
 	{
 		fw_printfln("manifold callback:%x",*pData);
 	}
-	//xSemaphoreGiveFromISR(xSemaphore_mfuart, &xHigherPriorityTaskWoken);
-//	ctrlData = xUartprocess( pData );
-//	 if( ctrlData.Success == 1) 	{
-//		 if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
-//				fw_Warning();
-//				Error_Handler(); }
-//				xSemaphoreGiveFromISR(xSemaphore_mfuart, &xHigherPriorityTaskWoken);	
-//			}				
-//			else{
-//			 HAL_UART_AbortReceive(&MANIFOLD_UART);
-//			 printf("dataprocess error\r\n");		
-//			if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
-//				fw_Warning();
-//				Error_Handler(); }						
-//			 }
-		//HAL_UART_AbortReceive((&MANIFOLD_UART));
-		if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, 1) != HAL_OK)
-		{
-			Error_Handler();
-			printf( "InitManifoldUart error" );
-		} 
-		 if( xHigherPriorityTaskWoken == pdTRUE ){
-		 portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-		}
-}
+
+	HAL_UART_AbortReceive((&MANIFOLD_UART));
+	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, 1) != HAL_OK)
+	{
+		Error_Handler();
+		printf( "InitManifoldUart error" );
+	} 
+	if( xHigherPriorityTaskWoken == pdTRUE )
+	{
+	 portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+	}
+
 
 
 void InitManifoldUart(){
