@@ -35,6 +35,11 @@
 #include "drivers_platemotor.h"
 #include "application_waveform.h"
 #include "drivers_uartjudge_low.h"
+
+#include "utilities_minmax.h"
+#include "drivers_ramp.h"
+#include "peripheral_laser.h"
+#include "drivers_uartrc_low.h"//zy
 extern PID_Regulator_t CMRotatePID ; 
 extern PID_Regulator_t CM1SpeedPID;
 extern PID_Regulator_t CM2SpeedPID;
@@ -81,6 +86,9 @@ extern uint8_t JUDGE_State;
 
 static uint32_t s_time_tick_2ms = 0;
 
+FrictionWheelState_e friction_wheel_stateZY = FRICTION_WHEEL_OFF;
+extern RampGen_t frictionRamp ;//张雁大符
+
 void Timer_2ms_lTask(void const * argument)
 {
 	//RTOS提供，用来做2ms精确定时
@@ -113,19 +121,27 @@ void Timer_2ms_lTask(void const * argument)
 		if(s_countWhile >= 1000)
 		{//定时1s,发送调试信息
 			s_countWhile = 0;
-			fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
-			//			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
-			//			fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
+//			IOPool_getNextRead(GMYAWRxIOPool, 0); 
+//			float tempYaw = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle-1445) * 360 / 8192.0f;
+//			NORMALIZE_ANGLE180(tempYaw);
+//			fw_printfln("YawAngle= %f", tempYaw);
+//			IOPool_getNextRead(GMPITCHRxIOPool, 0); 
+//			float tempPitch = -(IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - 5009) * 360 / 8192.0;
+//			NORMALIZE_ANGLE180(tempPitch);
+//			fw_printfln("PitchAngle= %f", tempPitch);
+			//fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
+//			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
+//			fw_printfln("PitchAngle= %d", IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle);
 			/*****查看任务栈空间剩余示例*******/
 			//		StackResidue = uxTaskGetStackHighWaterMark( GMControlTaskHandle );
 			//		fw_printfln("GM%ld",StackResidue);
 			if(JUDGE_State == OFFLINE)
 			{
-				fw_printfln("Judge not received");
+				//fw_printfln("Judge not received");
 			}
 			else
 			{
-				fw_printfln("Judge received");
+				//fw_printfln("Judge received");
 			}
 		}
 		else
@@ -175,6 +191,12 @@ void WorkStateFSM(void)
 			{
 				g_workState = STOP_STATE;
 			}
+			//ZY
+			else if(GetInputMode()==KEY_MOUSE_INPUT&&zyGetLeftPostion()==3)//&&(RC_CtrlData.rc.s1==3))
+			{
+				g_workState= RUNE_STATE;
+			}
+			//ZY
 		}break;
 		case STOP_STATE:   
 		{
@@ -182,10 +204,76 @@ void WorkStateFSM(void)
 			{
 				g_workState = PREPARE_STATE;   
 			}
+			else if(GetInputMode()==KEY_MOUSE_INPUT&&zyGetLeftPostion()==3)//&&(RC_CtrlData.rc.s1==3))
+			{
+				g_workState= RUNE_STATE;
+			}
 		}break;
 		case RUNE_STATE:
 		{
-			
+			if(zyGetLeftPostion()!=3)
+			{
+				g_workState = PREPARE_STATE;  
+				//LASER_OFF();
+				friction_wheel_stateZY = FRICTION_WHEEL_OFF;				  
+				SetFrictionWheelSpeed(1000); 
+				frictionRamp.ResetCounter(&frictionRamp);
+				SetShootState(NOSHOOTING);
+			}
+			else if(GetInputMode()==REMOTE_INPUT)
+			{
+				g_workState = PREPARE_STATE;
+				if(friction_wheel_stateZY==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_START_TURNNING)
+				{
+					//LASER_OFF();
+					friction_wheel_stateZY = FRICTION_WHEEL_OFF;				  
+					SetFrictionWheelSpeed(1000); 
+					frictionRamp.ResetCounter(&frictionRamp);
+					SetShootState(NOSHOOTING);
+				}		
+			}
+			else if(GetInputMode() == STOP )
+			{
+				g_workState = STOP_STATE;
+				if(friction_wheel_stateZY==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_START_TURNNING)
+				{
+					//LASER_OFF();
+					friction_wheel_stateZY = FRICTION_WHEEL_OFF;				  
+					SetFrictionWheelSpeed(1000); 
+					frictionRamp.ResetCounter(&frictionRamp);
+					SetShootState(NOSHOOTING);
+				}
+			}
+			else
+			{
+					switch(friction_wheel_stateZY)
+					{
+						case FRICTION_WHEEL_OFF:
+						{
+								SetShootState(NOSHOOTING);
+								frictionRamp.ResetCounter(&frictionRamp);
+								friction_wheel_stateZY = FRICTION_WHEEL_START_TURNNING;	 
+								//LASER_ON(); 
+						}break;
+						case FRICTION_WHEEL_START_TURNNING:
+						{
+							
+								/*摩擦轮转速修改 FRICTION_WHEEL_MAX_DUTY*/
+								SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
+								if(frictionRamp.IsOverflow(&frictionRamp))
+								{
+									friction_wheel_stateZY = FRICTION_WHEEL_ON; 	
+									//LASER_ON(); 
+								}
+								
+						}
+						break;
+						case FRICTION_WHEEL_ON:
+						{
+							//SetShootState(on)				 
+						} break;			
+					}			
+			}
 		}break;
 		default:
 		{
@@ -193,6 +281,7 @@ void WorkStateFSM(void)
 		}
 	}	
 }
+
 void WorkStateSwitchProcess(void)
 {
 	//如果从其他模式切换到prapare模式，要将一系列参数初始化
@@ -239,7 +328,7 @@ void ShooterMControlLoop(void)
 	if(GetShootState() == SHOOTING && GetInputMode()==KEY_MOUSE_INPUT && Stuck==0)
 	{
 		//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;//打一发弹编码器输出脉冲数
-		ShootOneBullet(&ShootMotorPositionPID);
+		ShootOneBullet();
 	}
 
 	//遥控器输入模式下，只要处于发射态，就一直转动
@@ -250,7 +339,7 @@ void ShooterMControlLoop(void)
 		if(RotateAdd>OneShoot)
 		{
 			//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
-			ShootOneBullet(&ShootMotorPositionPID);
+			ShootOneBullet();
 			RotateAdd = 0;
 		}
 	}
@@ -259,7 +348,7 @@ void ShooterMControlLoop(void)
 		RotateAdd = 0;
 	}
 
-	if(GetFrictionState()==FRICTION_WHEEL_ON)//拨盘转动前提条件：摩擦轮转动
+	if(GetFrictionState()==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_ON)//拨盘转动前提条件：摩擦轮转动GetFrictionState()==FRICTION_WHEEL_ON,张雁加后面的条件
 	{
 		this_fdb = GetQuadEncoderDiff(); 
 		//fw_printfln("this_fdb = %d",this_fdb);
