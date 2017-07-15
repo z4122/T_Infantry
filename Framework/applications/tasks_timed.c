@@ -143,6 +143,7 @@ void Timer_2ms_lTask(void const * argument)
 			else
 			{
 //				fw_printfln("Judge received");
+
 			}
 		}
 		else
@@ -215,7 +216,7 @@ void WorkStateFSM(void)
 			if(zyGetLeftPostion()!=3)
 			{
 				g_workState = PREPARE_STATE;  
-				LASER_OFF();
+			LASER_OFF();
 				friction_wheel_stateZY = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
@@ -282,6 +283,7 @@ void WorkStateFSM(void)
 		}
 	}	
 }
+
 
 extern float gap_angle;
 extern float pitchRealAngle;

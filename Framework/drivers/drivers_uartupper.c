@@ -39,9 +39,11 @@ extern float yawRealAngle;
 extern float pitchRealAngle;//张雁大符相关
 
 void manifoldUartRxCpltCallback(){
+	
+	//ShootOneBullet();
+	
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
-
 	IOPool_getNextWrite(ctrlUartIOPool);
 	IOPool_getNextRead(ctrlUartIOPool, 0);
 	zyYawAdd=0;
@@ -57,7 +59,7 @@ void manifoldUartRxCpltCallback(){
 		//fw_printfln("manifold callback:%x,%f,yawTarget:%f",*pData,zyYawAdd,zyYawTarget);
 		
 		ShootOneBullet();//拨盘啵一个
-	}
+}
 	else
 	{
 		fw_printfln("manifold callback:%x",*pData);
@@ -73,7 +75,7 @@ void manifoldUartRxCpltCallback(){
 	{
 	 portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 	}
-}
+
 
 
 void InitManifoldUart(){
