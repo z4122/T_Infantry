@@ -35,7 +35,7 @@
 #include "drivers_platemotor.h"
 #include "application_waveform.h"
 #include "drivers_uartjudge_low.h"
-
+#include "drivers_uartupper_user.h"
 #include "utilities_minmax.h"
 #include "drivers_ramp.h"
 #include "peripheral_laser.h"
@@ -68,9 +68,10 @@ float ZGyroModuleAngleMAX;
 float ZGyroModuleAngleMIN;
 extern float yawRealAngle;
 extern uint8_t g_isGYRO_Rested;
+extern float pitchAngleTarget;
 extern float pitchRealAngle;
 extern float gYroZs;
-extern float g_yawAngleTarget;
+extern float yawAngleTarget;
 extern float yawRealAngle;
 
 extern uint8_t JUDGE_STATE;
@@ -137,11 +138,11 @@ void Timer_2ms_lTask(void const * argument)
 			//		fw_printfln("GM%ld",StackResidue);
 			if(JUDGE_State == OFFLINE)
 			{
-				//fw_printfln("Judge not received");
+//				fw_printfln("Judge not received");
 			}
 			else
 			{
-				//fw_printfln("Judge received");
+//				fw_printfln("Judge received");
 			}
 		}
 		else
@@ -214,7 +215,7 @@ void WorkStateFSM(void)
 			if(zyGetLeftPostion()!=3)
 			{
 				g_workState = PREPARE_STATE;  
-				//LASER_OFF();
+				LASER_OFF();
 				friction_wheel_stateZY = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
@@ -225,7 +226,7 @@ void WorkStateFSM(void)
 				g_workState = PREPARE_STATE;
 				if(friction_wheel_stateZY==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_START_TURNNING)
 				{
-					//LASER_OFF();
+					LASER_OFF();
 					friction_wheel_stateZY = FRICTION_WHEEL_OFF;				  
 					SetFrictionWheelSpeed(1000); 
 					frictionRamp.ResetCounter(&frictionRamp);
@@ -237,7 +238,7 @@ void WorkStateFSM(void)
 				g_workState = STOP_STATE;
 				if(friction_wheel_stateZY==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_START_TURNNING)
 				{
-					//LASER_OFF();
+					LASER_OFF();
 					friction_wheel_stateZY = FRICTION_WHEEL_OFF;				  
 					SetFrictionWheelSpeed(1000); 
 					frictionRamp.ResetCounter(&frictionRamp);
@@ -253,7 +254,7 @@ void WorkStateFSM(void)
 								SetShootState(NOSHOOTING);
 								frictionRamp.ResetCounter(&frictionRamp);
 								friction_wheel_stateZY = FRICTION_WHEEL_START_TURNNING;	 
-								//LASER_ON(); 
+								LASER_ON(); 
 						}break;
 						case FRICTION_WHEEL_START_TURNNING:
 						{
@@ -263,7 +264,7 @@ void WorkStateFSM(void)
 								if(frictionRamp.IsOverflow(&frictionRamp))
 								{
 									friction_wheel_stateZY = FRICTION_WHEEL_ON; 	
-									//LASER_ON(); 
+									LASER_ON(); 
 								}
 								
 						}
@@ -282,6 +283,9 @@ void WorkStateFSM(void)
 	}	
 }
 
+extern float gap_angle;
+extern float pitchRealAngle;
+	
 void WorkStateSwitchProcess(void)
 {
 	//如果从其他模式切换到prapare模式，要将一系列参数初始化
@@ -289,8 +293,14 @@ void WorkStateSwitchProcess(void)
 	{
 		//计数初始化
 	  s_time_tick_2ms = 0;   
+		yawAngleTarget = 0;
+		pitchAngleTarget = 0;
 		CMControlInit();
 		RemoteTaskInit();
+	}
+	if((lastWorkState != g_workState) && (g_workState == RUNE_STATE))  
+	{
+		zyLocationInit(gap_angle, pitchRealAngle);
 	}
 }
   
