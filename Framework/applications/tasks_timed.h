@@ -23,6 +23,7 @@ void WorkStateFSM(void);
 void WorkStateSwitchProcess(void);
 void getJudgeState(void);
 void CMControlLoop(void);
+void RuneShootControl(void);
 void ShooterMControlLoop(void);
 
 //initiate status: 

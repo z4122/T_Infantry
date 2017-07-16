@@ -27,6 +27,7 @@
 #include "utilities_minmax.h"
 #include "math.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
@@ -41,8 +42,9 @@ else if(val>=max)\
 
 extern ChassisSpeed_Ref_t ChassisSpeedRef;
 extern Gimbal_Ref_t GimbalRef;
-extern FrictionWheelState_e friction_wheel_state ;
-static RemoteSwitch_t switch1;   //ң������ದ��
+extern FrictionWheelState_e g_friction_wheel_state ;
+
+RemoteSwitch_t g_switch1;   //ң������ದ��
 
 extern RampGen_t frictionRamp ;  //摩擦轮斜坡
 extern RampGen_t LRSpeedRamp ;   //键盘速度斜坡
@@ -121,6 +123,8 @@ void RControlTask(void const * argument){
 	}
 }
 
+bool g_switchRead = 0;
+
 void RemoteDataProcess(uint8_t *pData)
 {
 	if(pData == NULL)
@@ -147,6 +151,10 @@ void RemoteDataProcess(uint8_t *pData)
 	
 	SetInputMode(&RC_CtrlData.rc);
 	
+		/*左上角拨杆状态获取*/
+	GetRemoteSwitchAction(&g_switch1, RC_CtrlData.rc.s1);
+	g_switchRead = 1;
+	
 	zySetLeftMode(&RC_CtrlData.rc);//张雁大符
 
 	switch(GetInputMode())
@@ -170,7 +178,7 @@ void RemoteDataProcess(uint8_t *pData)
 //				{
 					MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);//键鼠模式
 					SetShootMode(AUTO);//调试自瞄用
-	//			RemoteShootControl(&switch1, RC_CtrlData.rc.s1);
+	//			RemoteShootControl(&g_switch1, RC_CtrlData.rc.s1);
 				//}
 			}
 //			else if(GetWorkState()==RUNE_STATE&&RC_CtrlData.rc.s1!=3)
@@ -197,7 +205,7 @@ void RemoteControlProcess(Remote *rc)
  		pitchAngleTarget += (rc->ch3 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT;
 		yawAngleTarget   -= (rc->ch2 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT; 
 	}
-	RemoteShootControl(&switch1, rc->s1);
+	RemoteShootControl(&g_switch1, rc->s1);
 }
 
 

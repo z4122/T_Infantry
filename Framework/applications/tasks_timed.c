@@ -35,11 +35,12 @@
 #include "drivers_platemotor.h"
 #include "application_waveform.h"
 #include "drivers_uartjudge_low.h"
-
+#include "drivers_uartupper_user.h"
 #include "utilities_minmax.h"
 #include "drivers_ramp.h"
 #include "peripheral_laser.h"
 #include "drivers_uartrc_low.h"//zy
+#include <stdbool.h>
 extern PID_Regulator_t CMRotatePID ; 
 extern PID_Regulator_t CM1SpeedPID;
 extern PID_Regulator_t CM2SpeedPID;
@@ -67,9 +68,10 @@ float ZGyroModuleAngleMAX;
 float ZGyroModuleAngleMIN;
 extern float yawRealAngle;
 extern uint8_t g_isGYRO_Rested;
+extern float pitchAngleTarget;
 extern float pitchRealAngle;
 extern float gYroZs;
-extern float g_yawAngleTarget;
+extern float yawAngleTarget;
 extern float yawRealAngle;
 
 extern uint8_t JUDGE_STATE;
@@ -113,6 +115,7 @@ void Timer_2ms_lTask(void const * argument)
 
 		getJudgeState();
 		
+		RuneShootControl();
 		ShooterMControlLoop();       //发射机构控制任务
 		
 		
@@ -135,11 +138,12 @@ void Timer_2ms_lTask(void const * argument)
 			//		fw_printfln("GM%ld",StackResidue);
 			if(JUDGE_State == OFFLINE)
 			{
-				//fw_printfln("Judge not received");
+//				fw_printfln("Judge not received");
 			}
 			else
 			{
-				//fw_printfln("Judge received");
+//				fw_printfln("Judge received");
+
 			}
 		}
 		else
@@ -166,6 +170,9 @@ void CMControlInit(void)
 *工作状态切换状态机
 **********************************************************/
 
+extern RemoteSwitch_t g_switch1; 
+extern bool g_switchRead;
+
 void WorkStateFSM(void)
 {
 	lastWorkState = g_workState;
@@ -185,14 +192,19 @@ void WorkStateFSM(void)
 		}break;
 		case NORMAL_STATE:     
 		{
+//			fw_printfln("switch%d",g_switch1.switch_value1);
 			if(GetInputMode() == STOP )
 			{
 				g_workState = STOP_STATE;
 			}
 			//ZY
-			else if(GetInputMode()==KEY_MOUSE_INPUT&&zyGetLeftPostion()==3)//&&(RC_CtrlData.rc.s1==3))
+			else if(GetInputMode() == KEY_MOUSE_INPUT
+							&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
+									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3) 
+							&& g_switchRead == 1)
 			{
-				g_workState= RUNE_STATE;
+				g_workState = RUNE_STATE;
+				g_switchRead = 0;
 			}
 			//ZY
 		}break;
@@ -202,75 +214,20 @@ void WorkStateFSM(void)
 			{
 				g_workState = PREPARE_STATE;   
 			}
-			else if(GetInputMode()==KEY_MOUSE_INPUT&&zyGetLeftPostion()==3)//&&(RC_CtrlData.rc.s1==3))
-			{
-				g_workState= RUNE_STATE;
-			}
 		}break;
 		case RUNE_STATE:
 		{
-			if(zyGetLeftPostion()!=3)
-			{
-				g_workState = PREPARE_STATE;  
-				//LASER_OFF();
-				friction_wheel_stateZY = FRICTION_WHEEL_OFF;				  
-				SetFrictionWheelSpeed(1000); 
-				frictionRamp.ResetCounter(&frictionRamp);
-				SetShootState(NOSHOOTING);
-			}
-			else if(GetInputMode()==REMOTE_INPUT)
-			{
-				g_workState = PREPARE_STATE;
-				if(friction_wheel_stateZY==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_START_TURNNING)
-				{
-					//LASER_OFF();
-					friction_wheel_stateZY = FRICTION_WHEEL_OFF;				  
-					SetFrictionWheelSpeed(1000); 
-					frictionRamp.ResetCounter(&frictionRamp);
-					SetShootState(NOSHOOTING);
-				}		
-			}
-			else if(GetInputMode() == STOP )
+//			fw_printfln("in rune state");
+			if(GetInputMode() == STOP )
 			{
 				g_workState = STOP_STATE;
-				if(friction_wheel_stateZY==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_START_TURNNING)
-				{
-					//LASER_OFF();
-					friction_wheel_stateZY = FRICTION_WHEEL_OFF;				  
-					SetFrictionWheelSpeed(1000); 
-					frictionRamp.ResetCounter(&frictionRamp);
-					SetShootState(NOSHOOTING);
-				}
 			}
-			else
+			else if((g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
+									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3) 
+							&& g_switchRead == 1)
 			{
-					switch(friction_wheel_stateZY)
-					{
-						case FRICTION_WHEEL_OFF:
-						{
-								SetShootState(NOSHOOTING);
-								frictionRamp.ResetCounter(&frictionRamp);
-								friction_wheel_stateZY = FRICTION_WHEEL_START_TURNNING;	 
-								//LASER_ON(); 
-						}break;
-						case FRICTION_WHEEL_START_TURNNING:
-						{
-							
-								/*摩擦轮转速修改 FRICTION_WHEEL_MAX_DUTY*/
-								SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
-								if(frictionRamp.IsOverflow(&frictionRamp))
-								{
-									friction_wheel_stateZY = FRICTION_WHEEL_ON; 	
-									//LASER_ON(); 
-								}
-								
-						}
-						break;
-						case FRICTION_WHEEL_ON:
-						{
-							//SetShootState(on)				 
-						} break;			
-					}			
+				g_workState = NORMAL_STATE;
+				g_switchRead = 0;
 			}
 		}break;
 		default:
@@ -280,6 +237,10 @@ void WorkStateFSM(void)
 	}	
 }
 
+
+extern float gap_angle;
+extern float pitchRealAngle;
+	
 void WorkStateSwitchProcess(void)
 {
 	//如果从其他模式切换到prapare模式，要将一系列参数初始化
@@ -287,11 +248,63 @@ void WorkStateSwitchProcess(void)
 	{
 		//计数初始化
 	  s_time_tick_2ms = 0;   
+		yawAngleTarget = 0;
+		pitchAngleTarget = 0;
 		CMControlInit();
 		RemoteTaskInit();
 	}
+	if((lastWorkState != g_workState) && (g_workState == RUNE_STATE))  
+	{
+		zyLocationInit(gap_angle, pitchRealAngle);
+	}
+	if((lastWorkState != g_workState) && (lastWorkState == RUNE_STATE))  
+	{
+		LASER_OFF();
+		SetShootState(NOSHOOTING);
+		SetFrictionWheelSpeed(1000);
+		SetFrictionState(FRICTION_WHEEL_OFF);
+		frictionRamp.ResetCounter(&frictionRamp);
+	}
+	if((g_workState == NORMAL_STATE) && (lastWorkState == RUNE_STATE))  
+	{
+		yawAngleTarget = -ZGyroModuleAngle;
+	}
+
+
 }
   
+void RuneShootControl(void) 
+{ 
+	if(g_workState == RUNE_STATE)
+	{
+		switch(GetFrictionState())
+		{
+			case FRICTION_WHEEL_OFF:
+			{
+				SetShootState(NOSHOOTING);
+				frictionRamp.ResetCounter(&frictionRamp);
+				SetFrictionState(FRICTION_WHEEL_START_TURNNING);	 
+				LASER_ON(); 
+			}break;
+			case FRICTION_WHEEL_START_TURNNING:
+			{
+				/*斜坡函数必须有，避免电流过大烧坏主控板*/
+				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
+				//SetFrictionWheelSpeed(1000);
+				//g_friction_wheel_state = FRICTION_WHEEL_ON; 
+				if(frictionRamp.IsOverflow(&frictionRamp))
+				{
+					SetFrictionState(FRICTION_WHEEL_ON); 	
+				}
+			}break;
+			case FRICTION_WHEEL_ON:
+			{
+//				SetShootState(SHOOTING);
+			} break;				
+		}
+	}
+}
+
 void getJudgeState(void)
 {
 	if(JUDGE_Received==1)
