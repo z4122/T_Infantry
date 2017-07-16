@@ -270,9 +270,6 @@ void WorkStateSwitchProcess(void)
 	if((lastWorkState != g_workState) && (g_workState == RUNE_STATE))  
 	{
 		zyLocationInit(gap_angle, pitchRealAngle);
-		
-		*(IOPool_pGetWriteData(ctrlUartIOPool) -> ch) = 4;
-		IOPool_getNextWrite(ctrlUartIOPool);
 	}
 	if((lastWorkState != g_workState) && (lastWorkState == RUNE_STATE))  
 	{
