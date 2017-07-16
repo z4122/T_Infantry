@@ -37,6 +37,7 @@ extern float yawAngleTarget, pitchAngleTarget;
 Location_Number_s Location_Number[9] = {{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}};
 extern float yawRealAngle;
 extern float pitchRealAngle;//张雁大符相关
+uint8_t runeLocation = 4;
 
 void manifoldUartRxCpltCallback()
 {
@@ -44,19 +45,18 @@ void manifoldUartRxCpltCallback()
 	
 	static portBASE_TYPE xHigherPriorityTaskWoken;
   xHigherPriorityTaskWoken = pdFALSE;
-	IOPool_getNextWrite(ctrlUartIOPool);
-	IOPool_getNextRead(ctrlUartIOPool, 0);
+
 	zyYawAdd=0;
 	zyYawTarget=0;
-	uint8_t *pData = IOPool_pGetReadData(ctrlUartIOPool, 0)->ch;
+	uint8_t *pData = &runeLocation;
 	
 	if(GetWorkState()==RUNE_STATE)
 	{
 		int temp=*pData;
 		yawAngleTarget = Location_Number[temp].yaw_position;
 		pitchAngleTarget = Location_Number[temp].pitch_position;
-//		fw_printfln("manifold callback:%x,%f,",*pData,zyYawAdd);
-		//fw_printfln("manifold callback:%x,%f,yawTarget:%f",*pData,zyYawAdd,zyYawTarget);
+		fw_printfln("manifold callback:%x,",*pData);
+		fw_printfln("manifold callback:pitchTarget,%f,yawTarget:%f",pitchAngleTarget,yawAngleTarget);
 		
 		ShootOneBullet();//拨盘啵一个
   }
@@ -66,7 +66,7 @@ void manifoldUartRxCpltCallback()
 	}
 
 	HAL_UART_AbortReceive((&MANIFOLD_UART));
-	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, 1) != HAL_OK)
+	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, &runeLocation, 1) != HAL_OK)
 	{
 		Error_Handler();
 		printf( "ManifoldUart error" );
@@ -83,7 +83,7 @@ void InitManifoldUart()
 	ctrlData.Success = 1;  
 	//vRefreshLocation(0, 0);
 	zyLocationInit(1.0,8.0);//1号-2.0,6.1
-	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, size_frame) != HAL_OK){
+	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, &runeLocation, size_frame) != HAL_OK){
 		Error_Handler();
 		printf( "InitManifoldUart error" );
 	} 
@@ -229,10 +229,10 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 	Location_Number[8].pitch_position = pitch_center - dis_pitch;
 }
 
-float pAddZy=6.94,pMinusZy=4.67,yAddZy=13.5,yMinusZy=11.8;
+float pAddZy=7.94,pMinusZy=4.67,yAddZy=9.5,yMinusZy=10.8;
 void zyLocationInit(float yaw_center,float pitch_center)
 {
-	pitch_center = pitch_center - 1.5;
+	pitch_center = pitch_center - 1.0;
 	Location_Number[0].yaw_position = yaw_center + yAddZy;
 	Location_Number[0].pitch_position = pitch_center + pAddZy;
 	Location_Number[1].yaw_position = yaw_center;
