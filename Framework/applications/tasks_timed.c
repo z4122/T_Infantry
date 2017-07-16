@@ -306,7 +306,7 @@ void RuneShootControl(void)
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetFrictionState(FRICTION_WHEEL_START_TURNNING);	 
-				LASER_ON(); 
+				LASER_OFF(); 
 			}break;
 			case FRICTION_WHEEL_START_TURNNING:
 			{
