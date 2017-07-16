@@ -38,8 +38,8 @@ Location_Number_s Location_Number[9] = {{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0
 extern float yawRealAngle;
 extern float pitchRealAngle;//张雁大符相关
 
-void manifoldUartRxCpltCallback(){
-	
+void manifoldUartRxCpltCallback()
+{
 	//ShootOneBullet();
 	
 	static portBASE_TYPE xHigherPriorityTaskWoken;
@@ -53,13 +53,13 @@ void manifoldUartRxCpltCallback(){
 	if(GetWorkState()==RUNE_STATE)
 	{
 		int temp=*pData;
-		yawAngleTarget=Location_Number[temp].yaw_position;
-		pitchAngleTarget=Location_Number[temp].pitch_position;
+		yawAngleTarget = Location_Number[temp].yaw_position;
+		pitchAngleTarget = Location_Number[temp].pitch_position;
 //		fw_printfln("manifold callback:%x,%f,",*pData,zyYawAdd);
 		//fw_printfln("manifold callback:%x,%f,yawTarget:%f",*pData,zyYawAdd,zyYawTarget);
 		
 		ShootOneBullet();//拨盘啵一个
-}
+  }
 	else
 	{
 		fw_printfln("manifold callback:%x",*pData);
@@ -69,16 +69,17 @@ void manifoldUartRxCpltCallback(){
 	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, IOPool_pGetWriteData(ctrlUartIOPool)->ch, 1) != HAL_OK)
 	{
 		Error_Handler();
-		printf( "InitManifoldUart error" );
+		printf( "ManifoldUart error" );
 	} 
 	if( xHigherPriorityTaskWoken == pdTRUE )
 	{
 	 portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 	}
+}
 
 
-
-void InitManifoldUart(){
+void InitManifoldUart()
+{
 	ctrlData.Success = 1;  
 	//vRefreshLocation(0, 0);
 	zyLocationInit(1.0,8.0);//1号-2.0,6.1
@@ -228,25 +229,26 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 	Location_Number[8].pitch_position = pitch_center - dis_pitch;
 }
 
-float pAddZy=11,pMinusZy=6,yAddZy=11;
+float pAddZy=6.94,pMinusZy=4.67,yAddZy=13.5,yMinusZy=11.8;
 void zyLocationInit(float yaw_center,float pitch_center)
 {
+	pitch_center = pitch_center - 1.5;
 	Location_Number[0].yaw_position = yaw_center + yAddZy;
 	Location_Number[0].pitch_position = pitch_center + pAddZy;
 	Location_Number[1].yaw_position = yaw_center;
 	Location_Number[1].pitch_position = pitch_center + pAddZy;
-	Location_Number[2].yaw_position = yaw_center - yAddZy;
+	Location_Number[2].yaw_position = yaw_center - yMinusZy;
 	Location_Number[2].pitch_position = pitch_center + pAddZy;
 	Location_Number[3].yaw_position = yaw_center + yAddZy;
 	Location_Number[3].pitch_position = pitch_center;
 	Location_Number[4].yaw_position = yaw_center;
 	Location_Number[4].pitch_position = pitch_center;
-	Location_Number[5].yaw_position = yaw_center - yAddZy;
+	Location_Number[5].yaw_position = yaw_center - yMinusZy;
 	Location_Number[5].pitch_position = pitch_center;
 	Location_Number[6].yaw_position = yaw_center + yAddZy;
 	Location_Number[6].pitch_position = pitch_center - pMinusZy;
 	Location_Number[7].yaw_position = yaw_center;
 	Location_Number[7].pitch_position = pitch_center - pMinusZy;
-  Location_Number[8].yaw_position = yaw_center - yAddZy;
+  Location_Number[8].yaw_position = yaw_center - yMinusZy;
 	Location_Number[8].pitch_position = pitch_center - pMinusZy;
 }

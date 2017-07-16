@@ -63,7 +63,7 @@ void rcUartRxCpltCallback(){
 RC_Ctl_t RC_CtrlData;   //remote control data
 ChassisSpeed_Ref_t ChassisSpeedRef; 
 Gimbal_Ref_t GimbalRef; 
-FrictionWheelState_e friction_wheel_state = FRICTION_WHEEL_OFF; 
+FrictionWheelState_e g_friction_wheel_state = FRICTION_WHEEL_OFF; 
 
 volatile Shoot_State_e shootState = NOSHOOTING; 
 InputMode_e inputmode = REMOTE_INPUT;  
@@ -189,9 +189,7 @@ input: RemoteSwitch_t *sw, include the switch info
 #endif
 void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val) 
 {
-	/*左上角拨杆状态获取*/
-	GetRemoteSwitchAction(sw, val);
-	switch(friction_wheel_state)
+	switch(g_friction_wheel_state)
 	{
 		case FRICTION_WHEEL_OFF:
 		{
@@ -199,7 +197,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			{
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);
-				friction_wheel_state = FRICTION_WHEEL_START_TURNNING;	 
+				g_friction_wheel_state = FRICTION_WHEEL_START_TURNNING;	 
 				LASER_ON(); 
 			}				 		
 		}break;
@@ -210,7 +208,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 				LASER_OFF();
 				SetShootState(NOSHOOTING);
 				SetFrictionWheelSpeed(1000);
-				friction_wheel_state = FRICTION_WHEEL_OFF;
+				g_friction_wheel_state = FRICTION_WHEEL_OFF;
 				frictionRamp.ResetCounter(&frictionRamp);
 			}
 			else
@@ -218,10 +216,10 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 				/*斜坡函数必须有，避免电流过大烧坏主控板*/
 				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
 				//SetFrictionWheelSpeed(1000);
-				//friction_wheel_state = FRICTION_WHEEL_ON; 
+				//g_friction_wheel_state = FRICTION_WHEEL_ON; 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
-					friction_wheel_state = FRICTION_WHEEL_ON; 	
+					g_friction_wheel_state = FRICTION_WHEEL_ON; 	
 				}
 				
 			}
@@ -231,7 +229,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   
 			{
 				LASER_OFF();
-				friction_wheel_state = FRICTION_WHEEL_OFF;				  
+				g_friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetShootState(NOSHOOTING);
@@ -251,7 +249,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 void MouseShootControl(Mouse *mouse)
 {
 	static int16_t closeDelayCount = 0;   
-	switch(friction_wheel_state)
+	switch(g_friction_wheel_state)
 	{
 		case FRICTION_WHEEL_OFF:
 		{
@@ -259,7 +257,7 @@ void MouseShootControl(Mouse *mouse)
 			{
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);
-				friction_wheel_state = FRICTION_WHEEL_START_TURNNING;	 
+				g_friction_wheel_state = FRICTION_WHEEL_START_TURNNING;	 
 				LASER_ON(); 
 				closeDelayCount = 0;
 			}				 		
@@ -277,7 +275,7 @@ void MouseShootControl(Mouse *mouse)
 			if(closeDelayCount>50)   
 			{
 				LASER_OFF();
-				friction_wheel_state = FRICTION_WHEEL_OFF;				  
+				g_friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetShootState(NOSHOOTING);
@@ -288,7 +286,7 @@ void MouseShootControl(Mouse *mouse)
 				SetFrictionWheelSpeed(1000 + (FRICTION_WHEEL_MAX_DUTY-1000)*frictionRamp.Calc(&frictionRamp)); 
 				if(frictionRamp.IsOverflow(&frictionRamp))
 				{
-					friction_wheel_state = FRICTION_WHEEL_ON; 	
+					g_friction_wheel_state = FRICTION_WHEEL_ON; 	
 				}
 				
 			}
@@ -306,7 +304,7 @@ void MouseShootControl(Mouse *mouse)
 			if(closeDelayCount>50)   //
 			{
 				LASER_OFF();
-				friction_wheel_state = FRICTION_WHEEL_OFF;				  
+				g_friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetShootState(NOSHOOTING);
@@ -338,12 +336,12 @@ void SetShootState(Shoot_State_e v)
 
 FrictionWheelState_e GetFrictionState()
 {
-	return friction_wheel_state;
+	return g_friction_wheel_state;
 }
 
 void SetFrictionState(FrictionWheelState_e v)
 {
-	friction_wheel_state = v;
+	g_friction_wheel_state = v;
 }
 void SetFrictionWheelSpeed(uint16_t x)
 {
