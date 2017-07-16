@@ -67,6 +67,7 @@ void RControlTask(void const * argument){
 	while(1){
 		/*等待串口接收中断回调函数释放信号量*/
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
+		//fw_printfln("RC is running");
 		/*获取两帧时间间隔，正常14ms，大于16ms认为错误*/
 		thiscount_rc = xTaskGetTickCount();
 		if( ((thiscount_rc - lastcount_rc) <= 16) && (first_frame == 1))//第一帧认为错误
@@ -163,6 +164,7 @@ void RemoteDataProcess(uint8_t *pData)
 		{
 			if(GetWorkState() == NORMAL_STATE)
 			{ //if gyro has been reseted
+				fw_printfln("RC is running");
 				RemoteControlProcess(&(RC_CtrlData.rc));//遥控器模式
 			}
 		}break;

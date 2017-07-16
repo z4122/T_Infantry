@@ -31,6 +31,7 @@
 #include "drivers_canmotor_low.h"
 #include "tasks_motor.h"
 #include "drivers_sonar_low.h"
+#include "tasks_platemotor.h"
 //#include "drivers_mpu6050_low.h"
 //#include "tasks_mpu6050.h"
 
@@ -85,20 +86,20 @@ void rtos_AddThreads()
   printIMUTaskHandle = osThreadCreate(osThread(IMUTask), NULL);
 
 //遥控器控制任务	
-	osThreadDef(RControlTask, RControlTask, osPriorityAboveNormal , 0, 512);//zy0512
+	osThreadDef(RControlTask, RControlTask, osPriorityAboveNormal , 0, 256);//zy0512
   RControlTaskHandle = osThreadCreate(osThread(RControlTask), NULL);
 
 //妙算通信任务：大神符，自动瞄准
-	osThreadDef(ManifoldUartTask, ManifoldUartTask, osPriorityAboveNormal, 0, 512);
+	osThreadDef(ManifoldUartTask, ManifoldUartTask, osPriorityAboveNormal, 0, 128);
   getCtrlUartTaskHandle = osThreadCreate(osThread(ManifoldUartTask), NULL);
 	
 //CM(ChasisMotor)底盘电机GM(Gimbla)云台电机控制任务
 	osThreadDef(GMC_Task, CMGMControlTask, osPriorityAboveNormal, 0, 1024);
   GMControlTaskHandle = osThreadCreate(osThread(GMC_Task), NULL);
 	
-//拨盘电机任务 //待移植
-//	osThreadDef(Plate_Task, PlateMotorTask, osPriorityAboveNormal, 0, 512);
-//  PlateTaskHandle = osThreadCreate(osThread(Plate_Task), NULL);
+//拨盘电机任务 
+	osThreadDef(Plate_Task, PlateMotorTask, osPriorityAboveNormal, 0, 256);
+  PlateTaskHandle = osThreadCreate(osThread(Plate_Task), NULL);
 //2ms定时任务，状态机切换，调试信息输出等
 
 	osThreadDef(Timer_Task, Timer_2ms_lTask, osPriorityAboveNormal, 0, 512);//zy512
