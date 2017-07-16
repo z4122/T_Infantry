@@ -25,7 +25,7 @@ void getJudgeState(void);
 void CMControlLoop(void);
 void RuneShootControl(void);
 void ShooterMControlLoop(void);
-int32_t GetQuadEncoderDiff(void);
+
 //initiate status: 
 typedef enum
 {
@@ -38,7 +38,7 @@ typedef enum
 
 WorkState_e GetWorkState(void);
 
-#define OneShoot (1011) //722 7扇拨盘  1011 5扇拨盘
+
 #define PID_SHOOT_MOTOR_SPEED      (30)
 #define CHASSIS_SPEED_ATTENUATION   (1.30f)
 #define PREPARE_TIME_TICK_MS 5000      //prapare time in ms*2
@@ -131,51 +131,7 @@ WorkState_e GetWorkState(void);
 	&PID_Calc,\
 	&PID_Reset,\
 }
-#define SHOOT_MOTOR_POSITION_PID_DEFAULT \
-{\
-	0,\
-	0,\
-	{0,0},\
-	7.5f,\
-	0.05f,\
-	0.6f,\
-	0,\
-	0,\
-	0,\
-	4900,\
-	3500,\
-	1500,\
-	0,\
-	1000,\
-	0,\
-	0,\
-	0,\
-	&PID_Calc,\
-	&PID_Reset,\
-}\
 
-#define SHOOT_MOTOR_SPEED_PID_DEFAULT \
-{\
-	0,\
-	0,\
-	{0,0},\
-	50.0f,\
-	0.5f,\
-	0.0f,\
-	0,\
-	0,\
-	0,\
-	1000,\
-	200,\
-	100,\
-	0,\
-	4950,\
-	0,\
-	0,\
-	0,\
-	&PID_Calc,\
-	&PID_Reset,\
-}\
 
 #endif
 
