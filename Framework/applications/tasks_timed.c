@@ -104,6 +104,7 @@ void Timer_2ms_lTask(void const * argument)
 //unsigned portBASE_TYPE StackResidue; //栈剩余
 	while(1)  
 	{       
+		
 		WorkStateFSM();//状态机
 	  WorkStateSwitchProcess();//状态机动作
 		
@@ -116,7 +117,7 @@ void Timer_2ms_lTask(void const * argument)
 		getJudgeState();
 		
 		RuneShootControl();
-		ShooterMControlLoop();       //发射机构控制任务
+		
 		
 		
 		if(s_countWhile >= 1000)
@@ -177,6 +178,7 @@ void WorkStateFSM(void)
 {
 	lastWorkState = g_workState;
 	s_time_tick_2ms ++;
+	
 	switch(g_workState)
 	{
 		case PREPARE_STATE:
@@ -192,7 +194,7 @@ void WorkStateFSM(void)
 		}break;
 		case NORMAL_STATE:     
 		{
-//			fw_printfln("switch%d",g_switch1.switch_value1);
+			fw_printfln("switch%d",g_switch1.switch_value1);
 			if(GetInputMode() == STOP )
 			{
 				g_workState = STOP_STATE;
@@ -322,10 +324,4 @@ void getJudgeState(void)
 	}
 }
 
-
-
-void ShooterMControlLoop(void)	
-{				      			
-	
-}
 

@@ -48,8 +48,8 @@ void PlateMotorTask(void const * argument)
 	int Stuck = 0;
 	int32_t last_fdb = 0x0;
 	int32_t this_fdb = 0x0;
-	portTickType xLastWakeTime;
-	xLastWakeTime = xTaskGetTickCount();
+	portTickType xLastWakeTimeQZK;
+	xLastWakeTimeQZK = xTaskGetTickCount();
 	
 	
 	while(1)
@@ -119,7 +119,7 @@ void PlateMotorTask(void const * argument)
 		{
 			__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 0);//摩擦轮不转，立刻关闭拨盘
 		}
-		vTaskDelayUntil( &xLastWakeTime, ( 2 / portTICK_RATE_MS ) );//这里进入阻塞态等待2ms
+		vTaskDelayUntil( &xLastWakeTimeQZK, ( 2 / portTICK_RATE_MS ) );//这里进入阻塞态等待2ms
 	}
 }
 
