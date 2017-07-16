@@ -108,7 +108,7 @@ void Timer_2ms_lTask(void const * argument)
 	{       
 		WorkStateFSM();//状态机
 	  WorkStateSwitchProcess();//状态机动作
-		
+
 		//陀螺仪复位计时
     if(s_time_tick_2ms == 2000)
 		{
@@ -175,6 +175,10 @@ void CMControlInit(void)
 extern RemoteSwitch_t g_switch1; 
 extern bool g_switchRead;
 
+static uint8_t waitRuneMSG[4] = {0xff, 0x00, 0x00, 0xfe};
+static uint8_t littleRuneMSG[4] = {0xff, 0x01, 0x00, 0xfe};
+static uint8_t bigRuneMSG[4] = {0xff, 0x02, 0x00, 0xfe};
+
 void WorkStateFSM(void)
 {
 	lastWorkState = g_workState;
@@ -207,6 +211,14 @@ void WorkStateFSM(void)
 			{
 				g_workState = RUNE_STATE;
 				g_switchRead = 0;
+				
+				if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3)//小符
+				{
+					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&littleRuneMSG, 4, 0xFFFF);
+				}else if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3)//大符
+				{
+					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&bigRuneMSG, 4, 0xFFFF);
+				}
 			}
 			//ZY
 		}break;
@@ -258,6 +270,9 @@ void WorkStateSwitchProcess(void)
 	if((lastWorkState != g_workState) && (g_workState == RUNE_STATE))  
 	{
 		zyLocationInit(gap_angle, pitchRealAngle);
+		
+		*(IOPool_pGetWriteData(ctrlUartIOPool) -> ch) = 4;
+		IOPool_getNextWrite(ctrlUartIOPool);
 	}
 	if((lastWorkState != g_workState) && (lastWorkState == RUNE_STATE))  
 	{
@@ -266,6 +281,11 @@ void WorkStateSwitchProcess(void)
 		SetFrictionWheelSpeed(1000);
 		SetFrictionState(FRICTION_WHEEL_OFF);
 		frictionRamp.ResetCounter(&frictionRamp);
+		
+		if(HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&waitRuneMSG, 4, 0xFFFF) != HAL_OK)
+		{
+			fw_Warning();
+		};
 	}
 	if((g_workState == NORMAL_STATE) && (lastWorkState == RUNE_STATE))  
 	{
