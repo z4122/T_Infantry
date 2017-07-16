@@ -44,23 +44,23 @@ fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
 //手动标定0点
-#define yaw_zero 614
-#define pitch_zero 2924
+#define yaw_zero 2218
+#define pitch_zero 3275
 #endif
 #ifdef INFANTRY_4
-fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(4.0, 0, 2.5, 10000.0, 10000.0, 10000.0, 10000.0);
-fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
-fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(25.0, 0.0, 5.0, 10000.0, 10000.0, 10000.0, 3500.0);
-fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
-#define yaw_zero 720
-#define pitch_zero 5003
+fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(8.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
+fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.0, 0.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
+fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(40.0, 0.0, 15.0, 10000.0, 10000.0, 10000.0, 3500.0);
+fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(30.0, 0.0, 5, 10000.0, 10000.0, 10000.0, 4000.0);
+#define yaw_zero 6900
+#define pitch_zero 5009 
 #endif
 #ifdef INFANTRY_1
-fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(15.0, 0.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);
-fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.3, -1.0, 1.5, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
-fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(35.0, 0.0, 2.0, 10000.0, 10000.0, 10000.0, 3500.0);
-fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(40.0, 0.0, 20, 10000.0, 10000.0, 10000.0, 4000.0);
-#define yaw_zero 1040
+fw_PID_Regulator_t pitchPositionPID = fw_PID_INIT(8.0, 0.0, 0.0, 10000.0, 10000.0, 10000.0, 10000.0);
+fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.0, 0.0, 0.5, 10000.0, 10000.0, 10000.0, 10000.0);//等幅振荡P37.3 I11.9 D3.75  原26.1 8.0 1.1
+fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(40.0, 0.0, 15.0, 10000.0, 10000.0, 10000.0, 3500.0);
+fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(30.0, 0.0, 5, 10000.0, 10000.0, 10000.0, 4000.0);
+#define yaw_zero 50
 #define pitch_zero 6400
 #endif
 //底盘速度PID
@@ -95,6 +95,9 @@ int twist =0;
 float mm =0;
 float nn =0;
 int16_t twist_target = 0;
+
+extern float zyYawTarget,zyPitchTarget;
+float yawRealAngle = 0.0;//张雁调试大符
 
 void CMGMControlTask(void const * argument){
 	while(1)
@@ -134,11 +137,12 @@ void ControlYaw(void)
 	if(IOPool_hasNextRead(GMYAWRxIOPool, 0))
 	{
 		uint16_t yawZeroAngle = yaw_zero;
-		float yawRealAngle = 0.0;
+		//float yawRealAngle = 0.0;张雁改全局
 		int16_t yawIntensity = 0;		
 		
 		/*从IOPool读编码器*/
 		IOPool_getNextRead(GMYAWRxIOPool, 0); 
+//		fw_printfln("yaw%d",IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
 		yawRealAngle = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yawZeroAngle) * 360 / 8192.0f;
 		NORMALIZE_ANGLE180(yawRealAngle);
 		
@@ -146,30 +150,37 @@ void ControlYaw(void)
 		{
 			yawRealAngle = -ZGyroModuleAngle;//yawrealangle的值改为复位后陀螺仪的绝对值，进行yaw轴运动设定
 			/*自瞄模式切换*/
-			if(GetShootMode() == AUTO) 
-			{
-				ChassisSpeedRef.rotate_ref = 0;
-				if((GetLocateState() == Located))
-				{
-				ChassisSpeedRef.rotate_ref = 0;
-				}
-				if((GetLocateState() == Locating) && (CReceive != 0))	
-				{
-				yawAngleTarget = yawRealAngle - yawAdd ;
-				fw_printfln("yawAdd-in control:%f",yawAdd );
-				CReceive--;
-				}
-				//大神符
-				else if((GetLocateState() == Located) && (rune_flag != 0))
-				{
-					if(GetRuneState() == AIMING)
-					{
-						fw_printfln("rune:%d", rune);
-						yawAngleTarget = Location_Number[rune - 1].yaw_position;
-						rune_flag--;
-					}
-				}
-			}//end of autoshoot
+			
+//			if(GetShootMode() == AUTO) 
+//			{
+//				ChassisSpeedRef.rotate_ref = 0;
+//				if((GetLocateState() == Located))
+//				{
+//				ChassisSpeedRef.rotate_ref = 0;
+//				}
+//				if((GetLocateState() == Locating) && (CReceive != 0))	
+//				{
+//				yawAngleTarget = yawRealAngle - yawAdd ;
+//				fw_printfln("yawAdd-in control:%f",yawAdd );
+//				CReceive--;
+//				}
+//				//大神符
+//				else if((GetLocateState() == Located) && (rune_flag != 0))
+//				{
+//					if(GetRuneState() == AIMING)
+//					{
+//						fw_printfln("rune:%d", rune);
+//						yawAngleTarget = Location_Number[rune - 1].yaw_position;
+//						rune_flag--;
+//					}
+//				}
+//			}//end of autoshoot
+		}
+		else if(GetWorkState()==RUNE_STATE)
+		{
+			//fw_printfln("Rune State:%f",yawAngleTarget);
+			//yawAngleTarget=zyYawTartet;
+			//yawRealAngle = -ZGyroModuleAngle;
 		}
 						
 		yawIntensity = ProcessYawPID(yawAngleTarget, yawRealAngle, -gYroZs);
@@ -189,23 +200,28 @@ void ControlPitch(void)
 		NORMALIZE_ANGLE180(pitchRealAngle);
 		
 		//自瞄模式切换
-		if(GetShootMode() == AUTO) 
+//		if(GetShootMode() == AUTO) 
+//		{
+//			if((GetLocateState() == Locating) && (CReceive != 0))	
+//			{
+//				//fw_printfln("pitchAdd:%f",pitchAdd );
+//				pitchAngleTarget = pitchRealAngle + pitchAdd ;
+//				CReceive --;
+//			}//大神符
+//			else if((GetLocateState() == Located) && (rune_flag != 0))
+//			{
+//				if(GetRuneState() == AIMING)
+//				{
+//					pitchAngleTarget = Location_Number[rune - 1].pitch_position;
+//					rune_flag--;
+//				}
+//			}
+//		}
+		if(GetWorkState()==RUNE_STATE)
 		{
-			if((GetLocateState() == Locating) && (CReceive != 0))	
-			{
-				//fw_printfln("pitchAdd:%f",pitchAdd );
-				pitchAngleTarget = pitchRealAngle + pitchAdd ;
-				CReceive --;
-			}//大神符
-			else if((GetLocateState() == Located) && (rune_flag != 0))
-			{
-				if(GetRuneState() == AIMING)
-				{
-					pitchAngleTarget = Location_Number[rune - 1].pitch_position;
-					rune_flag--;
-				}
-			}
+			//fw_printfln("Rune State:%d",1);
 		}
+		
 		#ifdef INFANTRY_5
 		MINMAX(pitchAngleTarget, -10.0f, 26.3f);
 		#endif
@@ -271,6 +287,12 @@ void ControlCMFL(void)
 										 + ChassisSpeedRef.left_right_ref*0.075 
 										 + ChassisSpeedRef.rotate_ref;
 		CM2SpeedPID.ref = 160 * CM2SpeedPID.ref;
+		
+		if(GetWorkState() == RUNE_STATE) 
+		{
+			CM2SpeedPID.ref = 0;
+		}
+		
 		CM2SpeedPID.fdb = pData->RotateSpeed;
 		#ifdef INFANTRY_1
 		CM2SpeedPID.ref = 1.2f * CM2SpeedPID.ref;
@@ -296,6 +318,12 @@ void ControlCMFR(void)
 		#ifdef INFANTRY_1
 		CM1SpeedPID.ref = 1.2f * CM1SpeedPID.ref;
 		#endif
+		
+		if(GetWorkState() == RUNE_STATE) 
+		{
+			CM1SpeedPID.ref = 0;
+		}
+		
 		CM1SpeedPID.Calc(&CM1SpeedPID);
 		
 		setMotor(CMFL, CHASSIS_SPEED_ATTENUATION * CM1SpeedPID.output);
@@ -317,6 +345,12 @@ void ControlCMBL(void)
 		#ifdef INFANTRY_1
 		CM3SpeedPID.ref = 1.2f * CM3SpeedPID.ref;
 		#endif
+		
+		if(GetWorkState() == RUNE_STATE) 
+		{
+			CM3SpeedPID.ref = 0;
+		}
+		
 		CM3SpeedPID.Calc(&CM3SpeedPID);
 		
 		setMotor(CMBL, CHASSIS_SPEED_ATTENUATION * CM3SpeedPID.output);
@@ -338,6 +372,12 @@ void ControlCMBR()
 		#ifdef INFANTRY_1
 		CM4SpeedPID.ref = 1.2f * CM4SpeedPID.ref;
 		#endif
+		
+		if(GetWorkState() == RUNE_STATE) 
+		{
+			CM4SpeedPID.ref = 0;
+		}
+		
 		CM4SpeedPID.Calc(&CM4SpeedPID);
 		
 		setMotor(CMBR, CHASSIS_SPEED_ATTENUATION * CM4SpeedPID.output);

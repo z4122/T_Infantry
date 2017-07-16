@@ -19,6 +19,6 @@
 #include "tasks_timed.h"
 #include "pid_regulator.h"
 
-void ShootOneBullet(PID_Regulator_t *ShootMotorPositionPID);
+void ShootOneBullet(void);
 
 #endif
