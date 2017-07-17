@@ -164,7 +164,7 @@ void RemoteDataProcess(uint8_t *pData)
 		{
 			if(GetWorkState() == NORMAL_STATE)
 			{ //if gyro has been reseted
-				fw_printfln("RC is running");
+//				fw_printfln("RC is running");
 				RemoteControlProcess(&(RC_CtrlData.rc));//遥控器模式
 			}
 		}break;
