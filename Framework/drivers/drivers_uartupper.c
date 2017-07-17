@@ -229,7 +229,7 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 	Location_Number[8].pitch_position = pitch_center - dis_pitch;
 }
 
-float pAddZy=7.94,pMinusZy=4.67,yAddZy=9.5,yMinusZy=10.8;
+float pAddZy=7.54,pMinusZy=4.67,yAddZy=9.5,yMinusZy=10.8;
 void zyLocationInit(float yaw_center,float pitch_center)
 {
 	pitch_center = pitch_center - 1.0;

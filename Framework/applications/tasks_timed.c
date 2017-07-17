@@ -198,7 +198,7 @@ void WorkStateFSM(void)
 		}break;
 		case NORMAL_STATE:     
 		{
-			fw_printfln("switch%d",g_switch1.switch_value1);
+//			fw_printfln("switch%d",g_switch1.switch_value1);
 			if(GetInputMode() == STOP )
 			{
 				g_workState = STOP_STATE;
@@ -270,7 +270,7 @@ void WorkStateSwitchProcess(void)
 	if((lastWorkState != g_workState) && (g_workState == RUNE_STATE))  
 	{
 		zyLocationInit(gap_angle, pitchRealAngle);
-		
+		LASER_OFF();
 		*(IOPool_pGetWriteData(ctrlUartIOPool) -> ch) = 4;
 		IOPool_getNextWrite(ctrlUartIOPool);
 	}
