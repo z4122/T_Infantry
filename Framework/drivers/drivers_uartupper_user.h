@@ -14,7 +14,7 @@
 #define DRIVERS_UARTUPPER_USER_H
 
 #include "utilities_iopool.h"
-#define size_frame 1  //定义妙算串口帧长度/字节
+#define size_frame 14  //定义妙算串口帧长度/字节
 #define byte_SOF 0x7d    //起始字节	
 #define byte_EOF 0x7e    //终止字节
 #define byte_ESCAPE 0xff //转义字节

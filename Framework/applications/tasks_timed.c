@@ -172,6 +172,7 @@ void CMControlInit(void)
 **********************************************************/
 
 extern RemoteSwitch_t g_switch1; 
+extern RC_Ctl_t RC_CtrlData; 
 extern bool g_switchRead;
 
 static uint8_t waitRuneMSG[4] = {0xff, 0x00, 0x00, 0xfe};
@@ -204,21 +205,22 @@ void WorkStateFSM(void)
 				g_workState = STOP_STATE;
 			}
 			//ZY
-			else if((GetInputMode() == KEY_MOUSE_INPUT
-							&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1 
-									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2) 
+			else if(GetInputMode() == KEY_MOUSE_INPUT
+								&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1 
+										|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2
+							||RC_CtrlData.key.v == 32768//B
+							||RC_CtrlData.key.v == 1024)//G)
 							&& g_switchRead == 1)
-							|| GetRuneState() != WAITING)
 			{
 				g_workState = RUNE_STATE;
 				g_switchRead = 0;
 				
 				if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1
-					||GetRuneState() == SMALLRUNE)//小符
+					||RC_CtrlData.key.v == 1024)//小符
 				{
 					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&littleRuneMSG, 4, 0xFFFF);
 				}else if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2
-					||GetRuneState() == BIGRUNE)//大符
+					||RC_CtrlData.key.v == 32768)//大符
 				{
 					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&bigRuneMSG, 4, 0xFFFF);
 				}
@@ -241,8 +243,11 @@ void WorkStateFSM(void)
 			}
 			else if(((g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
 									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3) 
+							||RC_CtrlData.key.v == 0x01//w
+							||RC_CtrlData.key.v == 0x04//a
+							||RC_CtrlData.key.v == 0x02//s
+							||RC_CtrlData.key.v == 0x08)//d
 							&& g_switchRead == 1)
-							||GetRuneState() == WAITING)
 			{
 				g_workState = NORMAL_STATE;
 				g_switchRead = 0;
