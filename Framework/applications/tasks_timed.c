@@ -204,18 +204,21 @@ void WorkStateFSM(void)
 				g_workState = STOP_STATE;
 			}
 			//ZY
-			else if(GetInputMode() == KEY_MOUSE_INPUT
-							&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
-									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3) 
+			else if((GetInputMode() == KEY_MOUSE_INPUT
+							&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1 
+									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2) 
 							&& g_switchRead == 1)
+							|| GetRuneState() != WAITING)
 			{
 				g_workState = RUNE_STATE;
 				g_switchRead = 0;
 				
-				if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3)//小符
+				if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1
+					||GetRuneState() == SMALLRUNE)//小符
 				{
 					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&littleRuneMSG, 4, 0xFFFF);
-				}else if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3)//大符
+				}else if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2
+					||GetRuneState() == BIGRUNE)//大符
 				{
 					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&bigRuneMSG, 4, 0xFFFF);
 				}
@@ -236,9 +239,10 @@ void WorkStateFSM(void)
 			{
 				g_workState = STOP_STATE;
 			}
-			else if((g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
+			else if(((g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
 									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3) 
 							&& g_switchRead == 1)
+							||GetRuneState() == WAITING)
 			{
 				g_workState = NORMAL_STATE;
 				g_switchRead = 0;
@@ -257,6 +261,14 @@ extern float pitchRealAngle;
 	
 void WorkStateSwitchProcess(void)
 {
+	if((lastWorkState != g_workState) && (g_workState == STOP_STATE))  
+	{
+		LASER_OFF();
+		SetShootState(NOSHOOTING);
+		SetFrictionWheelSpeed(1000);
+		SetFrictionState(FRICTION_WHEEL_OFF);
+		frictionRamp.ResetCounter(&frictionRamp);
+	}
 	//如果从其他模式切换到prapare模式，要将一系列参数初始化
 	if((lastWorkState != g_workState) && (g_workState == PREPARE_STATE))  
 	{
