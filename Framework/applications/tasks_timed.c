@@ -128,7 +128,7 @@ void Timer_2ms_lTask(void const * argument)
 //			NORMALIZE_ANGLE180(tempYaw);
 //			fw_printfln("YawAngle= %f", tempYaw);
 //			IOPool_getNextRead(GMPITCHRxIOPool, 0); 
-//			float tempPitch = -(IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - 3275) * 360 / 8192.0;
+//			float tempPitch = -(IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - 5009) * 360 / 8192.0;
 //			NORMALIZE_ANGLE180(tempPitch);
 //			fw_printfln("PitchAngle= %f", tempPitch);
 			//fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
@@ -139,7 +139,7 @@ void Timer_2ms_lTask(void const * argument)
 			//		fw_printfln("GM%ld",StackResidue);
 			if(JUDGE_State == OFFLINE)
 			{
-				fw_printfln("Judge not received");
+//				fw_printfln("Judge not received");
 			}
 			else
 			{
@@ -205,16 +205,17 @@ void WorkStateFSM(void)
 			}
 			//ZY
 			else if(GetInputMode() == KEY_MOUSE_INPUT
-							&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1 
-									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2) 
+							&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
+									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3) 
 							&& g_switchRead == 1)
 			{
 				g_workState = RUNE_STATE;
 				g_switchRead = 0;
-				if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)//小符
+				
+				if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3)//小符
 				{
 					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&littleRuneMSG, 4, 0xFFFF);
-				}else if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2)//大符
+				}else if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3)//大符
 				{
 					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&bigRuneMSG, 4, 0xFFFF);
 				}
@@ -265,14 +266,6 @@ void WorkStateSwitchProcess(void)
 		pitchAngleTarget = 0;
 		CMControlInit();
 		RemoteTaskInit();
-	}
-	if((lastWorkState != g_workState) && (g_workState == STOP_STATE))  
-	{
-		LASER_OFF();
-		SetShootState(NOSHOOTING);
-		SetFrictionWheelSpeed(1000);
-		SetFrictionState(FRICTION_WHEEL_OFF);
-		frictionRamp.ResetCounter(&frictionRamp);//停止
 	}
 	if((lastWorkState != g_workState) && (g_workState == RUNE_STATE))  
 	{
