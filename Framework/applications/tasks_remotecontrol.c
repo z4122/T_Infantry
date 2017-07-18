@@ -105,7 +105,7 @@ void RControlTask(void const * argument){
 //				fw_printf("l = %d | ", RC_CtrlData.mouse.press_l);
 //				fw_printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
 //				
-//				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
+				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
 //				fw_printf("===========\r\n");
 			}else{
 				countwhile++;
@@ -172,12 +172,7 @@ void RemoteDataProcess(uint8_t *pData)
 		{
 			if(GetWorkState() == NORMAL_STATE)
 			{
-//				if(RC_CtrlData.rc.s1==3)
-//				{
-//					g_workState=RUNE_STATE;
-//				}
-//				else
-//				{
+
 					MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);//键鼠模式
 					SetShootMode(AUTO);//调试自瞄用
 	//			RemoteShootControl(&g_switch1, RC_CtrlData.rc.s1);
@@ -190,7 +185,6 @@ void RemoteDataProcess(uint8_t *pData)
 		}break;
 		case STOP:
 		{
-			 //停止
 		}break;
 	}
 }
@@ -253,12 +247,12 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		//movement process
 		if(key->v & 0x01)  // key: w
 		{
-			ChassisSpeedRef.forward_back_ref = forward_back_speed* FBSpeedRamp.Calc(&FBSpeedRamp);
+			ChassisSpeedRef.forward_back_ref = forward_back_speed;//* FBSpeedRamp.Calc(&FBSpeedRamp);
 			twist_state = 0;
 		}
 		else if(key->v & 0x02) //key: s
 		{
-			ChassisSpeedRef.forward_back_ref = -forward_back_speed* FBSpeedRamp.Calc(&FBSpeedRamp);
+			ChassisSpeedRef.forward_back_ref = -forward_back_speed;// FBSpeedRamp.Calc(&FBSpeedRamp);
 			twist_state = 0;
 		}
 		else

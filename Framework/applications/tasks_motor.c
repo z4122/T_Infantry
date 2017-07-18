@@ -44,7 +44,7 @@ fw_PID_Regulator_t yawPositionPID = fw_PID_INIT(5.0, 0.0, 0.5, 10000.0, 10000.0,
 fw_PID_Regulator_t pitchSpeedPID = fw_PID_INIT(40.0, 0.0, 15.0, 10000.0, 10000.0, 10000.0, 3500.0);
 fw_PID_Regulator_t yawSpeedPID = fw_PID_INIT(30.0, 0.0, 5, 10000.0, 10000.0, 10000.0, 4000.0);
 //手动标定0点
-#define yaw_zero 2218
+#define yaw_zero 2200
 #define pitch_zero 3275
 #endif
 #ifdef INFANTRY_4
@@ -109,7 +109,7 @@ void CMGMControlTask(void const * argument){
 		ControlYaw();
 		ControlPitch();
 		
-	  ControlRotate();
+//	  ControlRotate();
 //		ChassisSpeedRef.rotate_ref = 0;//取消底盘跟随
 		ControlCMFL();
 		ControlCMFR();
@@ -185,6 +185,8 @@ void ControlYaw(void)
 						
 		yawIntensity = ProcessYawPID(yawAngleTarget, yawRealAngle, -gYroZs);
 		setMotor(GMYAW, yawIntensity);
+		
+		ControlRotate();
 	}
 }
 /*Pitch电机*/
@@ -223,7 +225,7 @@ void ControlPitch(void)
 		}
 		
 		#ifdef INFANTRY_5
-		MINMAX(pitchAngleTarget, -10.0f, 26.3f);
+		MINMAX(pitchAngleTarget, -3.0f, 28.3f);
 		#endif
 		#ifdef INFANTRY_4
 		MINMAX(pitchAngleTarget, -18.f, 30);
@@ -240,10 +242,11 @@ void ControlPitch(void)
 void ControlRotate(void)
 {
 	gap_angle  = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle - yaw_zero) * 360 / 8192.0f;
-    NORMALIZE_ANGLE180(gap_angle);	
+  NORMALIZE_ANGLE180(gap_angle);	
 	
 	if(GetWorkState() == NORMAL_STATE) 
 	{
+		 CMRotatePID.ref = 0;
 		/*扭腰*/
 		//试图用PID
 		if (twist_state == 1)
@@ -268,7 +271,6 @@ void ControlRotate(void)
 			 nn = floor(2.0f*mm);
 					
 			/*底盘跟随编码器旋转PID计算*/		
-			 CMRotatePID.ref = 0;
 			 CMRotatePID.fdb = gap_angle;
 			 CMRotatePID.Calc(&CMRotatePID);   
 			 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
