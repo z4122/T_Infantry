@@ -63,7 +63,84 @@ void setMotor(MotorId motorId, int16_t Intensity){
 	}
 	
 	//底盘功率限制，80W，能量槽满60，低于0掉血
-    RestrictPower(&CMFLIntensity, &CMFRIntensity, &CMBLIntensity, &CMBRIntensity);
+//    RestrictPower(&CMFLIntensity, &CMFRIntensity, &CMBLIntensity, &CMBRIntensity);
+	//ׁԶ٦Ê޸ѐ֧·О׆
+//ĬɏһО
+float CM_current_max = CM_current_MAX;
+float CMFLIntensity_max = CMFLIntensity_MAX;
+float CMFRIntensity_max = CMFRIntensity_MAX;
+float CMBLIntensity_max = CMBLIntensity_MAX;
+float CMBRIntensity_max = CMBRIntensity_MAX;
+
+//10-40ԵҽО׆
+if (mytGameInfo.remainPower > 10 & mytGameInfo.remainPower < 40){
+		
+	 CM_current_max = CM_current_lower;
+	 CMFLIntensity_max = CMFLIntensity_lower;
+	 CMFRIntensity_max = CMFRIntensity_lower;
+	 CMBLIntensity_max = CMBLIntensity_lower;
+	 CMBRIntensity_max = CMBRIntensity_lower;
+}
+//0-10ܫОО׆
+if (mytGameInfo.remainPower < 10 ){
+		
+	 CM_current_max = CM_current_bottom;
+	 CMFLIntensity_max = CMFLIntensity_bottom;
+	 CMFRIntensity_max = CMFRIntensity_bottom;
+	 CMBLIntensity_max = CMBLIntensity_bottom;
+	 CMBRIntensity_max = CMBRIntensity_bottom;
+}
+//߸הһӬ
+if (mytGameInfo.remainPower < 10 ){
+		
+	 CM_current_max = 0;
+	 CMFLIntensity_max = 0;
+	 CMFRIntensity_max = 0;
+	 CMBLIntensity_max = 0;
+	 CMBRIntensity_max = 0;
+}
+
+
+	float sum = (abs(CMFLIntensity) + abs(CMFRIntensity) + abs(CMBLIntensity) + abs(CMBRIntensity));
+	
+	if ((CMFLIntensity > CMFLIntensity_max))
+	{
+		CMFLIntensity = CMFLIntensity_max;
+	}
+	else if ((CMFLIntensity < -CMFLIntensity_max))
+	{
+		CMFLIntensity = -CMFLIntensity_max;
+	}
+	if(CMFRIntensity > CMFRIntensity_max)
+	{
+	  CMFRIntensity = CMFRIntensity_max;
+	}
+	else if(CMFRIntensity < -CMFRIntensity_max)
+	{
+	  CMFRIntensity = -CMFRIntensity_max;
+	}
+	if(CMBLIntensity > CMBLIntensity_max)
+	{
+	  CMBLIntensity = CMBLIntensity_max;
+	}
+	else if(CMBLIntensity < -CMBLIntensity_max)
+	{
+	  CMBLIntensity = -CMBLIntensity_max;
+	}
+	if(CMBRIntensity > CMBRIntensity_max)
+	{
+	  CMBRIntensity = CMBRIntensity_max;
+	}
+	else	if(CMBRIntensity < -CMBRIntensity_max)
+	{
+	  CMBRIntensity = -CMBRIntensity_max;
+	}
+	if( sum > CM_current_max){
+		CMFLIntensity = (CM_current_max/sum)*CMFLIntensity;
+		CMFRIntensity = (CM_current_max/sum)*CMFRIntensity;
+		CMBLIntensity = (CM_current_max/sum)*CMBLIntensity;
+		CMBRIntensity = (CM_current_max/sum)*CMBRIntensity;
+	}
 	
 	if(GetWorkState() == STOP_STATE)
 	{

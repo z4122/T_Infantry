@@ -13,6 +13,7 @@
 #include "drivers_uartjudge_low.h"
 #include "drivers_cmpower.h"
 #include "utilities_minmax.h"
+#include "utilities_debug.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -28,9 +29,12 @@ static float CMBRIntensity_max = CMBRIntensity_MAX;
 void RestrictPower(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3, int16_t *intensity4)
 {
 	//根据能量槽剩余做动态上限
-  dynamicUpperBound();
+	dynamicUpperBound();
+
+	 fw_printfln("remainPower: %f \r\n",mytGameInfo.remainPower);
+	fw_printfln("max%f",CM_current_max);
 	
-  int16_t *CMFLIntensity = intensity1;
+	int16_t *CMFLIntensity = intensity1;
 	int16_t *CMFRIntensity = intensity2;
 	int16_t *CMBLIntensity = intensity3;
 	int16_t *CMBRIntensity = intensity4;
@@ -41,7 +45,7 @@ void RestrictPower(int16_t *intensity1, int16_t *intensity2, int16_t *intensity3
 	MINMAX(*CMFLIntensity, -CMFLIntensity_max, CMFLIntensity_max);
 	MINMAX(*CMFRIntensity, -CMFRIntensity_max, CMFRIntensity_max);
 	MINMAX(*CMBLIntensity, -CMBLIntensity_max, CMBLIntensity_max);
-  MINMAX(*CMBRIntensity, -CMBRIntensity_max, CMBRIntensity_max);
+	MINMAX(*CMBRIntensity, -CMBRIntensity_max, CMBRIntensity_max);
 
 	if(sum > CM_current_max)
 	{
@@ -63,7 +67,7 @@ void dynamicUpperBound()
 		 CMBRIntensity_max = CMBRIntensity_lower;
 	}
 
-	if (mytGameInfo.remainPower < 15 )
+	else if (mytGameInfo.remainPower < 15 )
 	{
 		 CM_current_max = CM_current_bottom;
 		 CMFLIntensity_max = CMFLIntensity_bottom;
@@ -72,7 +76,7 @@ void dynamicUpperBound()
 		 CMBRIntensity_max = CMBRIntensity_bottom;
 	}
 
-	if (mytGameInfo.remainPower < 7)
+	else if (mytGameInfo.remainPower < 7)
 	{
 		 CM_current_max = 0;
 		 CMFLIntensity_max = 0;
@@ -81,12 +85,13 @@ void dynamicUpperBound()
 		 CMBRIntensity_max = 0;
 	}
 
-	if (JUDGE_State == 1)
-	{
-		 CM_current_max = 13000;
-		 CMFLIntensity_max = 4500;
-		 CMFRIntensity_max = 4500;
-		 CMBLIntensity_max = 4500;
-		 CMBRIntensity_max = 4500;
-	}
+//	if (JUDGE_State == OFFLINE)
+//	{
+//		 CM_current_max = 13000;
+//		 CMFLIntensity_max = 4500;
+//		 CMFRIntensity_max = 4500;
+//		 CMBLIntensity_max = 4500;
+//		 CMBRIntensity_max = 4500;
+//	}
+//	fw_printfln("max%f",CM_current_max);
 }

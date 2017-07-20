@@ -81,7 +81,6 @@ int mouse_click_left = 0;
 
 FrictionWheelState_e friction_wheel_stateZY = FRICTION_WHEEL_OFF;
 
-static int s_count_judge = 0;
 extern uint8_t JUDGE_Received;
 extern uint8_t JUDGE_State;
 
@@ -139,11 +138,11 @@ void Timer_2ms_lTask(void const * argument)
 			//		fw_printfln("GM%ld",StackResidue);
 			if(JUDGE_State == OFFLINE)
 			{
-//				fw_printfln("Judge not received");
+				fw_printfln("Judge not received");
 			}
 			else
 			{
-//				fw_printfln("Judge received");
+				fw_printfln("Judge received");
 
 			}
 		}
@@ -348,10 +347,12 @@ void RuneShootControl(void)
 
 void getJudgeState(void)
 {
+	static int s_count_judge = 0;
 	if(JUDGE_Received==1)
 	{
 		s_count_judge = 0;
 		JUDGE_State = ONLINE;
+		JUDGE_Received = 0;
 	}
 	else
 	{
