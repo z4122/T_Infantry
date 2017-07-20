@@ -287,6 +287,8 @@ void WorkStateSwitchProcess(void)
 	if((lastWorkState != g_workState) && (g_workState == RUNE_STATE))  
 	{
 		zyLocationInit(gap_angle, pitchRealAngle);
+		yawAngleTarget = gap_angle;
+		pitchAngleTarget = pitchRealAngle;
 		LASER_OFF();
 		*(IOPool_pGetWriteData(ctrlUartIOPool) -> ch) = 4;
 		IOPool_getNextWrite(ctrlUartIOPool);
