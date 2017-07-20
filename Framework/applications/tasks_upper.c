@@ -40,9 +40,6 @@ extern float pitchRealAngle;
 extern float ZGyroModuleAngle;	//陀螺仪角度
 //extern float yawAngleTarget, pitchAngleTarget;
 void ManifoldUartTask(void const * argument){
-	static uint8_t last_rune_locate = 0;
-	static uint8_t last_rune;
-	static float pitchAdd = 0;
 	while(1){
 			xSemaphoreTake(xSemaphore_mfuart, osWaitForever);
 	//		fw_printfln("Ctrl");

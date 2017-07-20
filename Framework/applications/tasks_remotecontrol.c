@@ -240,7 +240,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			forward_back_speed =  LOW_FORWARD_BACK_SPEED;
 			left_right_speed = LOW_LEFT_RIGHT_SPEED;
 		}
-		else if(key->v & 0x20)//CanpsLK
+		else if(key->v == 32)//Ctrl
 		{
 			forward_back_speed =  MIDDLE_FORWARD_BACK_SPEED;
 			left_right_speed = MIDDLE_LEFT_RIGHT_SPEED;
@@ -336,6 +336,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		{
 			twist_state = 0;
 		}
+
 
 		MouseShootControl(mouse);
 	}

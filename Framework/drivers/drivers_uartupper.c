@@ -83,7 +83,7 @@ void InitManifoldUart()
 	ctrlData.Success = 1;  
 	//vRefreshLocation(0, 0);
 	zyLocationInit(1.0,8.0);//1号-2.0,6.1
-	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, &runeLocation, size_frame) != HAL_OK){
+	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, &runeLocation, 1) != HAL_OK){
 		Error_Handler();
 		printf( "InitManifoldUart error" );
 	} 
@@ -192,7 +192,7 @@ void SetLocateState(Locate_State_e v){
 Locate_State_e GetLocateState(void){
 	return LocateState;
 }
-Rune_State_e RuneState = NOAIMING;
+Rune_State_e RuneState = WAITING;
 
 void SetRuneState(Rune_State_e v){
 	RuneState = v;
@@ -232,7 +232,7 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 float pAddZy=7.54,pMinusZy=4.67,yAddZy=9.5,yMinusZy=10.8;
 void zyLocationInit(float yaw_center,float pitch_center)
 {
-	pitch_center = pitch_center - 1.0;
+	pitch_center = pitch_center - 1.0f;
 	Location_Number[0].yaw_position = yaw_center + yAddZy;
 	Location_Number[0].pitch_position = pitch_center + pAddZy;
 	Location_Number[1].yaw_position = yaw_center;
