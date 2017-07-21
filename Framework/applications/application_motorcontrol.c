@@ -61,45 +61,53 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		default:
 			fw_Error_Handler();
 	}
-	
+
 	//底盘功率限制，80W，能量槽满60，低于0掉血
 //    RestrictPower(&CMFLIntensity, &CMFRIntensity, &CMBLIntensity, &CMBRIntensity);
 	//ׁԶ٦Ê޸ѐ֧·О׆
 //ĬɏһО
-float CM_current_max = CM_current_MAX;
-float CMFLIntensity_max = CMFLIntensity_MAX;
-float CMFRIntensity_max = CMFRIntensity_MAX;
-float CMBLIntensity_max = CMBLIntensity_MAX;
-float CMBRIntensity_max = CMBRIntensity_MAX;
+	float CM_current_max = CM_current_MAX;
+	float CMFLIntensity_max = CMFLIntensity_MAX;
+	float CMFRIntensity_max = CMFRIntensity_MAX;
+	float CMBLIntensity_max = CMBLIntensity_MAX;
+	float CMBRIntensity_max = CMBRIntensity_MAX;
 
-//10-40ԵҽО׆
-if (mytGameInfo.remainPower > 10 & mytGameInfo.remainPower < 40){
-		
-	 CM_current_max = CM_current_lower;
-	 CMFLIntensity_max = CMFLIntensity_lower;
-	 CMFRIntensity_max = CMFRIntensity_lower;
-	 CMBLIntensity_max = CMBLIntensity_lower;
-	 CMBRIntensity_max = CMBRIntensity_lower;
-}
-//0-10ܫОО׆
-if (mytGameInfo.remainPower < 10 ){
-		
-	 CM_current_max = CM_current_bottom;
-	 CMFLIntensity_max = CMFLIntensity_bottom;
-	 CMFRIntensity_max = CMFRIntensity_bottom;
-	 CMBLIntensity_max = CMBLIntensity_bottom;
-	 CMBRIntensity_max = CMBRIntensity_bottom;
-}
-//߸הһӬ
-if (mytGameInfo.remainPower < 10 ){
-		
-	 CM_current_max = 0;
-	 CMFLIntensity_max = 0;
-	 CMFRIntensity_max = 0;
-	 CMBLIntensity_max = 0;
-	 CMBRIntensity_max = 0;
-}
+	//10-40ԵҽО׆
+	if (mytGameInfo.remainPower > 10 & mytGameInfo.remainPower < 40){
+			
+		 CM_current_max = CM_current_lower;
+		 CMFLIntensity_max = CMFLIntensity_lower;
+		 CMFRIntensity_max = CMFRIntensity_lower;
+		 CMBLIntensity_max = CMBLIntensity_lower;
+		 CMBRIntensity_max = CMBRIntensity_lower;
+	}
+	//0-10ܫОО׆
+	if (mytGameInfo.remainPower < 10 ){
+			
+		 CM_current_max = CM_current_bottom;
+		 CMFLIntensity_max = CMFLIntensity_bottom;
+		 CMFRIntensity_max = CMFRIntensity_bottom;
+		 CMBLIntensity_max = CMBLIntensity_bottom;
+		 CMBRIntensity_max = CMBRIntensity_bottom;
+	}
+	//߸הһӬ
+	if (mytGameInfo.remainPower < 10 ){
+			
+		 CM_current_max = 0;
+		 CMFLIntensity_max = 0;
+		 CMFRIntensity_max = 0;
+		 CMBLIntensity_max = 0;
+		 CMBRIntensity_max = 0;
+	}
 
+	if (JUDGE_State == OFFLINE)
+	{
+		 CM_current_max = 13000;
+		 CMFLIntensity_max = 4500;
+		 CMFRIntensity_max = 4500;
+		 CMBLIntensity_max = 4500;
+		 CMBRIntensity_max = 4500;
+	}
 
 	float sum = (abs(CMFLIntensity) + abs(CMFRIntensity) + abs(CMBLIntensity) + abs(CMBRIntensity));
 	

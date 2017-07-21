@@ -85,13 +85,13 @@ void dynamicUpperBound()
 		 CMBRIntensity_max = 0;
 	}
 
-//	if (JUDGE_State == OFFLINE)
-//	{
-//		 CM_current_max = 13000;
-//		 CMFLIntensity_max = 4500;
-//		 CMFRIntensity_max = 4500;
-//		 CMBLIntensity_max = 4500;
-//		 CMBRIntensity_max = 4500;
-//	}
+	if (JUDGE_State == OFFLINE)
+	{
+		 CM_current_max = 13000;
+		 CMFLIntensity_max = 4500;
+		 CMFRIntensity_max = 4500;
+		 CMBLIntensity_max = 4500;
+		 CMBRIntensity_max = 4500;
+	}
 //	fw_printfln("max%f",CM_current_max);
 }
