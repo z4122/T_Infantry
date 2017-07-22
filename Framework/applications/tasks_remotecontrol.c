@@ -23,6 +23,7 @@
 #include "pwm_server_motor.h"
 #include "drivers_uartjudge_low.h"
 #include "tasks_motor.h"
+#include "iwdg.h"
 //**//
 #include "utilities_minmax.h"
 #include "math.h"
@@ -66,6 +67,7 @@ void RControlTask(void const * argument){
 	static TickType_t thiscount_rc;
 	static uint8_t first_frame = 0;
 	while(1){
+		HAL_IWDG_Refresh(&hiwdg);
 		/*等待串口接收中断回调函数释放信号量*/
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
 		//fw_printfln("RC is running");
