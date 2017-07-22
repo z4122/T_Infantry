@@ -28,6 +28,7 @@
 #include "math.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include "tasks_platemotor.h"
 
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
@@ -280,6 +281,10 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		{
 			ChassisSpeedRef.left_right_ref = 0;
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
+		}
+		if(key->v & 0x80)	//key:e
+		{
+			toggleLaunchMode();
 		}
 		
 		/*裁判系统离线时的功率限制方式*/
