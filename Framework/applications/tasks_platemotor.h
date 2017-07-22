@@ -26,6 +26,16 @@ void PlateMotorTask(void const * argument);
 void ShootOneBullet(void);
 int32_t GetQuadEncoderDiff(void);
 
+typedef enum
+{
+	SINGLE_MULTI,
+	CONSTENT_4
+}LaunchMode_e;
+
+void setLaunchMode(LaunchMode_e launchMode);
+LaunchMode_e getLaunchMode();
+void toggleLaunchMode();
+
 #define SHOOT_MOTOR_POSITION_PID_DEFAULT \
 {\
 	0,\
