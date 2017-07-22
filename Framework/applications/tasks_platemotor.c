@@ -98,11 +98,11 @@ void PlateMotorTask(void const * argument)
 			//{
 			if(this_fdb<last_fdb-10000 && getPlateMotorDir()==FORWARD)	//cnt寄存器溢出判断 正转
 			{
-				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb+(65535+this_fdb-last_fdb);
+				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb+(65536+this_fdb-last_fdb);
 			}
 			else if(this_fdb>last_fdb+10000 && getPlateMotorDir()==REVERSE)	//cnt寄存器溢出判断 反转
 			{
-				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb-(65535-this_fdb+last_fdb);
+				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb-(65536-this_fdb+last_fdb);
 			}
 			else
 				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb + this_fdb-last_fdb;
