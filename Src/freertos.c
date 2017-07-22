@@ -3,6 +3,11 @@
   * File Name          : freertos.c
   * Description        : Code for freertos applications
   ******************************************************************************
+  * This notice applies to any and all portions of this file
+  * that are not between comment pairs USER CODE BEGIN and
+  * USER CODE END. Other portions of this file, whether 
+  * inserted by the user or by software development tools
+  * are owned by their respective copyright owners.
   *
   * Copyright (c) 2017 STMicroelectronics International N.V. 
   * All rights reserved.
@@ -92,7 +97,7 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
-	rtos_AddSemaphores();//RTOS信号量,用于进程间同步，以及互斥锁等
+	rtos_AddSemaphores();//RTOS信号�?,用于进程间同步，以及互斥锁等
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
@@ -101,13 +106,13 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);//RTOS默认进程定义
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
 	rtos_AddThreads();//RTOS任务定义
-	g_bInited = 1;//初始化完成 todo:使用状态机方式替代全局变量
+	g_bInited = 1;//初始化完�? todo:使用状�?�机方式替代全局变量
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
