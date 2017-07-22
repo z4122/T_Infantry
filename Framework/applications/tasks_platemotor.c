@@ -38,7 +38,7 @@ PID_Regulator_t ShootMotorPositionPID = SHOOT_MOTOR_POSITION_PID_DEFAULT;      /
 PID_Regulator_t ShootMotorSpeedPID = SHOOT_MOTOR_SPEED_PID_DEFAULT;
 
 extern FrictionWheelState_e friction_wheel_stateZY;
-
+static int s_count_bullet = 0;
 
 
 void PlateMotorTask(void const * argument)
@@ -50,13 +50,20 @@ void PlateMotorTask(void const * argument)
 	int32_t this_fdb = 0x0;
 	portTickType xLastWakeTimeQZK;
 	xLastWakeTimeQZK = xTaskGetTickCount();
-	
+	static int s_count_1s = 0;
 	
 	while(1)
 	{
+		s_count_1s++;
+		if(s_count_1s == 500)
+		{
+			s_count_1s = 0;
+			s_count_bullet = 0;
+		}
 		if(GetShootState() == SHOOTING && GetInputMode()==KEY_MOUSE_INPUT && Stuck==0)
 		{
 			//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;//打一发弹编码器输出脉冲数
+			//遥控器一帧14ms，此任务循环7次，最终是打了7发
 			ShootOneBullet();
 		}
 
@@ -125,7 +132,11 @@ void PlateMotorTask(void const * argument)
 
 void ShootOneBullet()
 {
+	s_count_bullet ++;
+	if(s_count_bullet <= 4)
+	{
 	ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
+	}
 }
 
 int32_t GetQuadEncoderDiff(void)

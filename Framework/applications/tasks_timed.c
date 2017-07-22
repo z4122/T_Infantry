@@ -81,7 +81,6 @@ int mouse_click_left = 0;
 
 FrictionWheelState_e friction_wheel_stateZY = FRICTION_WHEEL_OFF;
 
-static int s_count_judge = 0;
 extern uint8_t JUDGE_Received;
 extern uint8_t JUDGE_State;
 
@@ -107,7 +106,7 @@ void Timer_2ms_lTask(void const * argument)
 		
 		WorkStateFSM();//状态机
 	  WorkStateSwitchProcess();//状态机动作
-		
+
 		//陀螺仪复位计时
     if(s_time_tick_2ms == 2000)
 		{
@@ -139,11 +138,11 @@ void Timer_2ms_lTask(void const * argument)
 			//		fw_printfln("GM%ld",StackResidue);
 			if(JUDGE_State == OFFLINE)
 			{
-//				fw_printfln("Judge not received");
+				fw_printfln("Judge not received");
 			}
 			else
 			{
-//				fw_printfln("Judge received");
+				fw_printfln("Judge received");
 
 			}
 		}
@@ -172,7 +171,12 @@ void CMControlInit(void)
 **********************************************************/
 
 extern RemoteSwitch_t g_switch1; 
+extern RC_Ctl_t RC_CtrlData; 
 extern bool g_switchRead;
+
+static uint8_t waitRuneMSG[4] = {0xff, 0x00, 0x00, 0xfe};
+static uint8_t littleRuneMSG[4] = {0xff, 0x01, 0x00, 0xfe};
+static uint8_t bigRuneMSG[4] = {0xff, 0x02, 0x00, 0xfe};
 
 void WorkStateFSM(void)
 {
@@ -194,19 +198,31 @@ void WorkStateFSM(void)
 		}break;
 		case NORMAL_STATE:     
 		{
-			fw_printfln("switch%d",g_switch1.switch_value1);
+//			fw_printfln("switch%d",g_switch1.switch_value1);
 			if(GetInputMode() == STOP )
 			{
 				g_workState = STOP_STATE;
 			}
 			//ZY
 			else if(GetInputMode() == KEY_MOUSE_INPUT
-							&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
-									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3) 
+								&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1 
+										|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2
+							||RC_CtrlData.key.v == 32768//B
+							||RC_CtrlData.key.v == 1024)//G)
 							&& g_switchRead == 1)
 			{
 				g_workState = RUNE_STATE;
 				g_switchRead = 0;
+				
+				if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1
+					||RC_CtrlData.key.v == 1024)//小符
+				{
+					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&littleRuneMSG, 4, 0xFFFF);
+				}else if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2
+					||RC_CtrlData.key.v == 32768)//大符
+				{
+					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&bigRuneMSG, 4, 0xFFFF);
+				}
 			}
 			//ZY
 		}break;
@@ -224,8 +240,12 @@ void WorkStateFSM(void)
 			{
 				g_workState = STOP_STATE;
 			}
-			else if((g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
+			else if(((g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
 									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3) 
+							||RC_CtrlData.key.v == 0x01//w
+							||RC_CtrlData.key.v == 0x04//a
+							||RC_CtrlData.key.v == 0x02//s
+							||RC_CtrlData.key.v == 0x08)//d
 							&& g_switchRead == 1)
 			{
 				g_workState = NORMAL_STATE;
@@ -245,6 +265,14 @@ extern float pitchRealAngle;
 	
 void WorkStateSwitchProcess(void)
 {
+	if((lastWorkState != g_workState) && (g_workState == STOP_STATE))  
+	{
+		LASER_OFF();
+		SetShootState(NOSHOOTING);
+		SetFrictionWheelSpeed(1000);
+		SetFrictionState(FRICTION_WHEEL_OFF);
+		frictionRamp.ResetCounter(&frictionRamp);
+	}
 	//如果从其他模式切换到prapare模式，要将一系列参数初始化
 	if((lastWorkState != g_workState) && (g_workState == PREPARE_STATE))  
 	{
@@ -258,6 +286,11 @@ void WorkStateSwitchProcess(void)
 	if((lastWorkState != g_workState) && (g_workState == RUNE_STATE))  
 	{
 		zyLocationInit(gap_angle, pitchRealAngle);
+		yawAngleTarget = gap_angle;
+		pitchAngleTarget = pitchRealAngle;
+		LASER_OFF();
+		*(IOPool_pGetWriteData(ctrlUartIOPool) -> ch) = 4;
+		IOPool_getNextWrite(ctrlUartIOPool);
 	}
 	if((lastWorkState != g_workState) && (lastWorkState == RUNE_STATE))  
 	{
@@ -266,6 +299,11 @@ void WorkStateSwitchProcess(void)
 		SetFrictionWheelSpeed(1000);
 		SetFrictionState(FRICTION_WHEEL_OFF);
 		frictionRamp.ResetCounter(&frictionRamp);
+		
+		if(HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&waitRuneMSG, 4, 0xFFFF) != HAL_OK)
+		{
+			fw_Warning();
+		};
 	}
 	if((g_workState == NORMAL_STATE) && (lastWorkState == RUNE_STATE))  
 	{
@@ -286,7 +324,7 @@ void RuneShootControl(void)
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetFrictionState(FRICTION_WHEEL_START_TURNNING);	 
-				LASER_ON(); 
+				LASER_OFF(); 
 			}break;
 			case FRICTION_WHEEL_START_TURNNING:
 			{
@@ -309,10 +347,12 @@ void RuneShootControl(void)
 
 void getJudgeState(void)
 {
+	static int s_count_judge = 0;
 	if(JUDGE_Received==1)
 	{
 		s_count_judge = 0;
 		JUDGE_State = ONLINE;
+		JUDGE_Received = 0;
 	}
 	else
 	{
