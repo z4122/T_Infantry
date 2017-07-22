@@ -24,7 +24,8 @@
 #include "rtos_semaphore.h"
 #include "tasks_platemotor.h"
 
-#include "tasks_timed.h"//zy
+#include "tasks_timed.h"
+#include "tasks_motor.h"//zy
 
 NaiveIOPoolDefine(ctrlUartIOPool, {0});
 
@@ -229,10 +230,34 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 	Location_Number[8].pitch_position = pitch_center - dis_pitch;
 }
 
-float pAddZy=7.54,pMinusZy=4.67,yAddZy=9.5,yMinusZy=10.8;
+#ifdef INFANTRY_4
+#define pAddZy 6.14
+#define pMinusZy 5.97
+#define yAddZy 7.5
+#define yMinusZy 10.6//4号车
+#define zyDetaP 1.7f
+#define zyDetaY 1.5f
+#endif
+#ifdef INFANTRY_5
+#define pAddZy 7.44
+#define pMinusZy 5.2
+#define yAddZy 10.5
+#define yMinusZy 9.9//5号车//float pAddZy=7.14,pMinusZy=5.97,yAddZy=8.5,yMinusZy=9.5;//5号车
+#define zyDetaP 2.0f
+#define zyDetaY 0.0f
+#endif
+#ifdef INFANTRY_1
+#define pAddZy 6.74
+#define pMinusZy 5.97
+#define yAddZy 8.0f
+#define yMinusZy 8.5//1号车
+#define zyDetaP 2.0f
+#define zyDetaY 2.5f
+#endif
 void zyLocationInit(float yaw_center,float pitch_center)
 {
-	pitch_center = pitch_center - 1.0f;
+	pitch_center = pitch_center - zyDetaP;
+	yaw_center=yaw_center+zyDetaY;//4号车+1.0f
 	Location_Number[0].yaw_position = yaw_center + yAddZy;
 	Location_Number[0].pitch_position = pitch_center + pAddZy;
 	Location_Number[1].yaw_position = yaw_center;
