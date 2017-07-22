@@ -33,6 +33,7 @@
 #include "drivers_uartupper_low.h"
 #include "drivers_uartupper_user.h"
 #include "stm32f4xx_hal_uart.h"
+#include "tasks_platemotor.h"
 NaiveIOPoolDefine(rcUartIOPool, {0});
 
 void InitRemoteControl(){
@@ -69,6 +70,8 @@ volatile Shoot_State_e shootState = NOSHOOTING;
 InputMode_e inputmode = REMOTE_INPUT;  
 
 unsigned int zyLeftPostion; //大符用左拨杆位置
+ 
+uint32_t RotateCNT = 0;	//长按连发计数
 
 RampGen_t frictionRamp = RAMP_GEN_DAFAULT;  
 RampGen_t LRSpeedRamp = RAMP_GEN_DAFAULT;   
@@ -311,12 +314,35 @@ void MouseShootControl(Mouse *mouse)
 			}			
 			else if(mouse->last_press_l == 0 && mouse->press_l== 1)  //检测鼠标左键单击动作
 			{
-				SetShootState(SHOOTING);				
+				SetShootState(SHOOTING);
+				if(getLaunchMode() == SINGLE_MULTI && GetFrictionState()==FRICTION_WHEEL_ON)
+				{
+					ShootOneBullet();
+				}
+				else if(getLaunchMode() == CONSTENT_4 && GetFrictionState()==FRICTION_WHEEL_ON)
+				{
+					ShootOneBullet();
+					ShootOneBullet();
+					ShootOneBullet();
+					ShootOneBullet();
+				}
 			}
-			else
+			else if(mouse->last_press_l == 0 && mouse->press_l== 0)
 			{
-				SetShootState(NOSHOOTING);				
-			}					 
+				SetShootState(NOSHOOTING);	
+				RotateCNT = 0;			
+			}			
+			else if(mouse->last_press_l == 1 && mouse->press_l== 1)
+			{
+				RotateCNT+=20;
+				if(RotateCNT>=OneShoot)
+				{
+					ShootOneBullet();
+					RotateCNT = 0;
+				}
+					
+			}
+				
 		} break;				
 	}	
 	mouse->last_press_r = mouse->press_r;
