@@ -40,6 +40,7 @@ PID_Regulator_t ShootMotorSpeedPID = SHOOT_MOTOR_SPEED_PID_DEFAULT;
 extern FrictionWheelState_e friction_wheel_stateZY;
 static int s_count_bullet = 0;
 
+LaunchMode_e launchMode = SINGLE_MULTI;
 
 void PlateMotorTask(void const * argument)
 {
@@ -60,11 +61,11 @@ void PlateMotorTask(void const * argument)
 			s_count_1s = 0;
 			s_count_bullet = 0;
 		}
-		if(GetShootState() == SHOOTING && GetInputMode()==KEY_MOUSE_INPUT && Stuck==0)
+		if(GetInputMode()==KEY_MOUSE_INPUT && Stuck==0)//键鼠模式下直接在数据处理程序中实现
 		{
 			//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;//打一发弹编码器输出脉冲数
 			//遥控器一帧14ms，此任务循环7次，最终是打了7发
-			ShootOneBullet();
+			//ShootOneBullet();
 		}
 
 	//遥控器输入模式下，只要处于发射态，就一直转动
@@ -146,4 +147,22 @@ int32_t GetQuadEncoderDiff(void)
 	//fw_printfln("%x",cnt);
 	 //__HAL_TIM_SET_COUNTER(&htim5, 0x7fff);
 	return cnt;
+}
+
+void setLaunchMode(LaunchMode_e lm)
+{
+	launchMode = lm;
+}
+
+LaunchMode_e getLaunchMode()
+{
+	return launchMode;
+}
+
+void toggleLaunchMode()
+{
+	if(getLaunchMode() == SINGLE_MULTI)
+		setLaunchMode(CONSTENT_4);
+	else
+		setLaunchMode(SINGLE_MULTI);
 }
