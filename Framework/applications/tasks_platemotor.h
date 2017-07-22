@@ -24,7 +24,7 @@
 
 void PlateMotorTask(void const * argument);
 void ShootOneBullet(void);
-int32_t GetQuadEncoderDiff(void);
+uint32_t GetQuadEncoderDiff(void);
 
 typedef enum
 {
