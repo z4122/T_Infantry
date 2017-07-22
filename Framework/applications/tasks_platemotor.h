@@ -24,7 +24,7 @@
 
 void PlateMotorTask(void const * argument);
 void ShootOneBullet(void);
-uint32_t GetQuadEncoderDiff(void);
+int32_t GetQuadEncoderDiff(void);
 
 typedef enum
 {
@@ -51,7 +51,7 @@ void toggleLaunchMode();
 	3500,\
 	1500,\
 	0,\
-	1000,\
+	900,\
 	0,\
 	0,\
 	0,\
