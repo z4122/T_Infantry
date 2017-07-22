@@ -87,7 +87,9 @@ extern uint8_t JUDGE_State;
 static uint32_t s_time_tick_2ms = 0;
 
 
-extern RampGen_t frictionRamp ;//张雁大符
+extern RampGen_t frictionRamp ;
+extern uint8_t bShoot;
+uint8_t zyShootTimeCount=0;//张雁大符
 
 void Timer_2ms_lTask(void const * argument)
 {
@@ -114,6 +116,21 @@ void Timer_2ms_lTask(void const * argument)
 		}            //在从STOP切换到其他状态时，s_time_tick_2ms清零重加，会重新复位陀螺仪
 
 		getJudgeState();
+		
+		if(g_workState==RUNE_STATE&&bShoot==1)
+		{
+			if(zyShootTimeCount<125)
+			{
+				zyShootTimeCount++;
+			}
+			else if(zyShootTimeCount==125)
+			{
+				bShoot=0;
+				ShootOneBullet();//拨盘啵一个
+				zyShootTimeCount=0;
+				
+			}
+		}
 		
 		RuneShootControl();
 		
@@ -363,5 +380,4 @@ void getJudgeState(void)
 		}
 	}
 }
-
 
