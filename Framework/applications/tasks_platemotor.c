@@ -47,8 +47,8 @@ void PlateMotorTask(void const * argument)
 	int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 	int RotateAdd = 0;
 	int Stuck = 0;
-	uint32_t last_fdb = 0x0;
-	uint32_t this_fdb = 0x0;
+	int32_t last_fdb = 0x0;
+	int32_t this_fdb = 0x0;
 	portTickType xLastWakeTimeQZK;
 	xLastWakeTimeQZK = xTaskGetTickCount();
 	static int s_count_1s = 0;
@@ -88,6 +88,8 @@ void PlateMotorTask(void const * argument)
 		if(GetFrictionState()==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_ON)//拨盘转动前提条件：摩擦轮转动GetFrictionState()==FRICTION_WHEEL_ON,张雁加后面的条件
 		{
 			this_fdb = GetQuadEncoderDiff(); 
+			
+			//fw_printfln("last_fdb = %d",last_fdb);
 			//fw_printfln("this_fdb = %d",this_fdb);
 			
 			//卡弹处理
@@ -127,6 +129,7 @@ void PlateMotorTask(void const * argument)
 		{
 			__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 0);//摩擦轮不转，立刻关闭拨盘
 		}
+		
 		vTaskDelayUntil( &xLastWakeTimeQZK, ( 2 / portTICK_RATE_MS ) );//这里进入阻塞态等待2ms
 	}
 }
@@ -134,15 +137,16 @@ void PlateMotorTask(void const * argument)
 void ShootOneBullet()
 {
 	s_count_bullet ++;
+	//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
 	if(s_count_bullet <= 4)
 	{
 	ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
 	}
 }
 
-uint32_t GetQuadEncoderDiff(void)
+int32_t GetQuadEncoderDiff(void)
 {
-  uint32_t cnt = 0;    
+  int32_t cnt = 0;    
 	cnt = __HAL_TIM_GET_COUNTER(&htim5) - 0x0;
 	//fw_printfln("%x",cnt);
 	 //__HAL_TIM_SET_COUNTER(&htim5, 0x7fff);
