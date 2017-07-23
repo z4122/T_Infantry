@@ -99,7 +99,7 @@ void PlateMotorTask(void const * argument)
 			{
 				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb-(65536-this_fdb+last_fdb);
 			}
-			else
+			else if((this_fdb-last_fdb)<500 && (this_fdb-last_fdb)>-500)
 				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb + this_fdb-last_fdb;
 
 			last_fdb = this_fdb;

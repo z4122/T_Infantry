@@ -71,8 +71,8 @@ InputMode_e inputmode = REMOTE_INPUT;
 
 unsigned int zyLeftPostion; //大符用左拨杆位置
  
-uint32_t RotateCNT = 0;	//长按连发计数
-uint16_t CNT_1s = 75;	//用于避免两秒内连射8发过于密集的情况
+static uint32_t RotateCNT = 0;	//长按连发计数
+static uint16_t CNT_1s = 75;	//用于避免两秒内连射8发过于密集的情况
 
 RampGen_t frictionRamp = RAMP_GEN_DAFAULT;  
 RampGen_t LRSpeedRamp = RAMP_GEN_DAFAULT;   
