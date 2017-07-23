@@ -60,7 +60,7 @@ extern int twist_state ;
 
 extern WorkState_e g_workState;//张雁大符
 
-static uint32_t delayCnt = 500;	//用于按键e去抖
+//static uint32_t delayCnt = 500;	//用于按键e去抖
 
 void RControlTask(void const * argument){
 	uint8_t data[18];
@@ -229,7 +229,7 @@ extern uint8_t JUDGE_State;
 
 void MouseKeyControlProcess(Mouse *mouse, Key *key)
 {
-	++delayCnt;
+	//++delayCnt;
 	static uint16_t forward_back_speed = 0;
 	static uint16_t left_right_speed = 0;
 	if(GetWorkState()!=PREPARE_STATE)
@@ -289,11 +289,16 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		}
 		if(key->v & 0x80)	//key:e  检测第8位是不是1
 		{
-			if(delayCnt>500)
-			{
-				toggleLaunchMode();
-				delayCnt = 0;
-			}
+			setLaunchMode(SINGLE_MULTI);
+//			if(delayCnt>500)
+//			{
+//				toggleLaunchMode();
+//				delayCnt = 0;
+//			}
+		}
+		if(key->v & 0x40)	//key:q
+		{
+			setLaunchMode(CONSTENT_4);
 		}
 		
 		/*裁判系统离线时的功率限制方式*/
