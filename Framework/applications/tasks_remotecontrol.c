@@ -60,7 +60,7 @@ extern int twist_state ;
 
 extern WorkState_e g_workState;//张雁大符
 
-uint32_t delayCnt = 500;	//用于按键e去抖
+static uint32_t delayCnt = 500;	//用于按键e去抖
 
 void RControlTask(void const * argument){
 	uint8_t data[18];
