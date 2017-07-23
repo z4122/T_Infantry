@@ -294,17 +294,6 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 				toggleLaunchMode();
 				delayCnt = 0;
 			}
-			
-			//++delayCnt;
-//			if(pressCnt>6)	//连续收到6个e
-//			{
-//				pressCnt = 0;
-//				toggleLaunchMode();
-//			}
-		}
-		else
-		{
-			
 		}
 		
 		/*裁判系统离线时的功率限制方式*/
