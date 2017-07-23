@@ -33,8 +33,8 @@ typedef enum
 }LaunchMode_e;
 
 void setLaunchMode(LaunchMode_e launchMode);
-LaunchMode_e getLaunchMode();
-void toggleLaunchMode();
+LaunchMode_e getLaunchMode(void);
+void toggleLaunchMode(void);
 
 #define SHOOT_MOTOR_POSITION_PID_DEFAULT \
 {\
