@@ -233,24 +233,24 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 }
 
 #ifdef INFANTRY_4
-#define pAddZy 8.14
-#define pMinusZy 5.97
-#define yAddZy 7.2
-#define yMinusZy 9.7//4号车
+#define pAddZy 8.14f
+#define pMinusZy 5.97f
+#define yAddZy 7.2f
+#define yMinusZy 9.7f//4号车
 #define zyDetaP 1.7f
 #define zyDetaY 1.8f
 #endif
 #ifdef INFANTRY_5
-#define pAddZy 7.44
-#define pMinusZy 5.2
-#define yAddZy 9.2
+#define pAddZy 7.44f
+#define pMinusZy 5.2f
+#define yAddZy 9.2f
 #define yMinusZy 9.9//5号车//float pAddZy=7.14,pMinusZy=5.97,yAddZy=8.5,yMinusZy=9.5;//5号车
 #define zyDetaP 2.0f
 #define zyDetaY 0.0f
 #endif
 #ifdef INFANTRY_1
-#define pAddZy 6.74
-#define pMinusZy 5.97
+#define pAddZy 6.74f
+#define pMinusZy 5.97f
 #define yAddZy 6.8f
 #define yMinusZy 8.5//1号车
 #define zyDetaP 2.0f
