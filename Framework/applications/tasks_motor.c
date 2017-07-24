@@ -186,7 +186,7 @@ void ControlPitch(void)
 			MINMAX(pitchAngleTarget, -2.f, 31.3f);
 			#endif
 			#ifdef INFANTRY_4
-			MINMAX(pitchAngleTarget, -18.f, 30);
+			MINMAX(pitchAngleTarget, -14.f, 30);
 			#endif
 			#ifdef INFANTRY_1
 			MINMAX(pitchAngleTarget, -9.0f, 32);

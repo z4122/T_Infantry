@@ -159,7 +159,7 @@ void Timer_2ms_lTask(void const * argument)
 			}
 			else
 			{
-				fw_printfln("Judge received");
+//				fw_printfln("Judge received");
 
 			}
 		}
