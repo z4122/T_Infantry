@@ -244,7 +244,7 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 #define pAddZy 7.44f
 #define pMinusZy 5.2f
 #define yAddZy 9.2f
-#define yMinusZy 9.9//5号车//float pAddZy=7.14,pMinusZy=5.97,yAddZy=8.5,yMinusZy=9.5;//5号车
+#define yMinusZy 9.9f//5号车//float pAddZy=7.14,pMinusZy=5.97,yAddZy=8.5,yMinusZy=9.5;//5号车
 #define zyDetaP 2.0f
 #define zyDetaY 0.0f
 #endif
@@ -252,7 +252,7 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 #define pAddZy 6.74f
 #define pMinusZy 5.97f
 #define yAddZy 6.8f
-#define yMinusZy 8.5//1号车
+#define yMinusZy 8.5f//1号车
 #define zyDetaP 2.0f
 #define zyDetaY 2.5f
 #endif
