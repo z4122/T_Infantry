@@ -72,7 +72,8 @@ InputMode_e inputmode = REMOTE_INPUT;
 unsigned int zyLeftPostion; //大符用左拨杆位置
  
 static uint32_t RotateCNT = 0;	//长按连发计数
-static uint16_t CNT_1s = 75;	//用于避免两秒内连射8发过于密集的情况
+static uint16_t CNT_1s = 75;	//用于避免四连发模式下两秒内连射8发过于密集的情况
+static uint16_t CNT_250ms = 18;	//用于点射模式下射频限制
 
 RampGen_t frictionRamp = RAMP_GEN_DAFAULT;  
 RampGen_t LRSpeedRamp = RAMP_GEN_DAFAULT;   
@@ -253,6 +254,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 void MouseShootControl(Mouse *mouse)
 {
 	++CNT_1s;
+	++CNT_250ms;
 	static int16_t closeDelayCount = 0;   
 	switch(g_friction_wheel_state)
 	{
@@ -319,7 +321,11 @@ void MouseShootControl(Mouse *mouse)
 				SetShootState(SHOOTING);
 				if(getLaunchMode() == SINGLE_MULTI && GetFrictionState()==FRICTION_WHEEL_ON)		//单发模式下，点一下打一发
 				{
-					ShootOneBullet();
+					if(CNT_250ms>17)
+					{
+						CNT_250ms = 0;
+						ShootOneBullet();
+					}
 				}
 				else if(getLaunchMode() == CONSTENT_4 && GetFrictionState()==FRICTION_WHEEL_ON)	//四连发模式下，点一下打四发
 				{
@@ -341,7 +347,7 @@ void MouseShootControl(Mouse *mouse)
 			}			
 			else if(mouse->last_press_l == 1 && mouse->press_l== 1 && getLaunchMode() == SINGLE_MULTI)//单发模式下长按，便持续连发
 			{
-				RotateCNT+=40;
+				RotateCNT+=50;
 				if(RotateCNT>=OneShoot)
 				{
 					ShootOneBullet();
