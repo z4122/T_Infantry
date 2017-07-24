@@ -69,12 +69,17 @@ void RControlTask(void const * argument){
 	static TickType_t thiscount_rc;
 	static uint8_t first_frame = 0;
 	while(1){
+		if(first_frame == 0)
+		{
+			MX_IWDG_Init();
+		}
 		HAL_IWDG_Refresh(&hiwdg);
 		/*等待串口接收中断回调函数释放信号量*/
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
 		//fw_printfln("RC is running");
 		/*获取两帧时间间隔，正常14ms，大于16ms认为错误*/
 		thiscount_rc = xTaskGetTickCount();
+
 		if( ((thiscount_rc - lastcount_rc) <= 16) && (first_frame == 1))//第一帧认为错误
 		{
 			/*从IOPool读数据到数组*/
@@ -88,14 +93,14 @@ void RControlTask(void const * argument){
 					data[i] = pData[i];
 				}
 
-      /*处理数据*/
-			RemoteDataProcess(data);	//process raw data then execute new order
-			/*扔掉多余数据，重新开启接收中断*/
-			HAL_UART_AbortReceive(&RC_UART);
-			HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
+				/*处理数据*/
+				RemoteDataProcess(data);	//process raw data then execute new order
+				/*扔掉多余数据，重新开启接收中断*/
+				HAL_UART_AbortReceive(&RC_UART);
+				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 
-			if(countwhile >= 300){
-				countwhile = 0;
+				if(countwhile >= 300){
+					countwhile = 0;
 //			    fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
 //				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
 //				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
@@ -112,10 +117,10 @@ void RControlTask(void const * argument){
 //				
 //				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
 //				fw_printf("===========\r\n");
-			}else{
-				countwhile++;
-			}
-	      }
+				}else{
+					countwhile++;
+				}
+	    }
 		}
 		else{
 			/*错误帧等待2ms后清空缓存，开启中断*/
