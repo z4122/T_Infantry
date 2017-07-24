@@ -21,7 +21,6 @@
 //#define INFANTRY_5                                                                           
 
 void CMGMControlTask(void const * argument);
-void UpdateFromManifold(void);
 void ControlYaw(void);
 void ControlPitch(void);
 void ControlRotate(void);

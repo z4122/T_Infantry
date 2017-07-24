@@ -78,11 +78,11 @@ void rtos_AddThreads()
   ledRedTaskHandle = osThreadCreate(osThread(ledRedTask), NULL);
 	
 //蜂鸣器任务，暂时无用
-	osThreadDef(buzzerTask, buzzerTask, osPriorityNormal, 0, 128);
-  buzzerTaskHandle = osThreadCreate(osThread(buzzerTask), NULL);
+//	osThreadDef(buzzerTask, buzzerTask, osPriorityNormal, 0, 128);
+//  buzzerTaskHandle = osThreadCreate(osThread(buzzerTask), NULL);
 	
 //IMU数据获取，角速度(用于云台电机速度反馈)，角度(需四元数解算)
-	osThreadDef(IMUTask, IMUTask, osPriorityHigh, 0, 128);
+	osThreadDef(IMUTask, IMUTask, osPriorityHigh, 0, 256);
   printIMUTaskHandle = osThreadCreate(osThread(IMUTask), NULL);
 
 //遥控器控制任务	
@@ -94,11 +94,11 @@ void rtos_AddThreads()
   getCtrlUartTaskHandle = osThreadCreate(osThread(ManifoldUartTask), NULL);
 
 //CM(ChasisMotor)底盘电机GM(Gimbla)云台电机控制任务
-	osThreadDef(GMC_Task, CMGMControlTask, osPriorityAboveNormal, 0, 1024);
+	osThreadDef(GMC_Task, CMGMControlTask, osPriorityAboveNormal, 0, 800);
   GMControlTaskHandle = osThreadCreate(osThread(GMC_Task), NULL);
 	
 //拨盘电机任务 
-	osThreadDef(Plate_Task, PlateMotorTask, osPriorityAboveNormal, 0, 256);
+	osThreadDef(Plate_Task, PlateMotorTask, osPriorityAboveNormal, 0, 300);
   PlateTaskHandle = osThreadCreate(osThread(Plate_Task), NULL);
 //2ms定时任务，状态机切换，调试信息输出等
 
