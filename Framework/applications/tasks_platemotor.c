@@ -44,9 +44,9 @@ LaunchMode_e launchMode = SINGLE_MULTI;
 
 void PlateMotorTask(void const * argument)
 {
-	int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
+	//int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 	int RotateAdd = 0;
-	int Stuck = 0;
+	//int Stuck = 0;
 	int32_t last_fdb = 0x0;
 	int32_t this_fdb = 0x0;
 	portTickType xLastWakeTimeQZK;
@@ -61,7 +61,7 @@ void PlateMotorTask(void const * argument)
 			s_count_1s = 0;
 			s_count_bullet = 0;
 		}
-		if(GetInputMode()==KEY_MOUSE_INPUT && Stuck==0)//键鼠模式下直接在数据处理程序中实现
+		if(GetInputMode()==KEY_MOUSE_INPUT)//键鼠模式下直接在数据处理程序中实现// && Stuck==0
 		{
 			//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;//打一发弹编码器输出脉冲数
 			//遥控器一帧14ms，此任务循环7次，最终是打了7发
@@ -69,13 +69,12 @@ void PlateMotorTask(void const * argument)
 		}
 
 	//遥控器输入模式下，只要处于发射态，就一直转动
-		if(GetShootState() == SHOOTING && GetInputMode() == REMOTE_INPUT && Stuck==0)
+		if(GetShootState() == SHOOTING && GetInputMode() == REMOTE_INPUT) //&& Stuck==0
 		{
 			RotateAdd += 4;
 			//fw_printfln("ref = %f",ShootMotorPositionPID.ref);
 			if(RotateAdd>OneShoot)
 			{
-				//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
 				ShootOneBullet();
 				RotateAdd = 0;
 			}
@@ -92,12 +91,6 @@ void PlateMotorTask(void const * argument)
 			//fw_printfln("last_fdb = %d",last_fdb);
 			//fw_printfln("this_fdb = %d",this_fdb);
 			
-			//卡弹处理
-	//		if(abs(ShootMotorPositionPID.ref-ShootMotorPositionPID.fdb)>100 && (abs(this_fdb-last_fdb)<5 || abs(this_fdb+65535-last_fdb)<5)) //认为卡弹
-	//		{//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - OneShoot;
-	//		}
-		//	else
-			//{
 			if(this_fdb<last_fdb-10000 && getPlateMotorDir()==FORWARD)	//cnt寄存器溢出判断 正转
 			{
 				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb+(65536+this_fdb-last_fdb);
@@ -106,14 +99,13 @@ void PlateMotorTask(void const * argument)
 			{
 				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb-(65536-this_fdb+last_fdb);
 			}
-			else
+			else if((this_fdb-last_fdb)<500 && (this_fdb-last_fdb)>-500)
 				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb + this_fdb-last_fdb;
-		//	}
+
 			last_fdb = this_fdb;
 			//fw_printfln("fdb = %f",ShootMotorPositionPID.fdb);
 			ShootMotorPositionPID.Calc(&ShootMotorPositionPID);
-	//		ShootMotorSpeedPID.ref = ShootMotorPositionPID.output;
-	//		ShootMotorSpeedPID.fdb = 
+	
 			if(ShootMotorPositionPID.output<0) //反转
 			{
 				setPlateMotorDir(REVERSE);
@@ -137,7 +129,6 @@ void PlateMotorTask(void const * argument)
 void ShootOneBullet()
 {
 	s_count_bullet ++;
-	//ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
 	if(s_count_bullet <= 4)
 	{
 	ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
@@ -148,8 +139,6 @@ int32_t GetQuadEncoderDiff(void)
 {
   int32_t cnt = 0;    
 	cnt = __HAL_TIM_GET_COUNTER(&htim5) - 0x0;
-	//fw_printfln("%x",cnt);
-	 //__HAL_TIM_SET_COUNTER(&htim5, 0x7fff);
 	return cnt;
 }
 
