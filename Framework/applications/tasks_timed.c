@@ -89,7 +89,8 @@ static uint32_t s_time_tick_2ms = 0;
 
 extern RampGen_t frictionRamp ;
 extern uint8_t bShoot;
-uint8_t zyShootTimeCount=0;//张雁大符
+uint8_t zyShootTimeCount=0;
+uint8_t zyRuneMode=0;//张雁大符
 
 void Timer_2ms_lTask(void const * argument)
 {
@@ -119,11 +120,11 @@ void Timer_2ms_lTask(void const * argument)
 		
 		if(g_workState==RUNE_STATE&&bShoot==1)
 		{
-			if(zyShootTimeCount<125)
+			if(zyShootTimeCount<150)
 			{
 				zyShootTimeCount++;
 			}
-			else if(zyShootTimeCount==125)
+			else if(zyShootTimeCount==150)
 			{
 				bShoot=0;
 				ShootOneBullet();//拨盘啵一个
@@ -210,6 +211,8 @@ void WorkStateFSM(void)
 			}
 			else if(s_time_tick_2ms > PREPARE_TIME_TICK_MS)
 			{
+				zyRuneMode=0;
+				LASER_ON();
 				g_workState = NORMAL_STATE;
 			}			
 		}break;
@@ -231,14 +234,19 @@ void WorkStateFSM(void)
 			{
 				g_workState = RUNE_STATE;
 				g_switchRead = 0;
-				
+				LASER_ON();
+				zyRuneMode=1;
 				if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1
 					||RC_CtrlData.key.v == 1024)//小符
 				{
+					LASER_OFF();
+					zyRuneMode=2;
 					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&littleRuneMSG, 4, 0xFFFF);
 				}else if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2
 					||RC_CtrlData.key.v == 32768)//大符
 				{
+					LASER_OFF();
+					zyRuneMode=3;
 					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&bigRuneMSG, 4, 0xFFFF);
 				}
 			}
@@ -265,6 +273,7 @@ void WorkStateFSM(void)
 			{
 				g_workState = NORMAL_STATE;
 				g_switchRead = 0;
+				zyRuneMode=0;
 			}
 		}break;
 		default:
@@ -303,13 +312,13 @@ void WorkStateSwitchProcess(void)
 		zyLocationInit(gap_angle, pitchRealAngle);
 		yawAngleTarget = gap_angle;
 		pitchAngleTarget = pitchRealAngle;
-		LASER_OFF();
+		//LASER_OFF();//zy0726
 		*(IOPool_pGetWriteData(ctrlUartIOPool) -> ch) = 4;
 		IOPool_getNextWrite(ctrlUartIOPool);
 	}
 	if((lastWorkState != g_workState) && (lastWorkState == RUNE_STATE))  
 	{
-		LASER_OFF();
+		LASER_ON();
 		SetShootState(NOSHOOTING);
 		SetFrictionWheelSpeed(1000);
 		SetFrictionState(FRICTION_WHEEL_OFF);
@@ -339,7 +348,7 @@ void RuneShootControl(void)
 				SetShootState(NOSHOOTING);
 				frictionRamp.ResetCounter(&frictionRamp);
 				SetFrictionState(FRICTION_WHEEL_START_TURNNING);	 
-				LASER_OFF(); 
+				//LASER_OFF(); //zy0726
 			}break;
 			case FRICTION_WHEEL_START_TURNNING:
 			{

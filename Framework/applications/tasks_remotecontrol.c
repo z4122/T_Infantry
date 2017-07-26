@@ -32,6 +32,9 @@
 #include "tasks_platemotor.h"
 #include "drivers_uartupper_user.h"
 
+#include "peripheral_laser.h"
+extern uint8_t zyRuneMode;//ZY激光瞄准镜
+
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
 {\
@@ -425,9 +428,13 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		}
 		if(RC_CtrlData.key.v == 1024)//小符 G
 		{
+			LASER_OFF();
+			zyRuneMode=2;
 			HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&littleRuneMSG, 4, 0xFFFF);
 		}else if(RC_CtrlData.key.v == 32768)//大符 B
 		{
+			LASER_OFF();
+			zyRuneMode=3;
 			HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&bigRuneMSG, 4, 0xFFFF);
 		}
 	}
