@@ -25,9 +25,12 @@
 #include "tasks_motor.h"
 #include "drivers_uartjudge_low.h"
 #include "drivers_cmpower.h"
+#include <stdbool.h>
 
 extern tGameInfo mytGameInfo;
 extern uint8_t JUDGE_State;
+
+extern bool g_bInited;
 
 void setMotor(MotorId motorId, int16_t Intensity){
 	static int16_t CMFLIntensity = 0, CMFRIntensity = 0, CMBLIntensity = 0, CMBRIntensity = 0;
@@ -150,7 +153,7 @@ void setMotor(MotorId motorId, int16_t Intensity){
 		CMBRIntensity = (CM_current_max/sum)*CMBRIntensity;
 	}
 	
-	if(GetWorkState() == STOP_STATE)
+	if(GetWorkState() == STOP_STATE || g_bInited != 1)
 	{
 		CMFLIntensity = 0;
 		CMFRIntensity = 0;

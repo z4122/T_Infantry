@@ -49,6 +49,7 @@ typedef struct{
 	float pitch_position;
 }Location_Number_s;
 
+void ShootRune(uint8_t location);
 void vRefreshLocation(float yaw_center, float pitch_center);
 	
 IOPoolDeclare(ctrlUartIOPool, struct{uint8_t ch[size_frame];});

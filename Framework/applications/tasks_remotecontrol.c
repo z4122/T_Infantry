@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "tasks_platemotor.h"
+#include "drivers_uartupper_user.h"
 
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
@@ -96,6 +97,7 @@ void RControlTask(void const * argument){
 				/*处理数据*/
 				RemoteDataProcess(data);	//process raw data then execute new order
 				/*扔掉多余数据，重新开启接收中断*/
+				vTaskDelay(2 / portTICK_RATE_MS);
 				HAL_UART_AbortReceive(&RC_UART);
 				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 
@@ -180,7 +182,7 @@ void RemoteDataProcess(uint8_t *pData)
 		}break;
 		case KEY_MOUSE_INPUT:
 		{
-			if(GetWorkState() == NORMAL_STATE)
+			if(GetWorkState() != PREPARE_STATE)
 			{
 //				if(RC_CtrlData.rc.s1==3)
 //				{
@@ -232,12 +234,16 @@ extern uint8_t JUDGE_State;
   #define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 3
 #endif
 
+extern uint8_t waitRuneMSG[4];
+extern uint8_t littleRuneMSG[4];
+extern uint8_t bigRuneMSG[4];
+
 void MouseKeyControlProcess(Mouse *mouse, Key *key)
 {
 	//++delayCnt;
 	static uint16_t forward_back_speed = 0;
 	static uint16_t left_right_speed = 0;
-	if(GetWorkState()!=PREPARE_STATE)
+	if(GetWorkState() == NORMAL_STATE)
 	{
 		VAL_LIMIT(mouse->x, -150, 150); 
 		VAL_LIMIT(mouse->y, -150, 150); 
@@ -363,6 +369,67 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 
 
 		MouseShootControl(mouse);
+	}
+	else if(GetWorkState() == RUNE_STATE)
+	{
+		switch(RC_CtrlData.key.v)
+		{
+			case 64://q
+			{
+				uint8_t location = 0;
+				ShootRune(location);
+			}break;
+			case 1://w
+			{
+				uint8_t location = 1;
+				ShootRune(location);
+			}break;
+			case 128://e
+			{
+				uint8_t location = 2;
+				ShootRune(location);
+			}break;
+			case 4://a
+			{
+				uint8_t location = 3;
+				ShootRune(location);
+			}break;
+			case 2://s
+			{
+				uint8_t location = 4;
+				ShootRune(location);
+			}break;
+			case 8://d
+			{
+				uint8_t location = 5;
+				ShootRune(location);
+			}break;
+			case 2048://z
+			{
+				uint8_t location = 6;
+				ShootRune(location);
+			}break;
+			case 4096://x
+			{
+				uint8_t location = 7;
+				ShootRune(location);
+			}break;
+			case 8192://c
+			{
+				uint8_t location = 8;
+				ShootRune(location);
+			}break;
+			default:
+			{
+			}
+		}
+		if(RC_CtrlData.key.v == 1024)//小符 G
+		{
+			HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&littleRuneMSG, 4, 0xFFFF);
+		}else if(RC_CtrlData.key.v == 32768)//大符 B
+		{
+			HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&bigRuneMSG, 4, 0xFFFF);
+		}
 	}
 }
 

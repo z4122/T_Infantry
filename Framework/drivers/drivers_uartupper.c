@@ -57,8 +57,6 @@ void manifoldUartRxCpltCallback()
 		int temp=*pData;
 		yawAngleTarget = Location_Number[temp].yaw_position;
 		pitchAngleTarget = Location_Number[temp].pitch_position;
-		fw_printfln("manifold callback:%x,",*pData);
-		fw_printfln("manifold callback:pitchTarget,%f,yawTarget:%f",pitchAngleTarget,yawAngleTarget);
 		
 		bShoot=1;
 		//ShootOneBullet();//拨盘啵一个
@@ -80,6 +78,17 @@ void manifoldUartRxCpltCallback()
 	}
 }
 
+void ShootRune(uint8_t loc)
+{
+	if(GetWorkState()==RUNE_STATE)
+	{
+		yawAngleTarget = Location_Number[loc].yaw_position;
+		pitchAngleTarget = Location_Number[loc].pitch_position;
+		
+		bShoot=1;
+		//ShootOneBullet();//拨盘啵一个
+  }
+}
 
 void InitManifoldUart()
 {
