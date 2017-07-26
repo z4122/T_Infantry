@@ -191,9 +191,9 @@ extern RemoteSwitch_t g_switch1;
 extern RC_Ctl_t RC_CtrlData; 
 extern bool g_switchRead;
 
-static uint8_t waitRuneMSG[4] = {0xff, 0x00, 0x00, 0xfe};
-static uint8_t littleRuneMSG[4] = {0xff, 0x01, 0x00, 0xfe};
-static uint8_t bigRuneMSG[4] = {0xff, 0x02, 0x00, 0xfe};
+uint8_t waitRuneMSG[4] = {0xff, 0x00, 0x00, 0xfe};
+uint8_t littleRuneMSG[4] = {0xff, 0x01, 0x00, 0xfe};
+uint8_t bigRuneMSG[4] = {0xff, 0x02, 0x00, 0xfe};
 
 void WorkStateFSM(void)
 {
@@ -225,7 +225,8 @@ void WorkStateFSM(void)
 								&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1 
 										|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2
 							||RC_CtrlData.key.v == 32768//B
-							||RC_CtrlData.key.v == 1024)//G)
+							||RC_CtrlData.key.v == 1024//G
+							||RC_CtrlData.key.v == 16384)//V
 							&& g_switchRead == 1)
 			{
 				g_workState = RUNE_STATE;
@@ -259,10 +260,7 @@ void WorkStateFSM(void)
 			}
 			else if(((g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_1TO3 
 									|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_2TO3) 
-							||RC_CtrlData.key.v == 0x01//w
-							||RC_CtrlData.key.v == 0x04//a
-							||RC_CtrlData.key.v == 0x02//s
-							||RC_CtrlData.key.v == 0x08)//d
+							||RC_CtrlData.key.v == 512)//F
 							&& g_switchRead == 1)
 			{
 				g_workState = NORMAL_STATE;
