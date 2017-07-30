@@ -90,7 +90,8 @@ static uint32_t s_time_tick_2ms = 0;
 extern RampGen_t frictionRamp ;
 extern uint8_t bShoot;
 uint8_t zyShootTimeCount=0;
-uint8_t zyRuneMode=0;//张雁大符
+uint8_t zyRuneMode=0;
+extern uint16_t checkRecTime;//张雁大符
 
 void Timer_2ms_lTask(void const * argument)
 {
@@ -118,35 +119,42 @@ void Timer_2ms_lTask(void const * argument)
 
 		getJudgeState();
 		
-		if(g_workState==RUNE_STATE&&bShoot==1)
+		if(g_workState==RUNE_STATE)
 		{
-			if(zyShootTimeCount<150)
+			if(bShoot==1)
 			{
-				zyShootTimeCount++;
+				if(zyShootTimeCount<50)
+				{
+					zyShootTimeCount++;
+				}
+				else if(zyShootTimeCount==50)
+				{
+					bShoot=0;
+					ShootOneBullet();//拨盘啵一个
+					zyShootTimeCount=0;
+					
+				}
 			}
-			else if(zyShootTimeCount==150)
-			{
-				bShoot=0;
-				ShootOneBullet();//拨盘啵一个
-				zyShootTimeCount=0;
-				
-			}
+			if(checkRecTime<65534)
+				checkRecTime++;
 		}
 		
 		RuneShootControl();
 		
 		
 		
-		if(s_countWhile >= 1000)
+		if(s_countWhile >= 1000)//150 1000
 		{//定时1s,发送调试信息
 			s_countWhile = 0;
 //			IOPool_getNextRead(GMYAWRxIOPool, 0); 
-//			float tempYaw = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle-1445) * 360 / 8192.0f;
+//			float tempYaw = (IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle-100) * 360 / 8192.0f;
 //			NORMALIZE_ANGLE180(tempYaw);
-//			fw_printfln("YawAngle= %f", tempYaw);
-//			IOPool_getNextRead(GMPITCHRxIOPool, 0); 
-//			float tempPitch = -(IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - 5009) * 360 / 8192.0;
+//			fw_printfln("YawAngle= %f,targetYaw:%f", tempYaw,yawAngleTarget);
+////		fw_printfln("YawAngle= %f", tempYaw);
+////			IOPool_getNextRead(GMPITCHRxIOPool, 0); 
+//			float tempPitch = -(IOPool_pGetReadData(GMPITCHRxIOPool, 0)->angle - 6400) * 360 / 8192.0f;
 //			NORMALIZE_ANGLE180(tempPitch);
+//			fw_printfln("PitchAngle= %f,targetPitch:%f", tempPitch,pitchAngleTarget);
 //			fw_printfln("PitchAngle= %f", tempPitch);
 			//fw_printfln("ZGyroModuleAngle:  %f",ZGyroModuleAngle);
 //			fw_printfln("YawAngle= %d", IOPool_pGetReadData(GMYAWRxIOPool, 0)->angle);
@@ -309,9 +317,12 @@ void WorkStateSwitchProcess(void)
 	}
 	if((lastWorkState != g_workState) && (g_workState == RUNE_STATE))  
 	{
-		zyLocationInit(gap_angle, pitchRealAngle);
-		yawAngleTarget = gap_angle;
-		pitchAngleTarget = pitchRealAngle;
+		zyLocationInit(gap_angle, pitchAngleTarget);
+		//yawAngleTarget = gap_angle;
+		yawAngleTarget = 0;
+//		fw_printfln("Rune gap_angle:%f",gap_angle);
+//		fw_printfln("Rune pitchRealAngle:%f",pitchRealAngle);
+//		pitchAngleTarget = pitchRealAngle;
 		//LASER_OFF();//zy0726
 		*(IOPool_pGetWriteData(ctrlUartIOPool) -> ch) = 4;
 		IOPool_getNextWrite(ctrlUartIOPool);

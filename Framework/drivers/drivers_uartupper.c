@@ -39,7 +39,8 @@ Location_Number_s Location_Number[9] = {{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0
 extern float yawRealAngle;
 extern float pitchRealAngle;
 uint8_t bShoot=0;
-extern uint8_t zyRuneMode;//张雁大符相关
+extern uint8_t zyRuneMode;
+uint16_t checkRecTime=0;//张雁大符相关
 uint8_t runeLocation = 4;
 
 void manifoldUartRxCpltCallback()
@@ -53,7 +54,7 @@ void manifoldUartRxCpltCallback()
 	zyYawTarget=0;
 	uint8_t *pData = &runeLocation;
 	
-	if(GetWorkState()==RUNE_STATE&&zyRuneMode>1)
+	if(GetWorkState()==RUNE_STATE&&zyRuneMode>1&&checkRecTime>300)
 	{
 		int temp=*pData;
 		yawAngleTarget = Location_Number[temp].yaw_position;
@@ -61,6 +62,7 @@ void manifoldUartRxCpltCallback()
 		
 		bShoot=1;
 		//ShootOneBullet();//拨盘啵一个
+		checkRecTime=0;
   }
 	else
 	{
@@ -243,28 +245,28 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 }
 
 #ifdef INFANTRY_4
-#define pAddZy 7.04f
+#define pAddZy 6.84f
 #define pMinusZy 5.97f
-#define yAddZy 8.7f
-#define yMinusZy 9.7f//4号车
-#define zyDetaP 1.4f
-#define zyDetaY 1.7f
+#define yAddZy 9.7f
+#define yMinusZy 10.3f//4号车
+#define zyDetaP 1.7f
+#define zyDetaY 1.1f
 #endif
 #ifdef INFANTRY_5
-#define pAddZy 7.44f
-#define pMinusZy 5.2f
+#define pAddZy 6.64f
+#define pMinusZy 5.9f
 #define yAddZy 9.2f
 #define yMinusZy 9.9f//5号车//float pAddZy=7.14,pMinusZy=5.97,yAddZy=8.5,yMinusZy=9.5;//5号车
-#define zyDetaP 2.0f
+#define zyDetaP 1.4f
 #define zyDetaY 0.0f
 #endif
 #ifdef INFANTRY_1
-#define pAddZy 6.34f
+#define pAddZy 6.84f
 #define pMinusZy 5.97f
-#define yAddZy 8.7f
-#define yMinusZy 9.6f//1号车
-#define zyDetaP 2.3f
-#define zyDetaY 2.1f
+#define yAddZy 8.9f
+#define yMinusZy 10.2f//1号车
+#define zyDetaP 1.5f
+#define zyDetaY 1.5f
 #endif
 void zyLocationInit(float yaw_center,float pitch_center)
 {
