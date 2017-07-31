@@ -133,6 +133,7 @@ void Timer_2ms_lTask(void const * argument)
 					ShootOneBullet();//拨盘啵一个
 					zyShootTimeCount=0;
 					
+					
 					checkRecTime=0;
 				}
 			}
