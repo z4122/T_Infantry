@@ -37,8 +37,9 @@ void SetLocateState(Locate_State_e v);
 Locate_State_e GetLocateState(void);
 
 typedef enum{
-	AIMING = 0,
-	NOAIMING = 1,
+	WAITING = 0,
+	BIGRUNE = 1,
+	SMALLRUNE = 2,
 }Rune_State_e;
 void SetRuneState(Rune_State_e v);
 Rune_State_e GetRuneState(void);
@@ -48,6 +49,7 @@ typedef struct{
 	float pitch_position;
 }Location_Number_s;
 
+void ShootRune(uint8_t location);
 void vRefreshLocation(float yaw_center, float pitch_center);
 	
 IOPoolDeclare(ctrlUartIOPool, struct{uint8_t ch[size_frame];});

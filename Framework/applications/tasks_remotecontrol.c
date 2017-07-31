@@ -23,11 +23,17 @@
 #include "pwm_server_motor.h"
 #include "drivers_uartjudge_low.h"
 #include "tasks_motor.h"
+#include "iwdg.h"
 //**//
 #include "utilities_minmax.h"
 #include "math.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include "tasks_platemotor.h"
+#include "drivers_uartupper_user.h"
+
+#include "peripheral_laser.h"
+extern uint8_t zyRuneMode;//ZY激光瞄准镜
 
 #define VAL_LIMIT(val, min, max)\
 if(val<=min)\
@@ -58,6 +64,8 @@ extern int twist_state ;
 
 extern WorkState_e g_workState;//张雁大符
 
+//static uint32_t delayCnt = 500;	//用于按键e去抖
+
 void RControlTask(void const * argument){
 	uint8_t data[18];
 	static int countwhile = 0;
@@ -65,10 +73,17 @@ void RControlTask(void const * argument){
 	static TickType_t thiscount_rc;
 	static uint8_t first_frame = 0;
 	while(1){
+		if(first_frame == 0)
+		{
+			MX_IWDG_Init();
+		}
+		HAL_IWDG_Refresh(&hiwdg);
 		/*等待串口接收中断回调函数释放信号量*/
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
+		//fw_printfln("RC is running");
 		/*获取两帧时间间隔，正常14ms，大于16ms认为错误*/
 		thiscount_rc = xTaskGetTickCount();
+
 		if( ((thiscount_rc - lastcount_rc) <= 16) && (first_frame == 1))//第一帧认为错误
 		{
 			/*从IOPool读数据到数组*/
@@ -82,14 +97,15 @@ void RControlTask(void const * argument){
 					data[i] = pData[i];
 				}
 
-      /*处理数据*/
-			RemoteDataProcess(data);	//process raw data then execute new order
-			/*扔掉多余数据，重新开启接收中断*/
-			HAL_UART_AbortReceive(&RC_UART);
-			HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
+				/*处理数据*/
+				RemoteDataProcess(data);	//process raw data then execute new order
+				/*扔掉多余数据，重新开启接收中断*/
+				vTaskDelay(2 / portTICK_RATE_MS);
+				HAL_UART_AbortReceive(&RC_UART);
+				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 
-			if(countwhile >= 300){
-				countwhile = 0;
+				if(countwhile >= 300){
+					countwhile = 0;
 //			    fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
 //				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
 //				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
@@ -106,10 +122,10 @@ void RControlTask(void const * argument){
 //				
 //				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
 //				fw_printf("===========\r\n");
-			}else{
-				countwhile++;
-			}
-	      }
+				}else{
+					countwhile++;
+				}
+	    }
 		}
 		else{
 			/*错误帧等待2ms后清空缓存，开启中断*/
@@ -163,12 +179,13 @@ void RemoteDataProcess(uint8_t *pData)
 		{
 			if(GetWorkState() == NORMAL_STATE)
 			{ //if gyro has been reseted
+//				fw_printfln("RC is running");
 				RemoteControlProcess(&(RC_CtrlData.rc));//遥控器模式
 			}
 		}break;
 		case KEY_MOUSE_INPUT:
 		{
-			if(GetWorkState() == NORMAL_STATE)
+			if(GetWorkState() != PREPARE_STATE)
 			{
 //				if(RC_CtrlData.rc.s1==3)
 //				{
@@ -220,11 +237,16 @@ extern uint8_t JUDGE_State;
   #define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 3
 #endif
 
+extern uint8_t waitRuneMSG[4];
+extern uint8_t littleRuneMSG[4];
+extern uint8_t bigRuneMSG[4];
+
 void MouseKeyControlProcess(Mouse *mouse, Key *key)
 {
+	//++delayCnt;
 	static uint16_t forward_back_speed = 0;
 	static uint16_t left_right_speed = 0;
-	if(GetWorkState()!=PREPARE_STATE)
+	if(GetWorkState() == NORMAL_STATE)
 	{
 		VAL_LIMIT(mouse->x, -150, 150); 
 		VAL_LIMIT(mouse->y, -150, 150); 
@@ -238,7 +260,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			forward_back_speed =  LOW_FORWARD_BACK_SPEED;
 			left_right_speed = LOW_LEFT_RIGHT_SPEED;
 		}
-		else if(key->v & 0x20)//CanpsLK
+		else if(key->v == 32)//Ctrl
 		{
 			forward_back_speed =  MIDDLE_FORWARD_BACK_SPEED;
 			left_right_speed = MIDDLE_LEFT_RIGHT_SPEED;
@@ -278,6 +300,19 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		{
 			ChassisSpeedRef.left_right_ref = 0;
 			LRSpeedRamp.ResetCounter(&LRSpeedRamp);
+		}
+		if(key->v & 0x80)	//key:e  检测第8位是不是1
+		{
+			setLaunchMode(SINGLE_MULTI);
+//			if(delayCnt>500)
+//			{
+//				toggleLaunchMode();
+//				delayCnt = 0;
+//			}
+		}
+		if(key->v & 0x40)	//key:q
+		{
+			setLaunchMode(CONSTENT_4);
 		}
 		
 		/*裁判系统离线时的功率限制方式*/
@@ -335,7 +370,73 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 			twist_state = 0;
 		}
 
+
 		MouseShootControl(mouse);
+	}
+	else if(GetWorkState() == RUNE_STATE)
+	{
+		switch(RC_CtrlData.key.v)
+		{
+			case 64://q
+			{
+				uint8_t location = 0;
+				ShootRune(location);
+			}break;
+			case 1://w
+			{
+				uint8_t location = 1;
+				ShootRune(location);
+			}break;
+			case 128://e
+			{
+				uint8_t location = 2;
+				ShootRune(location);
+			}break;
+			case 4://a
+			{
+				uint8_t location = 3;
+				ShootRune(location);
+			}break;
+			case 2://s
+			{
+				uint8_t location = 4;
+				ShootRune(location);
+			}break;
+			case 8://d
+			{
+				uint8_t location = 5;
+				ShootRune(location);
+			}break;
+			case 2048://z
+			{
+				uint8_t location = 6;
+				ShootRune(location);
+			}break;
+			case 4096://x
+			{
+				uint8_t location = 7;
+				ShootRune(location);
+			}break;
+			case 8192://c
+			{
+				uint8_t location = 8;
+				ShootRune(location);
+			}break;
+			default:
+			{
+			}
+		}
+		if(RC_CtrlData.key.v == 1024)//小符 G
+		{
+			LASER_OFF();
+			zyRuneMode=2;
+			HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&littleRuneMSG, 4, 0xFFFF);
+		}else if(RC_CtrlData.key.v == 32768)//大符 B
+		{
+			LASER_OFF();
+			zyRuneMode=3;
+			HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&bigRuneMSG, 4, 0xFFFF);
+		}
 	}
 }
 
