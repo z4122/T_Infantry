@@ -127,20 +127,13 @@ void Timer_2ms_lTask(void const * argument)
 				{
 					zyShootTimeCount++;
 				}
-<<<<<<< HEAD
-				else if(zyShootTimeCount==10&&checkRecTime>200)
-=======
 				else if(zyShootTimeCount==10)
->>>>>>> origin/master
 				{
 					bShoot=0;
 					ShootOneBullet();//拨盘啵一个
 					zyShootTimeCount=0;
 					
-<<<<<<< HEAD
-=======
 					
->>>>>>> origin/master
 					checkRecTime=0;
 				}
 			}

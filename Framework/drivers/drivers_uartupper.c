@@ -56,11 +56,7 @@ void manifoldUartRxCpltCallback()
 	zyYawTarget=0;
 	uint8_t *pData = &runeLocation;
 	
-<<<<<<< HEAD
-	if(GetWorkState()==RUNE_STATE&&zyRuneMode>1)//&&checkRecTime>200)
-=======
 	if((GetWorkState()==RUNE_STATE&&zyRuneMode>1) && (checkRecTime > 200))
->>>>>>> origin/master
 	{
 		int temp=*pData;
 		yawAngleTarget = Location_Number[temp].yaw_position;

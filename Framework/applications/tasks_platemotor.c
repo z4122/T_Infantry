@@ -39,18 +39,19 @@ PID_Regulator_t ShootMotorSpeedPID = SHOOT_MOTOR_SPEED_PID_DEFAULT;
 
 extern FrictionWheelState_e friction_wheel_stateZY;
 static int s_count_bullet = 0;
-int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
+
 LaunchMode_e launchMode = SINGLE_MULTI;
 
 void PlateMotorTask(void const * argument)
 {
+	//int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 	int RotateAdd = 0;
+	//int Stuck = 0;
 	int32_t last_fdb = 0x0;
 	int32_t this_fdb = 0x0;
 	portTickType xLastWakeTimeQZK;
 	xLastWakeTimeQZK = xTaskGetTickCount();
 	static int s_count_1s = 0;
-	static int s_stuck_cnt = 0;
 	
 	while(1)
 	{
@@ -82,29 +83,7 @@ void PlateMotorTask(void const * argument)
 		{
 			RotateAdd = 0;
 		}
-		
-		//卡弹检测
-		//当参考值和反馈值保持长时间较大差别时，判定卡弹
-		if(ShootMotorPositionPID.ref-ShootMotorPositionPID.fdb>OneShoot*3 || ShootMotorPositionPID.ref-ShootMotorPositionPID.fdb<OneShoot*(-3))
-		{
-			++s_stuck_cnt;
-			if(s_stuck_cnt>250)//保持500ms。即认为卡弹
-			{
-				s_stuck_cnt = 0;
-				stuck = 1;	//置位卡弹标志位,
-			}	
-		}
-		else
-		{
-			s_stuck_cnt = 0;
-		}
-		
-		if(stuck == 1)//如果卡弹，则调整拨盘位置为卡弹前的那一格
-		{
-			ShootRefModify();
-			stuck = 0;
-		}
-		
+
 		if(GetFrictionState()==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_ON)//拨盘转动前提条件：摩擦轮转动GetFrictionState()==FRICTION_WHEEL_ON,张雁加后面的条件
 		{
 			this_fdb = GetQuadEncoderDiff(); 
@@ -122,7 +101,7 @@ void PlateMotorTask(void const * argument)
 			}
 			else if((this_fdb-last_fdb)<500 && (this_fdb-last_fdb)>-500)
 				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb + this_fdb-last_fdb;
-			
+
 			last_fdb = this_fdb;
 			//fw_printfln("fdb = %f",ShootMotorPositionPID.fdb);
 			ShootMotorPositionPID.Calc(&ShootMotorPositionPID);
@@ -154,15 +133,6 @@ void ShootOneBullet()
 	{
 	ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
 	}
-}
-
-void ShootRefModify()
-{
-	while(ShootMotorPositionPID.ref-ShootMotorPositionPID.fdb>OneShoot)
-	{
-		ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - OneShoot;
-	}
-	ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - OneShoot;
 }
 
 int32_t GetQuadEncoderDiff(void)
