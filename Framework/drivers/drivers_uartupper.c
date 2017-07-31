@@ -43,6 +43,8 @@ extern uint8_t zyRuneMode;
 //uint16_t checkRecTime=0;//张雁大符相关
 uint8_t runeLocation = 4;
 
+extern uint16_t checkRecTime;
+
 void manifoldUartRxCpltCallback()
 {
 	//ShootOneBullet();
@@ -54,7 +56,11 @@ void manifoldUartRxCpltCallback()
 	zyYawTarget=0;
 	uint8_t *pData = &runeLocation;
 	
+<<<<<<< HEAD
 	if(GetWorkState()==RUNE_STATE&&zyRuneMode>1)//&&checkRecTime>200)
+=======
+	if((GetWorkState()==RUNE_STATE&&zyRuneMode>1) && (checkRecTime > 200))
+>>>>>>> origin/master
 	{
 		int temp=*pData;
 		yawAngleTarget = Location_Number[temp].yaw_position;
@@ -82,9 +88,11 @@ void manifoldUartRxCpltCallback()
 	}
 }
 
+
+
 void ShootRune(uint8_t loc)//手打射击函数
 {
-	if(GetWorkState()==RUNE_STATE)
+	if((GetWorkState()==RUNE_STATE) && (checkRecTime > 100))
 	{
 		yawAngleTarget = Location_Number[loc].yaw_position;
 		pitchAngleTarget = Location_Number[loc].pitch_position;
