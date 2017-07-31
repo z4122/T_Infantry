@@ -91,7 +91,7 @@ extern RampGen_t frictionRamp ;
 extern uint8_t bShoot;
 uint8_t zyShootTimeCount=0;
 uint8_t zyRuneMode=0;
-extern uint16_t checkRecTime;//张雁大符
+uint16_t checkRecTime=300;//张雁大符
 
 void Timer_2ms_lTask(void const * argument)
 {
@@ -123,16 +123,17 @@ void Timer_2ms_lTask(void const * argument)
 		{
 			if(bShoot==1)
 			{
-				if(zyShootTimeCount<50)
+				if(zyShootTimeCount<10)
 				{
 					zyShootTimeCount++;
 				}
-				else if(zyShootTimeCount==50)
+				else if(zyShootTimeCount==10&&checkRecTime>200)
 				{
 					bShoot=0;
 					ShootOneBullet();//拨盘啵一个
 					zyShootTimeCount=0;
 					
+					checkRecTime=0;
 				}
 			}
 			if(checkRecTime<65534)
