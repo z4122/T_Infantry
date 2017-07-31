@@ -123,11 +123,11 @@ void Timer_2ms_lTask(void const * argument)
 		{
 			if(bShoot==1)
 			{
-				if(zyShootTimeCount<10)
+				if(zyShootTimeCount<100)
 				{
 					zyShootTimeCount++;
 				}
-				else if(zyShootTimeCount==10)
+				else if(zyShootTimeCount==100)
 				{
 					bShoot=0;
 					ShootOneBullet();//拨盘啵一个
