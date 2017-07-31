@@ -127,7 +127,7 @@ void Timer_2ms_lTask(void const * argument)
 				{
 					zyShootTimeCount++;
 				}
-				else if(zyShootTimeCount==10&&checkRecTime>200)
+				else if(zyShootTimeCount==10)
 				{
 					bShoot=0;
 					ShootOneBullet();//拨盘啵一个
@@ -137,10 +137,11 @@ void Timer_2ms_lTask(void const * argument)
 					checkRecTime=0;
 				}
 			}
-			if(checkRecTime<65534)
-				checkRecTime++;
 		}
-		
+		if(checkRecTime<65534)
+		{
+			checkRecTime++;
+		}
 		RuneShootControl();
 		
 		
