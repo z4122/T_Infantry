@@ -89,7 +89,7 @@ static uint32_t s_time_tick_2ms = 0;
 
 extern RampGen_t frictionRamp ;
 extern uint8_t bShoot;
-uint8_t zyShootTimeCount=0;
+uint16_t zyShootTimeCount=0;
 uint8_t zyRuneMode=0;
 uint16_t checkRecTime=300;//张雁大符
 
@@ -123,11 +123,11 @@ void Timer_2ms_lTask(void const * argument)
 		{
 			if(bShoot==1)
 			{
-				if(zyShootTimeCount<100)
+				if(zyShootTimeCount<85)
 				{
 					zyShootTimeCount++;
 				}
-				else if(zyShootTimeCount==100)
+				else if(zyShootTimeCount==85)
 				{
 					bShoot=0;
 					ShootOneBullet();//拨盘啵一个
