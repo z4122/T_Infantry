@@ -39,12 +39,11 @@ PID_Regulator_t ShootMotorSpeedPID = SHOOT_MOTOR_SPEED_PID_DEFAULT;
 
 extern FrictionWheelState_e friction_wheel_stateZY;
 static int s_count_bullet = 0;
-
+int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 LaunchMode_e launchMode = SINGLE_MULTI;
 
 void PlateMotorTask(void const * argument)
 {
-	//int stuck = 0;	//卡弹标志位，未卡弹为false，卡弹为true
 	int RotateAdd = 0;
 	//int Stuck = 0;
 	int32_t last_fdb = 0x0;
@@ -52,6 +51,7 @@ void PlateMotorTask(void const * argument)
 	portTickType xLastWakeTimeQZK;
 	xLastWakeTimeQZK = xTaskGetTickCount();
 	static int s_count_1s = 0;
+	static int s_stuck_cnt = 0;
 	
 	while(1)
 	{
@@ -84,6 +84,28 @@ void PlateMotorTask(void const * argument)
 			RotateAdd = 0;
 		}
 
+		//卡弹检测
+		//当参考值和反馈值长时间保持较大差别时，判定卡弹
+		if(ShootMotorPositionPID.ref-ShootMotorPositionPID.fdb>OneShoot*3 || ShootMotorPositionPID.ref-ShootMotorPositionPID.fdb<OneShoot*(-3))
+		{
+			++s_stuck_cnt;
+			if(s_stuck_cnt>250)
+			{
+				s_stuck_cnt = 0;
+				stuck = 1;
+			}
+		}
+		else
+		{
+			s_stuck_cnt = 0;
+		}
+		
+		if(stuck == 1)
+		{
+			stuck = 0;
+			ShootRefModify();
+		}
+		
 		if(GetFrictionState()==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_ON)//拨盘转动前提条件：摩擦轮转动GetFrictionState()==FRICTION_WHEEL_ON,张雁加后面的条件
 		{
 			this_fdb = GetQuadEncoderDiff(); 
@@ -134,6 +156,13 @@ void ShootOneBullet()
 	ShootMotorPositionPID.ref = ShootMotorPositionPID.ref+OneShoot;
 	}
 }
+
+void ShootRefModify()
+{
+	while(ShootMotorPositionPID.ref>ShootMotorPositionPID.fdb)
+		ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - 2*OneShoot;
+}
+	
 
 int32_t GetQuadEncoderDiff(void)
 {
