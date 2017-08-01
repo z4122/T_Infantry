@@ -250,8 +250,8 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 }
 
 #ifdef INFANTRY_4
-#define pAddZy 6.84f
-#define pMinusZy 5.97f
+#define pAddZy 6.74f
+#define pMinusZy 5.77f
 #define yAddZy 9.7f
 #define yMinusZy 10.3f//4号车
 #define zyDetaP 1.7f
