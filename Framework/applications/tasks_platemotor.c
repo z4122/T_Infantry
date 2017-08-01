@@ -159,9 +159,11 @@ void ShootOneBullet()
 
 void ShootRefModify()
 {
-	while(ShootMotorPositionPID.ref>ShootMotorPositionPID.fdb)
+	while(ShootMotorPositionPID.ref>ShootMotorPositionPID.fdb && ShootMotorPositionPID.ref>2*OneShoot)
 		ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - 2*OneShoot;
+	
 }
+
 	
 
 int32_t GetQuadEncoderDiff(void)
