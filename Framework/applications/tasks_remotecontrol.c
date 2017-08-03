@@ -375,6 +375,11 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 	}
 	else if(GetWorkState() == RUNE_STATE)
 	{
+		VAL_LIMIT(mouse->x, -150, 150); 
+		VAL_LIMIT(mouse->y, -150, 150); 
+	
+		pitchAngleTarget -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  
+		yawAngleTarget    -= mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
 		switch(RC_CtrlData.key.v)
 		{
 			case 64://q
