@@ -379,7 +379,7 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 	
 		pitchAngleTarget -= mouse->y* MOUSE_TO_PITCH_ANGLE_INC_FACT;  
 		yawAngleTarget    -= mouse->x* MOUSE_TO_YAW_ANGLE_INC_FACT;
-		
+
 		switch(RC_CtrlData.key.v)
 		{
 			case 64://q
