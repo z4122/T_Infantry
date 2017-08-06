@@ -210,7 +210,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 		{
 			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   
 			{
-				LASER_OFF();
+				LASER_OFF();//zy0802
 				SetShootState(NOSHOOTING);
 				SetFrictionWheelSpeed(1000);
 				g_friction_wheel_state = FRICTION_WHEEL_OFF;
@@ -233,7 +233,7 @@ void RemoteShootControl(RemoteSwitch_t *sw, uint8_t val)
 		{
 			if(sw->switch_value1 == REMOTE_SWITCH_CHANGE_3TO1)   
 			{
-				LASER_OFF();
+				LASER_OFF();//zy0802
 				g_friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
@@ -281,7 +281,7 @@ void MouseShootControl(Mouse *mouse)
 			}
 			if(closeDelayCount>50)   
 			{
-				LASER_OFF();
+				LASER_OFF();//zy0802
 				g_friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);
@@ -310,7 +310,7 @@ void MouseShootControl(Mouse *mouse)
 			}
 			if(closeDelayCount>50)   //
 			{
-				LASER_OFF();
+				LASER_OFF();//zy0802
 				g_friction_wheel_state = FRICTION_WHEEL_OFF;				  
 				SetFrictionWheelSpeed(1000); 
 				frictionRamp.ResetCounter(&frictionRamp);

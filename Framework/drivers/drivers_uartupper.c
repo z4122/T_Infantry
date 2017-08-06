@@ -102,7 +102,12 @@ void InitManifoldUart()
 {
 	ctrlData.Success = 1;  
 	//vRefreshLocation(0, 0);
-	zyLocationInit(1.0,8.0);//1号-2.0,6.1
+	//zyLocationInit(1.0,8.0);//1号-2.0,6.1
+	for(int i=0;i<9;i++)
+	{
+		Location_Number[i].yaw_position=0;
+		Location_Number[i].pitch_position=0;
+	}
 	if(HAL_UART_Receive_DMA(&MANIFOLD_UART, &runeLocation, 1) != HAL_OK){
 		Error_Handler();
 		printf( "InitManifoldUart error" );
@@ -254,7 +259,7 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 #define pMinusZy 5.77f
 #define yAddZy 9.7f
 #define yMinusZy 10.3f//4号车
-#define zyDetaP 1.7f
+#define zyDetaP 0.2f
 #define zyDetaY 1.0f
 #endif
 #ifdef INFANTRY_5
@@ -270,12 +275,33 @@ void vRefreshLocation(float yaw_center, float pitch_center){
 #define pMinusZy 5.87f
 #define yAddZy 9.0f
 #define yMinusZy 10.0f//1号车
-#define zyDetaP 1.5f
-#define zyDetaY 1.1f
+#define zyDetaP 0.4f
+#define zyDetaY 0.8f
 #endif
-void zyLocationInit(float yaw_center,float pitch_center)
+void zyLocationInit(Location_Number_s * Rune3Position)//(float yaw_center,float pitch_center)
 {
-	pitch_center = pitch_center - zyDetaP;
+	for(int i=0;i<3;i++)
+	{
+		Rune3Position[i].yaw_position=Rune3Position[i].yaw_position+zyDetaY;
+		Rune3Position[i].pitch_position=Rune3Position[i].pitch_position-zyDetaP;
+	}
+	Location_Number[0].yaw_position= Rune3Position[0].yaw_position;
+	Location_Number[0].pitch_position= Rune3Position[0].pitch_position - 0.2f;
+	Location_Number[1].yaw_position = Rune3Position[1].yaw_position;
+	Location_Number[1].pitch_position = Rune3Position[0].pitch_position - 0.2f;
+	Location_Number[2].yaw_position = Rune3Position[2].yaw_position;
+	Location_Number[2].pitch_position = Rune3Position[0].pitch_position - 0.2f;
+	Location_Number[3].yaw_position = Rune3Position[0].yaw_position;
+	Location_Number[3].pitch_position = Rune3Position[1].pitch_position;
+	Location_Number[4]=Rune3Position[1];
+	Location_Number[5].yaw_position = Rune3Position[2].yaw_position;
+	Location_Number[5].pitch_position = Rune3Position[1].pitch_position;
+	Location_Number[6].yaw_position = Rune3Position[0].yaw_position;
+	Location_Number[6].pitch_position = Rune3Position[2].pitch_position;
+	Location_Number[7].yaw_position = Rune3Position[1].yaw_position;
+	Location_Number[7].pitch_position = Rune3Position[2].pitch_position;
+  Location_Number[8]=Rune3Position[2];
+	/*pitch_center = pitch_center - zyDetaP;
 	yaw_center=yaw_center+zyDetaY;//4号车+1.0f
 	Location_Number[0].yaw_position = yaw_center + yAddZy;
 	Location_Number[0].pitch_position = pitch_center + pAddZy;
@@ -295,4 +321,5 @@ void zyLocationInit(float yaw_center,float pitch_center)
 	Location_Number[7].pitch_position = pitch_center - pMinusZy;
   Location_Number[8].yaw_position = yaw_center - yMinusZy;
 	Location_Number[8].pitch_position = pitch_center - pMinusZy;
+	*/
 }

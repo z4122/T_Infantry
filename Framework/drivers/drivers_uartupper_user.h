@@ -56,6 +56,7 @@ IOPoolDeclare(ctrlUartIOPool, struct{uint8_t ch[size_frame];});
 
 void manifoldUartRxCpltCallback(void);
 
-void zyLocationInit(float yaw_center, float pitch_center);//张雁大符初始
+//void zyLocationInit(float yaw_center, float pitch_center);
+void zyLocationInit(Location_Number_s * Rune3Position);//张雁大符初始
 
 #endif
