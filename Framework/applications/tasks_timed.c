@@ -39,7 +39,8 @@
 #include "utilities_minmax.h"
 #include "drivers_ramp.h"
 #include "peripheral_laser.h"
-#include "drivers_uartrc_low.h"//zy
+#include "drivers_uartrc_low.h"
+#include "tasks_motor.h"//zy
 #include <stdbool.h>
 extern PID_Regulator_t CMRotatePID ; 
 extern PID_Regulator_t CM1SpeedPID;
@@ -89,9 +90,24 @@ static uint32_t s_time_tick_2ms = 0;
 
 extern RampGen_t frictionRamp ;
 extern uint8_t bShoot;
-uint8_t zyShootTimeCount=0;
+uint16_t zyShootTimeCount=0;
 uint8_t zyRuneMode=0;
-uint16_t checkRecTime=300;//张雁大符
+uint16_t checkRecTime=300;
+Location_Number_s pRunePosition[3];
+uint16_t checkKeyTime=500;
+#ifdef INFANTRY_5
+//手动标定0点
+#define yaw_zero 2163//2200
+#define pitch_zero 3275
+#endif
+#ifdef INFANTRY_4
+#define yaw_zero 2806//2840
+#define pitch_zero 5009 
+#endif
+#ifdef INFANTRY_1
+#define yaw_zero 4708//100
+#define pitch_zero 6400
+#endif //p在前，y在后//张雁大符
 
 void Timer_2ms_lTask(void const * argument)
 {
@@ -123,24 +139,17 @@ void Timer_2ms_lTask(void const * argument)
 		{
 			if(bShoot==1)
 			{
-				if(zyShootTimeCount<10)
+				if(zyShootTimeCount<1)
 				{
 					zyShootTimeCount++;
 				}
-<<<<<<< HEAD
-				else if(zyShootTimeCount==10&&checkRecTime>200)
-=======
-				else if(zyShootTimeCount==10)
->>>>>>> origin/master
+				else if(zyShootTimeCount==1)
 				{
 					bShoot=0;
 					ShootOneBullet();//拨盘啵一个
 					zyShootTimeCount=0;
 					
-<<<<<<< HEAD
-=======
 					
->>>>>>> origin/master
 					checkRecTime=0;
 				}
 			}
@@ -148,6 +157,10 @@ void Timer_2ms_lTask(void const * argument)
 		if(checkRecTime<65534)
 		{
 			checkRecTime++;
+		}
+		if(checkKeyTime<65534)
+		{
+			checkKeyTime++;
 		}
 		RuneShootControl();
 		
@@ -243,6 +256,19 @@ void WorkStateFSM(void)
 			}
 			//ZY
 			else if(GetInputMode() == KEY_MOUSE_INPUT
+								&& (RC_CtrlData.key.v == 16384)&& g_switchRead == 1)
+			{
+				g_switchRead = 0;
+				if(checkKeyTime>450)
+				{
+					checkKeyTime=0;
+					zyRuneMode=0;
+					LASER_ON();
+					g_workState=RUNE_STATE;
+				}
+				
+			}
+			/*else if(GetInputMode() == KEY_MOUSE_INPUT
 								&& (g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1 
 										|| g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO2
 							||RC_CtrlData.key.v == 32768//B
@@ -253,7 +279,7 @@ void WorkStateFSM(void)
 				g_workState = RUNE_STATE;
 				g_switchRead = 0;
 				LASER_ON();
-				zyRuneMode=1;
+				zyRuneMode=0;
 				if(g_switch1.switch_value1 == REMOTE_SWITCH_CHANGE_3TO1
 					||RC_CtrlData.key.v == 1024)//小符
 				{
@@ -267,7 +293,7 @@ void WorkStateFSM(void)
 					zyRuneMode=3;
 					HAL_UART_Transmit(&MANIFOLD_UART , (uint8_t *)&bigRuneMSG, 4, 0xFFFF);
 				}
-			}
+			}*/
 			//ZY
 		}break;
 		case STOP_STATE:   
@@ -291,7 +317,43 @@ void WorkStateFSM(void)
 			{
 				g_workState = NORMAL_STATE;
 				g_switchRead = 0;
-				zyRuneMode=0;
+				zyRuneMode=4;
+			}
+			else if(GetInputMode() == KEY_MOUSE_INPUT
+								&& (RC_CtrlData.key.v == 16384)&& g_switchRead == 1&&zyRuneMode==0)
+			{
+				g_switchRead = 0;
+				if(checkKeyTime>450)
+				{
+					checkKeyTime=0;
+					pRunePosition[0].pitch_position=pitchAngleTarget;
+					pRunePosition[0].yaw_position=yawAngleTarget;
+					zyRuneMode++;
+				}
+			}
+			else if(GetInputMode() == KEY_MOUSE_INPUT
+								&& (RC_CtrlData.key.v == 16384)&& g_switchRead == 1&&zyRuneMode==1)
+			{
+				g_switchRead = 0;
+				if(checkKeyTime>450)
+				{
+					checkKeyTime=0;
+					pRunePosition[1].pitch_position=pitchAngleTarget;
+					pRunePosition[1].yaw_position=yawAngleTarget;
+					zyRuneMode++;
+				}
+			}else if(GetInputMode() == KEY_MOUSE_INPUT
+								&& (RC_CtrlData.key.v == 16384)&& g_switchRead == 1&&zyRuneMode==2)
+			{
+				g_switchRead = 0;
+				if(checkKeyTime>450)
+				{
+					checkKeyTime=0;
+					pRunePosition[2].pitch_position=pitchAngleTarget;
+					pRunePosition[2].yaw_position=yawAngleTarget;
+					zyLocationInit(pRunePosition);
+					zyRuneMode=4;
+				}
 			}
 		}break;
 		default:
@@ -327,19 +389,22 @@ void WorkStateSwitchProcess(void)
 	}
 	if((lastWorkState != g_workState) && (g_workState == RUNE_STATE))  
 	{
-		zyLocationInit(gap_angle, pitchAngleTarget);
+		/*zyLocationInit(gap_angle, pitchAngleTarget);
 		//yawAngleTarget = gap_angle;
-		yawAngleTarget = 0;
+		
 //		fw_printfln("Rune gap_angle:%f",gap_angle);
 //		fw_printfln("Rune pitchRealAngle:%f",pitchRealAngle);
-//		pitchAngleTarget = pitchRealAngle;
+//		
 		//LASER_OFF();//zy0726
+		*/
+		yawAngleTarget = 0;
+		pitchAngleTarget = pitchRealAngle;
 		*(IOPool_pGetWriteData(ctrlUartIOPool) -> ch) = 4;
 		IOPool_getNextWrite(ctrlUartIOPool);
 	}
 	if((lastWorkState != g_workState) && (lastWorkState == RUNE_STATE))  
 	{
-		LASER_ON();
+		LASER_OFF();//LASER_ON()
 		SetShootState(NOSHOOTING);
 		SetFrictionWheelSpeed(1000);
 		SetFrictionState(FRICTION_WHEEL_OFF);

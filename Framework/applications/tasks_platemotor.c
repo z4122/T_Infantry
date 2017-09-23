@@ -45,6 +45,7 @@ LaunchMode_e launchMode = SINGLE_MULTI;
 void PlateMotorTask(void const * argument)
 {
 	int RotateAdd = 0;
+	//int Stuck = 0;
 	int32_t last_fdb = 0x0;
 	int32_t this_fdb = 0x0;
 	portTickType xLastWakeTimeQZK;
@@ -82,27 +83,27 @@ void PlateMotorTask(void const * argument)
 		{
 			RotateAdd = 0;
 		}
-		
+
 		//卡弹检测
-		//当参考值和反馈值保持长时间较大差别时，判定卡弹
+		//当参考值和反馈值长时间保持较大差别时，判定卡弹
 		if(ShootMotorPositionPID.ref-ShootMotorPositionPID.fdb>OneShoot*3 || ShootMotorPositionPID.ref-ShootMotorPositionPID.fdb<OneShoot*(-3))
 		{
 			++s_stuck_cnt;
-			if(s_stuck_cnt>250)//保持500ms。即认为卡弹
+			if(s_stuck_cnt>250)
 			{
 				s_stuck_cnt = 0;
-				stuck = 1;	//置位卡弹标志位,
-			}	
+				stuck = 1;
+			}
 		}
 		else
 		{
 			s_stuck_cnt = 0;
 		}
 		
-		if(stuck == 1)//如果卡弹，则调整拨盘位置为卡弹前的那一格
+		if(stuck == 1)
 		{
-			ShootRefModify();
 			stuck = 0;
+			ShootRefModify();
 		}
 		
 		if(GetFrictionState()==FRICTION_WHEEL_ON||friction_wheel_stateZY==FRICTION_WHEEL_ON)//拨盘转动前提条件：摩擦轮转动GetFrictionState()==FRICTION_WHEEL_ON,张雁加后面的条件
@@ -122,7 +123,7 @@ void PlateMotorTask(void const * argument)
 			}
 			else if((this_fdb-last_fdb)<500 && (this_fdb-last_fdb)>-500)
 				ShootMotorPositionPID.fdb = ShootMotorPositionPID.fdb + this_fdb-last_fdb;
-			
+
 			last_fdb = this_fdb;
 			//fw_printfln("fdb = %f",ShootMotorPositionPID.fdb);
 			ShootMotorPositionPID.Calc(&ShootMotorPositionPID);
@@ -158,12 +159,12 @@ void ShootOneBullet()
 
 void ShootRefModify()
 {
-	while(ShootMotorPositionPID.ref-ShootMotorPositionPID.fdb>OneShoot)
-	{
-		ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - OneShoot;
-	}
-	ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - OneShoot;
+	while(ShootMotorPositionPID.ref>ShootMotorPositionPID.fdb && ShootMotorPositionPID.ref>2*OneShoot)
+		ShootMotorPositionPID.ref = ShootMotorPositionPID.ref - 2*OneShoot;
+	
 }
+
+	
 
 int32_t GetQuadEncoderDiff(void)
 {

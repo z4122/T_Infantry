@@ -155,12 +155,14 @@ void ControlYaw(void)
 			yawIntensity = ProcessYawPID(yawAngleTarget, yawRealAngle, -gYroZs);
 			setMotor(GMYAW, yawIntensity);
 			s_yawCount = 0;
+			
+			ControlRotate();
 		}
 		else
 		{
 			s_yawCount++;
 		}
-		 ControlRotate();
+		 
 	}
 }
 /*Pitch电机*/

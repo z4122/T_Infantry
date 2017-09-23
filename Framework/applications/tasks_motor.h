@@ -15,9 +15,9 @@
 #ifndef TASKS_MOTOR_H
 #define TASKS_MOTOR_H
 
-/*通过define使一套程序使用多台车*/
-//#define INFANTRY_1
-#define INFANTRY_4
+///*通过define使一套程序使用多台车*/
+#define INFANTRY_1
+//#define INFANTRY_4
 //#define INFANTRY_5                                                                           
 
 void CMGMControlTask(void const * argument);
