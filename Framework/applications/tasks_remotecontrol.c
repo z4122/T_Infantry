@@ -183,8 +183,8 @@ void RemoteDataProcess(uint8_t *pData)
 	}
 }
 
-uint16_t enemy_yaw = 9000;
-uint16_t enemy_pitch = 5000;
+uint16_t enemy_yaw = YAW_OFFSET;
+uint16_t enemy_pitch = PITCH_OFFSET;
 
 void Auto_AttackControlProcess(Remote *rc)
 {

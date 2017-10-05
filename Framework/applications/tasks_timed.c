@@ -109,6 +109,8 @@ uint16_t checkKeyTime=500;
 #define pitch_zero 6400
 #endif //p在前，y在后//张雁大符
 
+uint16_t enemy_detect_cnt = 0;
+
 void Timer_2ms_lTask(void const * argument)
 {
 	//RTOS提供，用来做2ms精确定时
@@ -164,7 +166,15 @@ void Timer_2ms_lTask(void const * argument)
 		}
 		RuneShootControl();
 		
-		
+		if(enemy_detect_cnt>500)    //1s内没有刷新自动打击数据则回中
+		{
+			enemy_yaw = YAW_OFFSET;
+			enemy_pitch = PITCH_OFFSET;
+		}
+		else
+		{
+			enemy_detect_cnt++;
+		}
 		
 		if(s_countWhile >= 1000)//150 1000
 		{//定时1s,发送调试信息

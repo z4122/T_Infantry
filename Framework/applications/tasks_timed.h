@@ -25,6 +25,7 @@ void getJudgeState(void);
 void CMControlLoop(void);
 void RuneShootControl(void);
 
+extern uint16_t enemy_detect_cnt;
 
 //initiate status: 
 typedef enum
