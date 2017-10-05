@@ -185,6 +185,12 @@ void Timer_2ms_lTask(void const * argument)
 			/*****查看任务栈空间剩余示例*******/
 			//		StackResidue = uxTaskGetStackHighWaterMark( GMControlTaskHandle );
 			//		fw_printfln("GM%ld",StackResidue);
+			
+			fw_printfln("yawAngleTarget= %f", yawAngleTarget);
+			fw_printfln("pitchAngleTarget= %f", pitchAngleTarget);
+			fw_printfln("enemy_yaw= %d", enemy_yaw);
+			fw_printfln("enemy_pitch= %d", enemy_pitch);
+			
 			if(JUDGE_State == OFFLINE)
 			{
 				fw_printfln("Judge not received");

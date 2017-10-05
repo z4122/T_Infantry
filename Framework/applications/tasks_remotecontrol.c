@@ -78,15 +78,13 @@ void RControlTask(void const * argument){
 			MX_IWDG_Init();
 		}
 		HAL_IWDG_Refresh(&hiwdg);
-		/*等待串口接收中断回调函数释放信号量*/
+	
 		xSemaphoreTake(xSemaphore_rcuart, osWaitForever);
-		//fw_printfln("RC is running");
-		/*获取两帧时间间隔，正常14ms，大于16ms认为错误*/
+		
 		thiscount_rc = xTaskGetTickCount();
 
 		if( ((thiscount_rc - lastcount_rc) <= 16) && (first_frame == 1))//第一帧认为错误
 		{
-			/*从IOPool读数据到数组*/
 			IOPool_getNextWrite(rcUartIOPool);
 			if(IOPool_hasNextRead(rcUartIOPool, 0))
 			{
@@ -97,39 +95,20 @@ void RControlTask(void const * argument){
 					data[i] = pData[i];
 				}
 
-				/*处理数据*/
 				RemoteDataProcess(data);	//process raw data then execute new order
-				/*扔掉多余数据，重新开启接收中断*/
+			
 				vTaskDelay(2 / portTICK_RATE_MS);
 				HAL_UART_AbortReceive(&RC_UART);
 				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 
 				if(countwhile >= 300){
 					countwhile = 0;
-//			    fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
-//				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
-//				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
-//				fw_printf("ch3 = %d \r\n", RC_CtrlData.rc.ch3);
-//				
-//				fw_printf("s1 = %d | ", RC_CtrlData.rc.s1);
-//				fw_printf("s2 = %d \r\n", RC_CtrlData.rc.s2);
-//				
-//				fw_printf("x = %d | ", RC_CtrlData.mouse.x);
-//				fw_printf("y = %d | ", RC_CtrlData.mouse.y);
-//				fw_printf("z = %d | ", RC_CtrlData.mouse.z);
-//				fw_printf("l = %d | ", RC_CtrlData.mouse.press_l);
-//				fw_printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
-//				
-//				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
-//				fw_printf("===========\r\n");
 				}else{
 					countwhile++;
 				}
 	    }
 		}
 		else{
-			/*错误帧等待2ms后清空缓存，开启中断*/
-			//fw_printfln("RC discarded");
 			first_frame = 1;
 			vTaskDelay(2 / portTICK_RATE_MS);
 			HAL_UART_AbortReceive(&RC_UART);
@@ -167,7 +146,6 @@ void RemoteDataProcess(uint8_t *pData)
 	
 	SetInputMode(&RC_CtrlData.rc);
 	
-		/*左上角拨杆状态获取*/
 	GetRemoteSwitchAction(&g_switch1, RC_CtrlData.rc.s1);
 	g_switchRead = 1;
 	
@@ -187,27 +165,39 @@ void RemoteDataProcess(uint8_t *pData)
 		{
 			if(GetWorkState() != PREPARE_STATE)
 			{
-//				if(RC_CtrlData.rc.s1==3)
-//				{
-//					g_workState=RUNE_STATE;
-//				}
-//				else
-//				{
 					MouseKeyControlProcess(&RC_CtrlData.mouse,&RC_CtrlData.key);//键鼠模式
 					SetShootMode(AUTO);//调试自瞄用
-	//			RemoteShootControl(&g_switch1, RC_CtrlData.rc.s1);
-				//}
 			}
-//			else if(GetWorkState()==RUNE_STATE&&RC_CtrlData.rc.s1!=3)
-//			{
-//				g_workState=NORMAL_STATE;
-//			}
+		}break;
+		case AUTO_ATTACK:
+		{
+			if(GetWorkState() == NORMAL_STATE)
+			{ 
+				Auto_AttackControlProcess(&(RC_CtrlData.rc));
+			}
 		}break;
 		case STOP:
 		{
 			 //停止
 		}break;
 	}
+}
+
+uint16_t enemy_yaw = 9000;
+uint16_t enemy_pitch = 5000;
+
+void Auto_AttackControlProcess(Remote *rc)
+{
+	if(GetWorkState()!=PREPARE_STATE)
+	{
+		SetShootMode(MANUL);
+		ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
+		ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
+		
+ 		pitchAngleTarget += (float)(enemy_pitch - (int16_t)PITCH_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT * AUTO_ATTACK_PITCH;
+		yawAngleTarget   += (float)(enemy_yaw - (int16_t)YAW_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT * AUTO_ATTACK_YAW; 
+	}
+	RemoteShootControl(&g_switch1, rc->s1);
 }
 
 void RemoteControlProcess(Remote *rc)
@@ -227,7 +217,6 @@ void RemoteControlProcess(Remote *rc)
 
 extern uint8_t JUDGE_State;
 
-//为不同操作手调整鼠标灵敏度
 #ifndef INFANTRY_1
   #define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 2
   #define MOUSE_TO_YAW_ANGLE_INC_FACT 		0.025f * 2
@@ -303,18 +292,12 @@ void MouseKeyControlProcess(Mouse *mouse, Key *key)
 		if(key->v & 0x80)	//key:e  检测第8位是不是1
 		{
 			setLaunchMode(SINGLE_MULTI);
-//			if(delayCnt>500)
-//			{
-//				toggleLaunchMode();
-//				delayCnt = 0;
-//			}
 		}
 		if(key->v & 0x40)	//key:q
 		{
 			setLaunchMode(CONSTENT_4);
 		}
 		
-		/*裁判系统离线时的功率限制方式*/
 		if(JUDGE_State == OFFLINE)
 		{
 			if(abs(ChassisSpeedRef.forward_back_ref) + abs(ChassisSpeedRef.left_right_ref) > 500)

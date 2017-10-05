@@ -156,7 +156,7 @@ void SetInputMode(Remote *rc)
 	}
 	else if(rc->s2 == 2)
 	{
-		inputmode = STOP;
+		inputmode = AUTO_ATTACK;
 	}	
 }
 

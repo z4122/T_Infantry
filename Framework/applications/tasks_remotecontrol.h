@@ -21,6 +21,10 @@ void RemoteTaskInit(void);
 void RemoteDataProcess(uint8_t *pData);
 void MouseKeyControlProcess(Mouse *mouse, Key *key);
 void RemoteControlProcess(Remote *rc);
+void Auto_AttackControlProcess(Remote *rc);
+
+extern uint16_t enemy_yaw;
+extern uint16_t enemy_pitch;
 
 
 #endif

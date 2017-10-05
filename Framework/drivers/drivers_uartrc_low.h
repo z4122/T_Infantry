@@ -30,9 +30,16 @@ void InitRemoteControl(void);
 #define REMOTE_CONTROLLER_STICK_OFFSET      1024u   
 #define RC_FRAME_LENGTH                     18u
 #define STICK_TO_CHASSIS_SPEED_REF_FACT     2.f
-#define STICK_TO_PITCH_ANGLE_INC_FACT       0.008f
 
+#define STICK_TO_PITCH_ANGLE_INC_FACT       0.008f
 #define STICK_TO_YAW_ANGLE_INC_FACT         0.005f
+
+#define AUTO_ATTACK_YAW         0.05f
+#define AUTO_ATTACK_PITCH       0.05f
+
+#define YAW_OFFSET         9000u  
+#define PITCH_OFFSET       5000u  
+
 #define FRICTION_WHEEL_MAX_DUTY             1350
 //mouse control parameters
 //#define MOUSE_TO_PITCH_ANGLE_INC_FACT 		0.025f * 3
@@ -121,6 +128,7 @@ typedef enum
 	REMOTE_INPUT = 1,
 	KEY_MOUSE_INPUT = 3,
 	STOP = 2,
+	AUTO_ATTACK = 4,
 }InputMode_e;
 
 //Ħ����״̬ö��
