@@ -227,7 +227,9 @@ void ControlRotate(void)
 				CMRotatePID.output = 10;
 				twist_count = twist_count + 1;
 			}
-			 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+			//if(GetInputMode() == AUTO_ATTACK ) ChassisSpeedRef.rotate_ref = 0;
+			//else 
+			ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 		}				
 		else
 		{
@@ -240,7 +242,9 @@ void ControlRotate(void)
 			 CMRotatePID.ref = 0;
 			 CMRotatePID.fdb = gap_angle;
 			 CMRotatePID.Calc(&CMRotatePID);   
-			 ChassisSpeedRef.rotate_ref = CMRotatePID.output;
+			 //if(GetInputMode() == AUTO_ATTACK ) ChassisSpeedRef.rotate_ref = 0;
+			 //else 
+			ChassisSpeedRef.rotate_ref = CMRotatePID.output;
 		}
 	}
 }

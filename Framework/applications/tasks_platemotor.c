@@ -69,9 +69,9 @@ void PlateMotorTask(void const * argument)
 		}
 
 	//遥控器输入模式下，只要处于发射态，就一直转动
-		if(GetShootState() == SHOOTING && GetInputMode() == REMOTE_INPUT) //&& Stuck==0
+		if(GetShootState() == SHOOTING && (GetInputMode() == REMOTE_INPUT || GetInputMode() == AUTO_ATTACK)) //&& Stuck==0
 		{
-			RotateAdd += 4;
+			RotateAdd += 1;
 			//fw_printfln("ref = %f",ShootMotorPositionPID.ref);
 			if(RotateAdd>OneShoot)
 			{

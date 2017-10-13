@@ -194,8 +194,10 @@ void Auto_AttackControlProcess(Remote *rc)
 		ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
 		ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
 		
- 		pitchAngleTarget += (float)(enemy_pitch - (int16_t)PITCH_OFFSET) * STICK_TO_PITCH_ANGLE_INC_FACT * AUTO_ATTACK_PITCH;
-		yawAngleTarget   += (float)(enemy_yaw - (int16_t)YAW_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT * AUTO_ATTACK_YAW; 
+ 		pitchAngleTarget = (float)(enemy_pitch - (int16_t)PITCH_OFFSET) * AUTO_ATTACK_PITCH;
+		float enemy_yaw_temp = (float)(enemy_yaw - (int16_t)YAW_OFFSET);
+		if(enemy_yaw_temp<2000 && enemy_yaw_temp>-2000) yawAngleTarget   -= (float)(enemy_yaw - (int16_t)YAW_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT * AUTO_ATTACK_YAW; 
+		else yawAngleTarget   -= (float)(enemy_yaw - (int16_t)YAW_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT * AUTO_ATTACK_YAW2; 
 	}
 	RemoteShootControl(&g_switch1, rc->s1);
 }

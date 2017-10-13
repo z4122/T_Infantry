@@ -34,11 +34,12 @@ void InitRemoteControl(void);
 #define STICK_TO_PITCH_ANGLE_INC_FACT       0.008f
 #define STICK_TO_YAW_ANGLE_INC_FACT         0.005f
 
-#define AUTO_ATTACK_YAW         0.05f
-#define AUTO_ATTACK_PITCH       0.05f
+#define AUTO_ATTACK_YAW         0.005f
+#define AUTO_ATTACK_YAW2        0.03f
+#define AUTO_ATTACK_PITCH       0.0035f
 
 #define YAW_OFFSET         9000u  
-#define PITCH_OFFSET       5000u  
+#define PITCH_OFFSET       2500u  
 
 #define FRICTION_WHEEL_MAX_DUTY             1350
 //mouse control parameters

@@ -89,7 +89,7 @@ void manifoldUartRxCpltCallback() //参照裁判系统读取的方法
 				auto_buffercnt++;
 			}
 		}
-		if(HAL_UART_Receive_DMA(&JUDGE_UART, &auto_attack_temp, 1) != HAL_OK)
+		if(HAL_UART_Receive_DMA(&MANIFOLD_UART, &auto_attack_temp, 1) != HAL_OK)
 		{
 			Error_Handler();
 	  }
