@@ -25,6 +25,7 @@ void Auto_AttackControlProcess(Remote *rc);
 
 extern uint16_t enemy_yaw;
 extern uint16_t enemy_pitch;
+extern uint8_t find_enemy;
 
 
 #endif

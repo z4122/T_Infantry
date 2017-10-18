@@ -61,9 +61,22 @@ void manifoldUartRxCpltCallback() //参照裁判系统读取的方法
 			
 			if(auto_buffercnt == 4)
 			{
-				if (auto_buffer[3]!=0xA6) 
+//				if ((auto_buffer[3]!=0xA6) && (auto_buffer[3]!=0xA4))
+//				{
+//					auto_receiving = 0;auto_buffercnt = 0;
+//				}
+				if(auto_buffer[3]==0xA6)
 				{
-					auto_receiving = 0;auto_buffercnt = 0;
+					find_enemy = 1;
+				}
+				else if(auto_buffer[3]==0xA4)
+				{
+					find_enemy = 0;
+				}
+				else
+				{
+					auto_receiving = 0;
+					auto_buffercnt = 0;
 				}
 			}
 			

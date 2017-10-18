@@ -185,6 +185,7 @@ void RemoteDataProcess(uint8_t *pData)
 
 uint16_t enemy_yaw = YAW_OFFSET;
 uint16_t enemy_pitch = PITCH_OFFSET;
+uint8_t find_enemy = 0;
 
 void Auto_AttackControlProcess(Remote *rc)
 {
@@ -194,10 +195,24 @@ void Auto_AttackControlProcess(Remote *rc)
 		ChassisSpeedRef.forward_back_ref = (RC_CtrlData.rc.ch1 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT;
 		ChassisSpeedRef.left_right_ref   = (rc->ch0 - (int16_t)REMOTE_CONTROLLER_STICK_OFFSET) * STICK_TO_CHASSIS_SPEED_REF_FACT; 
 		
- 		pitchAngleTarget = (float)(enemy_pitch - (int16_t)PITCH_OFFSET) * AUTO_ATTACK_PITCH;
-		float enemy_yaw_temp = (float)(enemy_yaw - (int16_t)YAW_OFFSET);
-		if(enemy_yaw_temp<2000 && enemy_yaw_temp>-2000) yawAngleTarget   -= (float)(enemy_yaw - (int16_t)YAW_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT * AUTO_ATTACK_YAW; 
-		else yawAngleTarget   -= (float)(enemy_yaw - (int16_t)YAW_OFFSET) * STICK_TO_YAW_ANGLE_INC_FACT * AUTO_ATTACK_YAW2; 
+ 		//pitchAngleTarget = (float)(enemy_pitch - (int16_t)PITCH_OFFSET) * AUTO_ATTACK_PITCH;
+		
+		if(find_enemy == 1)
+		{
+			static float enemy_yaw_err_last = 0;
+			float enemy_yaw_err = (float)((int16_t)YAW_OFFSET - enemy_yaw);
+			float enemy_yaw_out = enemy_yaw_err/1000 * fabs(enemy_yaw_err)  * AUTO_ATTACK_YAW_KP + (enemy_yaw_err - enemy_yaw_err_last)*AUTO_ATTACK_YAW_KD;
+			if (enemy_yaw_out>2) enemy_yaw_out = 2;
+			else if (enemy_yaw_out<-2) enemy_yaw_out = -2;
+			yawAngleTarget += enemy_yaw_out;
+			
+			static float enemy_pitch_err_last = 0;
+			float enemy_pitch_err = (float)((int16_t)PITCH_OFFSET - enemy_pitch);
+			float enemy_pitch_out = enemy_pitch_err/1000 * fabs(enemy_pitch_err) * AUTO_ATTACK_YAW_KP + (enemy_pitch_err - enemy_pitch_err_last)*AUTO_ATTACK_YAW_KD;
+			if (enemy_pitch_out>1) enemy_pitch_out = 1;
+			else if (enemy_pitch_out<-1) enemy_pitch_out = -1;
+			pitchAngleTarget -= enemy_pitch_out;
+		}
 	}
 	RemoteShootControl(&g_switch1, rc->s1);
 }
