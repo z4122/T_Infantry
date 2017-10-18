@@ -75,7 +75,7 @@ void RControlTask(void const * argument){
 	while(1){
 		if(first_frame == 0)
 		{
-			MX_IWDG_Init();
+			//MX_IWDG_Init();
 		}
 		HAL_IWDG_Refresh(&hiwdg);
 		/*等待串口接收中断回调函数释放信号量*/
@@ -97,31 +97,15 @@ void RControlTask(void const * argument){
 					data[i] = pData[i];
 				}
 
-				/*处理数据*/
+
 				RemoteDataProcess(data);	//process raw data then execute new order
-				/*扔掉多余数据，重新开启接收中断*/
+
 				vTaskDelay(2 / portTICK_RATE_MS);
 				HAL_UART_AbortReceive(&RC_UART);
 				HAL_UART_Receive_DMA(&RC_UART, IOPool_pGetWriteData(rcUartIOPool)->ch, 18);
 
 				if(countwhile >= 300){
 					countwhile = 0;
-//			    fw_printf("ch0 = %d | ", RC_CtrlData.rc.ch0);
-//				fw_printf("ch1 = %d | ", RC_CtrlData.rc.ch1);
-//				fw_printf("ch2 = %d | ", RC_CtrlData.rc.ch2);
-//				fw_printf("ch3 = %d \r\n", RC_CtrlData.rc.ch3);
-//				
-//				fw_printf("s1 = %d | ", RC_CtrlData.rc.s1);
-//				fw_printf("s2 = %d \r\n", RC_CtrlData.rc.s2);
-//				
-//				fw_printf("x = %d | ", RC_CtrlData.mouse.x);
-//				fw_printf("y = %d | ", RC_CtrlData.mouse.y);
-//				fw_printf("z = %d | ", RC_CtrlData.mouse.z);
-//				fw_printf("l = %d | ", RC_CtrlData.mouse.press_l);
-//				fw_printf("r = %d \r\n", RC_CtrlData.mouse.press_r);
-//				
-//				fw_printf("key = %d \r\n", RC_CtrlData.key.v);
-//				fw_printf("===========\r\n");
 				}else{
 					countwhile++;
 				}

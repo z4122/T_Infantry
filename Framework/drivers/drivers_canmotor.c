@@ -211,6 +211,7 @@ void TransmitCMGMCan(void)
 			
 			IOPool_getNextRead(CMTxIOPool, 0);
 			CMGMMOTOR_CAN.pTxMsg = IOPool_pGetReadData(CMTxIOPool, 0);
+			
 			//使用临界区避免被抢占
 			taskENTER_CRITICAL();
 			if(HAL_CAN_Transmit_IT(&CMGMMOTOR_CAN) != HAL_OK){

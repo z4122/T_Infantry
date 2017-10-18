@@ -17,6 +17,7 @@
 #include "drivers_led_user.h"
 #include "drivers_led_low.h"
 #include "peripheral_gpio.h"
+#include "OLED.h"
 
 
 #define ledGreenOn() HAL_GPIO_WritePin(GREEN_PIN, GREEN_GPIO_PORT, GPIO_PIN_RESET)
@@ -34,9 +35,14 @@ void ledGreenTask(void const * argument){
 			ledGreenOff();
 		}else if(ledGreenStatus == blink){
 			ledGreenOn();
-			osDelay(777);
-			ledGreenOff();
-			osDelay(222);
+			static int16_t OLEDcnt = 0;
+			OLEDcnt ++;
+			if(OLEDcnt>2000) OLEDcnt = 0;
+			Oled_Clear();
+			Oled_Putstr(1,1,"TPP2018");
+			Oled_Putstr(2,1,"cnt");
+			Oled_Putnum(3,2,OLEDcnt);
+			osDelay(1000);
 		}
 	}
 }

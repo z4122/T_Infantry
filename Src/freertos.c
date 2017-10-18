@@ -113,7 +113,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
 	rtos_AddThreads();//RTOS任务定义
-	MX_IWDG_Init();
+	//MX_IWDG_Init();
 	g_bInited = 1;//初始化完�? todo:使用状�?�机方式替代全局变量
   /* USER CODE END RTOS_THREADS */
 

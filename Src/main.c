@@ -57,6 +57,7 @@
 #include "usart.h"
 #include "usb_device.h"
 #include "gpio.h"
+#include "OLED.h"
 
 /* USER CODE BEGIN Includes */
 #include "utilities_debug.h"
@@ -87,16 +88,16 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 	
-	/*硬件决定性能边界，软件发挥硬件性能并定义机器人行为*/
+	/*硬件决定性能边界，软件发挥硬件�?�能并定义机器人行为*/
 	
-	/*各位请抱紧机械大腿*/
+	/*各位请抱紧机械大�?*/
 	
 	/*
 	TPP2016步兵电控
-	骆庭晟：底层与代码框架
-	荣岌昆：运动逻辑与整机调试
+	骆庭晟：底层与代码框�?
+	荣岌昆：运动逻辑与整机调�?
 	邱志康：拨盘电机调试
-	张雁：大符调试
+	张雁：大符调�?
 	陈小枫：基地反击Demo
 	*/
 	//我好帅啊
@@ -136,10 +137,10 @@ int main(void)
   MX_USART6_UART_Init();
   MX_TIM3_Init();
   MX_USART1_UART_Init();
-//  MX_IWDG_Init();
+  //MX_IWDG_Init();
 
   /* USER CODE BEGIN 2 */
-
+	Oled_Init();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */

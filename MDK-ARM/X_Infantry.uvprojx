@@ -10,12 +10,11 @@
       <TargetName>X_Infantry</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F427IIHx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.3.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2002FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x81FFFFF) CLOCK(25000000) FPU2 CPUTYPE("Cortex-M4")</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -85,8 +84,6 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
-            <nStopA1X>0</nStopA1X>
-            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -125,6 +122,47 @@
             <HexOffset>0</HexOffset>
             <Oh166RecLen>16</Oh166RecLen>
           </OPTHX>
+          <Simulator>
+            <UseSimulator>0</UseSimulator>
+            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
+            <RunToMain>1</RunToMain>
+            <RestoreBreakpoints>1</RestoreBreakpoints>
+            <RestoreWatchpoints>1</RestoreWatchpoints>
+            <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
+            <RestoreFunctions>1</RestoreFunctions>
+            <RestoreToolbox>1</RestoreToolbox>
+            <LimitSpeedToRealTime>0</LimitSpeedToRealTime>
+            <RestoreSysVw>1</RestoreSysVw>
+          </Simulator>
+          <Target>
+            <UseTarget>1</UseTarget>
+            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
+            <RunToMain>1</RunToMain>
+            <RestoreBreakpoints>1</RestoreBreakpoints>
+            <RestoreWatchpoints>1</RestoreWatchpoints>
+            <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
+            <RestoreFunctions>1</RestoreFunctions>
+            <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>1</RestoreTracepoints>
+            <RestoreSysVw>1</RestoreSysVw>
+          </Target>
+          <RunDebugAfterBuild>0</RunDebugAfterBuild>
+          <TargetSelection>6</TargetSelection>
+          <SimDlls>
+            <CpuDll></CpuDll>
+            <CpuDllArguments></CpuDllArguments>
+            <PeripheralDll></PeripheralDll>
+            <PeripheralDllArguments></PeripheralDllArguments>
+            <InitializationFile></InitializationFile>
+          </SimDlls>
+          <TargetDlls>
+            <CpuDll></CpuDll>
+            <CpuDllArguments></CpuDllArguments>
+            <PeripheralDll></PeripheralDll>
+            <PeripheralDllArguments></PeripheralDllArguments>
+            <InitializationFile></InitializationFile>
+            <Driver>Segger\JL2CM3.dll</Driver>
+          </TargetDlls>
         </DebugOption>
         <Utilities>
           <Flash1>
@@ -189,7 +227,6 @@
             <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
-            <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>3</RwSelD>
             <CodeSel>0</CodeSel>
@@ -324,18 +361,11 @@
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
-            <v6Lang>1</v6Lang>
-            <v6LangP>1</v6LangP>
-            <vShortEn>1</vShortEn>
-            <vShortWch>1</vShortWch>
-            <v6Lto>0</v6Lto>
-            <v6WtE>0</v6WtE>
-            <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F427xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                                             ../Drivers/STM32F4xx_HAL_Driver/Inc;                                             ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;                                             ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;                                             ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                                             ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;                                             ../Drivers/CMSIS/Device/ST/STM32F4xx/Include;                                             ../Middlewares/Third_Party/FreeRTOS/Source/include;                                             ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;                                             ../Drivers/CMSIS/Include;                                             ..\Framework;                                             ..\Framework\utilities;                                             ..\Framework\rtos;                                             ..\Framework\drivers;                                             ..\Framework\applications;                                             ..\Framework\peripheral</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Drivers/CMSIS/Include;..\Framework;..\Framework\utilities;..\Framework\rtos;..\Framework\drivers;..\Framework\applications;..\Framework\peripheral</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -348,7 +378,6 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -670,29 +699,14 @@
               <FilePath>..\Framework\rtos\rtos_init.c</FilePath>
             </File>
             <File>
-              <FileName>rtos_init.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\rtos\rtos_init.h</FilePath>
-            </File>
-            <File>
               <FileName>rtos_semaphore.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\rtos\rtos_semaphore.c</FilePath>
             </File>
             <File>
-              <FileName>rtos_semaphore.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\rtos\rtos_semaphore.h</FilePath>
-            </File>
-            <File>
               <FileName>rtos_task.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\rtos\rtos_task.c</FilePath>
-            </File>
-            <File>
-              <FileName>rtos_task.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\rtos\rtos_task.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -700,19 +714,9 @@
           <GroupName>Framework/Peripheral</GroupName>
           <Files>
             <File>
-              <FileName>peripheral_define.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_define.h</FilePath>
-            </File>
-            <File>
               <FileName>peripheral_can.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\peripheral\peripheral_can.c</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_can.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_can.h</FilePath>
             </File>
             <File>
               <FileName>peripheral_gpio.c</FileName>
@@ -720,39 +724,14 @@
               <FilePath>..\Framework\peripheral\peripheral_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>peripheral_gpio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_gpio.h</FilePath>
-            </File>
-            <File>
               <FileName>peripheral_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\peripheral\peripheral_spi.c</FilePath>
             </File>
             <File>
-              <FileName>peripheral_spi.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_spi.h</FilePath>
-            </File>
-            <File>
               <FileName>peripheral_usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\peripheral\peripheral_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_usart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_usart.h</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_tim.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_tim.h</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_laser.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_laser.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -765,24 +744,9 @@
               <FilePath>..\Framework\utilities\utilities_debug.c</FilePath>
             </File>
             <File>
-              <FileName>utilities_debug.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\utilities\utilities_debug.h</FilePath>
-            </File>
-            <File>
               <FileName>utilities_iopool.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\utilities\utilities_iopool.c</FilePath>
-            </File>
-            <File>
-              <FileName>utilities_iopool.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\utilities\utilities_iopool.h</FilePath>
-            </File>
-            <File>
-              <FileName>utilities_minmax.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\utilities\utilities_minmax.h</FilePath>
             </File>
             <File>
               <FileName>utilities_tim.c</FileName>
@@ -793,11 +757,6 @@
               <FileName>peripheral_tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\peripheral\peripheral_tim.c</FilePath>
-            </File>
-            <File>
-              <FileName>utilities_tim.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\utilities\utilities_tim.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -810,59 +769,9 @@
               <FilePath>..\Framework\drivers\drivers_led.c</FilePath>
             </File>
             <File>
-              <FileName>drivers_led_low.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_led_low.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_led_user.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_led_user.h</FilePath>
-            </File>
-            <File>
               <FileName>drivers_imu.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\drivers\drivers_imu.c</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_imu_mpu6500_reg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_imu_mpu6500_reg.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_imu_IST8310_reg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_imu_IST8310_reg.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_imu_low.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_imu_low.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_imu_user.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_imu_user.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_buzzer_low.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_buzzer_low.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_buzzer_user.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_buzzer_user.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_buzzer_notes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_buzzer_notes.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_buzzer_music.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_buzzer_music.h</FilePath>
             </File>
             <File>
               <FileName>drivers_buzzer.c</FileName>
@@ -875,21 +784,6 @@
               <FilePath>..\Framework\drivers\drivers_canmotor.c</FilePath>
             </File>
             <File>
-              <FileName>drivers_canmotor_low.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_canmotor_low.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_canmotor_user.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_canmotor_user.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_uart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_uart.h</FilePath>
-            </File>
-            <File>
               <FileName>drivers_uart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\drivers\drivers_uart.c</FilePath>
@@ -900,29 +794,9 @@
               <FilePath>..\Framework\drivers\drivers_uartrc.c</FilePath>
             </File>
             <File>
-              <FileName>drivers_uartrc_low.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_uartrc_low.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_uartrc_user.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_uartrc_user.h</FilePath>
-            </File>
-            <File>
               <FileName>drivers_uartupper.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\drivers\drivers_uartupper.c</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_uartupper_low.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_uartupper_low.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_uartupper_user.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_uartupper_user.h</FilePath>
             </File>
             <File>
               <FileName>drivers_flash.c</FileName>
@@ -930,39 +804,14 @@
               <FilePath>..\Framework\drivers\drivers_flash.c</FilePath>
             </File>
             <File>
-              <FileName>drivers_flash.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_flash.h</FilePath>
-            </File>
-            <File>
               <FileName>drivers_sonar.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\drivers\drivers_sonar.c</FilePath>
             </File>
             <File>
-              <FileName>drivers_sonar_low.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_sonar_low.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_sonar_user.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_sonar_user.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_ramp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_ramp.h</FilePath>
-            </File>
-            <File>
               <FileName>RMLib.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\Framework\drivers\RMLib.lib</FilePath>
-            </File>
-            <File>
-              <FileName>pid_regulator.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\pid_regulator.h</FilePath>
             </File>
             <File>
               <FileName>pid_regulator.c</FileName>
@@ -975,19 +824,9 @@
               <FilePath>..\Framework\drivers\pwm_server_ motor.c</FilePath>
             </File>
             <File>
-              <FileName>pwm_server_motor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\pwm_server_motor.h</FilePath>
-            </File>
-            <File>
               <FileName>drivers_uartjudge.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\drivers\drivers_uartjudge.c</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_uartjudge_low.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_uartjudge_low.h</FilePath>
             </File>
             <File>
               <FileName>drivers_platemotor.c</FileName>
@@ -995,19 +834,14 @@
               <FilePath>..\Framework\drivers\drivers_platemotor.c</FilePath>
             </File>
             <File>
-              <FileName>drivers_platemotor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_platemotor.h</FilePath>
-            </File>
-            <File>
               <FileName>drivers_cmpower.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\drivers\drivers_cmpower.c</FilePath>
             </File>
             <File>
-              <FileName>drivers_cmpower.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_cmpower.h</FilePath>
+              <FileName>OLED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Framework\drivers\OLED.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1020,19 +854,9 @@
               <FilePath>..\Framework\applications\tasks_motor.c</FilePath>
             </File>
             <File>
-              <FileName>tasks_motor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\applications\tasks_motor.h</FilePath>
-            </File>
-            <File>
               <FileName>application_motorcontrol.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\applications\application_motorcontrol.c</FilePath>
-            </File>
-            <File>
-              <FileName>application_motorcontrol.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\applications\application_motorcontrol.h</FilePath>
             </File>
             <File>
               <FileName>tasks_upper.c</FileName>
@@ -1040,19 +864,9 @@
               <FilePath>..\Framework\applications\tasks_upper.c</FilePath>
             </File>
             <File>
-              <FileName>tasks_upper.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\applications\tasks_upper.h</FilePath>
-            </File>
-            <File>
               <FileName>application_quaternion.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\applications\application_quaternion.c</FilePath>
-            </File>
-            <File>
-              <FileName>application_quaternion.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\applications\application_quaternion.h</FilePath>
             </File>
             <File>
               <FileName>tasks_remotecontrol.c</FileName>
@@ -1060,19 +874,9 @@
               <FilePath>..\Framework\applications\tasks_remotecontrol.c</FilePath>
             </File>
             <File>
-              <FileName>tasks_remotecontrol.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\applications\tasks_remotecontrol.h</FilePath>
-            </File>
-            <File>
               <FileName>tasks_timed.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\applications\tasks_timed.c</FilePath>
-            </File>
-            <File>
-              <FileName>tasks_timed.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\applications\tasks_timed.h</FilePath>
             </File>
             <File>
               <FileName>application_waveform.c</FileName>
@@ -1080,19 +884,9 @@
               <FilePath>..\Framework\applications\application_waveform.c</FilePath>
             </File>
             <File>
-              <FileName>application_waveform.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\applications\application_waveform.h</FilePath>
-            </File>
-            <File>
               <FileName>tasks_platemotor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\applications\tasks_platemotor.c</FilePath>
-            </File>
-            <File>
-              <FileName>tasks_platemotor.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\applications\tasks_platemotor.h</FilePath>
             </File>
           </Files>
         </Group>

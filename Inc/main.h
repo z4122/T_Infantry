@@ -60,16 +60,22 @@
 #define LASER_GPIO_Port GPIOG
 #define LASER2_Pin GPIO_PIN_0
 #define LASER2_GPIO_Port GPIOI
+#define OLED_SCL_Pin GPIO_PIN_10
+#define OLED_SCL_GPIO_Port GPIOF
 #define EncoderB_Pin GPIO_PIN_11
 #define EncoderB_GPIO_Port GPIOH
 #define EncoderA_Pin GPIO_PIN_10
 #define EncoderA_GPIO_Port GPIOH
 #define PM_Dir_Ctrl1_Pin GPIO_PIN_4
 #define PM_Dir_Ctrl1_GPIO_Port GPIOA
+#define Oled_DC_Pin GPIO_PIN_4
+#define Oled_DC_GPIO_Port GPIOC
 #define PM_Ctrl_Pin GPIO_PIN_12
 #define PM_Ctrl_GPIO_Port GPIOD
-#define PM_Dir_Ctrl2_Pin GPIO_PIN_5
-#define PM_Dir_Ctrl2_GPIO_Port GPIOA
+#define Oled_SDA_Pin GPIO_PIN_5
+#define Oled_SDA_GPIO_Port GPIOA
+#define Oled_RST_Pin GPIO_PIN_5
+#define Oled_RST_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
