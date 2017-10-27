@@ -233,6 +233,7 @@ uint8_t InitMPU6500(void)
 }
 
 //Get 10 axis data from MPU6500
+//没用到这个函数
 void IMU_Get_Data()
 {
   uint8_t mpu_buff[22];
