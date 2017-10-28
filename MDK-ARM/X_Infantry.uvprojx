@@ -705,16 +705,6 @@
               <FilePath>..\Framework\peripheral\peripheral_define.h</FilePath>
             </File>
             <File>
-              <FileName>peripheral_can.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_can.c</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_can.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_can.h</FilePath>
-            </File>
-            <File>
               <FileName>peripheral_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Framework\peripheral\peripheral_gpio.c</FilePath>
@@ -723,26 +713,6 @@
               <FileName>peripheral_gpio.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\peripheral\peripheral_gpio.h</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_spi.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_spi.h</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>peripheral_usart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\peripheral\peripheral_usart.h</FilePath>
             </File>
             <File>
               <FileName>peripheral_tim.h</FileName>
@@ -838,11 +808,6 @@
               <FileName>drivers_imu_low.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Framework\drivers\drivers_imu_low.h</FilePath>
-            </File>
-            <File>
-              <FileName>drivers_imu_user.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Framework\drivers\drivers_imu_user.h</FilePath>
             </File>
             <File>
               <FileName>drivers_buzzer_low.h</FileName>

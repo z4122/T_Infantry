@@ -422,8 +422,8 @@ void SetMoveSpeed(Move_Speed_e v)
 	movespeed = v;
 }
 
+/*
 Slab_Mode_e slabmode = CLOSE;
-
 Slab_Mode_e GetSlabState()
 {
 	return slabmode;
@@ -432,4 +432,4 @@ Slab_Mode_e GetSlabState()
 void SetSlabState(Slab_Mode_e v)
 {
 	slabmode = v;
-}
+}*/

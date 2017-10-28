@@ -66,11 +66,13 @@ typedef enum
 	HIGH_s = 2,
 }Move_Speed_e;
 
+/*没用到
 typedef enum
 {
 	OPEN = 0,
 	CLOSE = 1,
 }Slab_Mode_e;
+*/
 
 Shoot_Mode_e GetShootMode(void);
 void SetShootMode(Shoot_Mode_e v);
@@ -78,7 +80,7 @@ Emergency_Flag GetEmergencyFlag(void);
 void SetEmergencyFlag(Emergency_Flag v);
 Move_Speed_e GetMoveSpeed(void);
 void SetMoveSpeed(Move_Speed_e v);
-Slab_Mode_e GetSlabState(void);
-void SetSlabState(Slab_Mode_e v);
+//Slab_Mode_e GetSlabState(void);
+//void SetSlabState(Slab_Mode_e v);
 
 #endif

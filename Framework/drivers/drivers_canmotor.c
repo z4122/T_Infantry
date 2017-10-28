@@ -267,6 +267,7 @@ void TransmitGYROCAN(void){
 *
 ***********************************************************************************************
 */
+/*
 void EncoderProcess(volatile Encoder *v, Motor820RRxMsg_t * msg)
 {
 	int i=0;
@@ -312,3 +313,4 @@ void GetEncoderBias(volatile Encoder *v, Motor820RRxMsg_t * msg)
 	v->last_raw_value = v->ecd_bias;
 	v->temp_count++;
 }
+*/
