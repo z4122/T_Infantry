@@ -15,6 +15,7 @@
 
 #include "utilities_iopool.h"
 
+/*没用到
 typedef struct{
 	int16_t ch0;
 	int16_t ch1;
@@ -37,13 +38,15 @@ typedef struct{
 typedef struct{
 	uint16_t v;
 }Key_t;
+*/
 
+/*没用到
 typedef struct{
 	Remote_t rc;
 	Mouse_t mouse;
 	Key_t key;
 }RC_CtrlData_t; 
-
+*/
 
 IOPoolDeclare(rcUartIOPool, struct{uint8_t ch[18];});
 

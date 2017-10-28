@@ -170,6 +170,7 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan){
 			case ZGYRO_RXID:
 			 {
 				//单轴陀螺仪没有datasheet，完全参照官方程序
+				 //解算成角度值
 				CanRxMsgTypeDef *msg = &ZGYROCanRxMsg;
 				ZGyroModuleAngle = -0.01f*((int32_t)(msg->Data[0]<<24)|(int32_t)(msg->Data[1]<<16) | (int32_t)(msg->Data[2]<<8) | (int32_t)(msg->Data[3])); 
 			 }
